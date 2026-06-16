@@ -1,0 +1,527 @@
+{
+  "updatedAt": "2026-06-05T04:05:18.292Z",
+  "createdAt": "2026-06-04T10:46:54.349Z",
+  "id": "hPIU6XcX4RwClrjC",
+  "name": "Incident_Analysis_Agent_MCP",
+  "active": false,
+  "isArchived": false,
+  "nodes": [
+    {
+      "parameters": {
+        "formTitle": "SAP Incident Analysis",
+        "formDescription": "Upload POS Receipt (PDF) and Incident Data (Excel) for analysis",
+        "formFields": {
+          "values": [
+            {
+              "fieldLabel": "gkPos_receipt",
+              "fieldType": "file",
+              "acceptFileTypes": ".pdf",
+              "requiredField": true
+            },
+            {
+              "fieldLabel": "incidentExcel",
+              "fieldType": "file",
+              "acceptFileTypes": ".xlsx",
+              "requiredField": true
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.formTrigger",
+      "typeVersion": 2.5,
+      "position": [
+        -64,
+        -384
+      ],
+      "id": "40a63d39-a70a-4795-befd-1b485ab33dca",
+      "name": "Form: Submit Incident Data",
+      "webhookId": "8576068d-534b-45d8-8376-0a9d6ab0f460"
+    },
+    {
+      "parameters": {
+        "operation": "xlsx",
+        "options": {
+          "sheetName": "Incident"
+        }
+      },
+      "type": "n8n-nodes-base.extractFromFile",
+      "typeVersion": 1.1,
+      "position": [
+        768,
+        -288
+      ],
+      "id": "a4ed5017-2e58-46c4-a462-4056e716157d",
+      "name": "Extract Excel Data"
+    },
+    {
+      "parameters": {
+        "jsCode": "const excelRows = [];\nconst pdfRows = [];\n\n// Separate Excel and PDF data\nfor (const item of $input.all()) {\n\n  // Excel rows\n  if (item.json.Number) {\n\n    const desc = item.json[\"Short description\"] || \"\";\n\n    const salesOrder =\n      desc.match(/Order[:#\\s]*(\\d+)/i)?.[1] ||\n      desc.match(/\\b\\d{10}\\b/)?.[0] ||\n      \"\";\n\n    excelRows.push({\n      incidentNumber: item.json.Number,\n      priority: item.json.Priority,\n      incidentState: item.json[\"Incident state\"],\n      shortDescription: desc,\n      salesOrder\n    });\n  }\n\n  // PDF rows\n  if (item.json.text) {\n\n    const pdfText = item.json.text;\n\n    // Extract SO from PDF\n    const salesOrder =\n      pdfText.match(/\\b\\d{10}\\b/)?.[0] ||\n      \"\";\n\n    pdfRows.push({\n      salesOrder,\n      pdfText\n    });\n  }\n}\n\n// Merge by Sales Order\nconst finalData = [];\n\nfor (const excel of excelRows) {\n\n  const matchingPdf = pdfRows.find(\n    p => p.salesOrder === excel.salesOrder\n  );\n\n  finalData.push({\n    incidentNumber: excel.incidentNumber,\n    priority: excel.priority,\n    incidentState: excel.incidentState,\n    shortDescription: excel.shortDescription,\n    salesOrder: excel.salesOrder,\n    pdfContent: matchingPdf?.pdfText || \"PDF NOT FOUND\"\n  });\n}\n\n// Return one item per incident\nreturn finalData.map(item => ({\n  json: item\n}));"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1328,
+        -384
+      ],
+      "id": "69401009-b3df-430f-be08-e2e48c188134",
+      "name": "Merge Extracted Data"
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "=Analyze this SAP sales order incident using the available MCP tools.\n\nIncident Number:\n{{ $json.incidentNumber }}\n\nSales Order:\n{{ $json.salesOrder }}\n\nDescription:\n{{ $json.description }}\n\nReceipt Summary:\n{{ $json.pdfContent }}\n\nInstructions:\n\n1. Validate the sales order from the receipt content\n2. Fetch SAP sales order details using MCP tools\n3. Fetch customer master details using MCP tools\n4. Compare receipt data with SAP data\n5. Identify possible finance posting issues\n6. Search for similar historical incidents\n7. Provide resolution recommendations\n8. Return strictly valid JSON only\n9. Do not return markdown\n10. Do not return explanations outside JSON\n",
+        "hasOutputParser": true,
+        "options": {
+          "systemMessage": "You are an SAP Incident Resolution Agent.\n\nProcess exactly ONE incident.\n\nTool usage rules:\n\n1. Call getSalesOrder exactly once.\n2. Call getCustomerMaster only if customer validation is required.\n3. Call KnowledgeSearch at most once.\n4. Call KnowledgeLearn only after a final root cause is identified.\n5. Never call the same tool twice.\n6. Maximum total tool calls per incident = 4.\n7. After tool execution is complete, immediately return the final JSON.\n8. Do not continue reasoning after producing the final JSON.\n\nReturn only valid JSON.\n\nOutput must be valid JSON only.\n\nRequired JSON:\n\n{\n  \"incidentNumber\":\"\",\n  \"salesOrder\":\"\",\n  \"customerNumber\":\"\",\n  \"incidentCategory\":\"\",\n  \"rootCause\":\"\",\n  \"recommendation\":\"\",\n  \"eccDataSummary\":\"\",\n  \"confidenceScore\":\"\"\n}\n\nConfidence Score values:\n- High\n- Medium\n- Low",
+          "maxIterations": 30
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 3.1,
+      "position": [
+        2064,
+        -400
+      ],
+      "id": "f8d0e77c-9eee-4a13-979c-030bac2da6bd",
+      "name": "AI Agent: Incident Analyzer"
+    },
+    {
+      "parameters": {
+        "endpointUrl": "http://localhost:5678/mcp/sap-incident-mcp",
+        "include": "selected",
+        "includeTools": [
+          "getSalesOrder",
+          "getCustomerMaster",
+          "KnowledgeSearch",
+          "KnowledgeLearn"
+        ],
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.mcpClientTool",
+      "typeVersion": 1.2,
+      "position": [
+        2160,
+        -48
+      ],
+      "id": "bd8ae992-9f50-4063-ac2a-4c726ba6476c",
+      "name": "MCP Client: SAP Tools"
+    },
+    {
+      "parameters": {
+        "jsCode": "return items.map(item => {\n\n  const analysis = item.json.output;\n\n  return {\n    json: {\n      incident_number: analysis.incidentNumber,\n      sales_order_number: analysis.salesOrder,\n      customer_id: analysis.customerNumber,\n      incident_category: analysis.incidentCategory,\n      root_cause: analysis.rootCause,\n      recommendation: analysis.recommendation,\n      ecc_data_summary: analysis.eccDataSummary,\n      confidence_score: analysis.confidenceScore\n    }\n  };\n\n});"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        2496,
+        -480
+      ],
+      "id": "62a1bb7f-96c6-4421-879a-40020e2eb9eb",
+      "name": "Validate Response"
+    },
+    {
+      "parameters": {
+        "model": "gpt-4.1-mini",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatAzureOpenAi",
+      "typeVersion": 1,
+      "position": [
+        1840,
+        -64
+      ],
+      "id": "f174b5ac-d4b8-4919-8022-1588903c55d5",
+      "name": "Azure OpenAI Chat Model"
+    },
+    {
+      "parameters": {
+        "operation": "xlsx",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.convertToFile",
+      "typeVersion": 1.1,
+      "position": [
+        2624,
+        -32
+      ],
+      "id": "96ffe7dc-98d8-4b57-8145-3748528e7a54",
+      "name": "Convert to File"
+    },
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.merge",
+      "typeVersion": 3.2,
+      "position": [
+        1104,
+        -384
+      ],
+      "id": "0e54b02f-2934-4df0-8e3a-33f7983a2cb2",
+      "name": "Merge"
+    },
+    {
+      "parameters": {
+        "operation": "pdf",
+        "binaryPropertyName": "=data",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.extractFromFile",
+      "typeVersion": 1.1,
+      "position": [
+        768,
+        -480
+      ],
+      "id": "2115b654-fc38-4851-b0cb-dd0c3f408714",
+      "name": "Extract PDF Content"
+    },
+    {
+      "parameters": {
+        "jsCode": "const pdfs = [];\nconst excels = [];\n\nfor (const item of items) {\n\n  const binaries = item.binary || {};\n\n  for (const key of Object.keys(binaries)) {\n\n    const file = binaries[key];\n\n    const mime = file.mimeType || \"\";\n\n    // PDFs\n    if (mime === \"application/pdf\") {\n\n      pdfs.push({\n        json: {\n          fileType: \"pdf\",\n          originalField: key,\n          fileName: file.fileName\n        },\n        binary: {\n          data: file\n        }\n      });\n    }\n\n    // Excel\n    else if (\n      mime === \"application/vnd.openxmlformats-officedocument.spreadsheetml.sheet\" ||\n      mime === \"application/vnd.ms-excel\"\n    ) {\n\n      excels.push({\n        json: {\n          fileType: \"excel\",\n          originalField: key,\n          fileName: file.fileName\n        },\n        binary: {\n          data: file\n        }\n      });\n    }\n  }\n}\n\nreturn [...pdfs, ...excels];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        160,
+        -384
+      ],
+      "id": "d437088d-b2d6-4771-baba-dde183d1510e",
+      "name": "Code in JavaScript"
+    },
+    {
+      "parameters": {
+        "rules": {
+          "values": [
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 3
+                },
+                "conditions": [
+                  {
+                    "leftValue": "={{ Object.values($binary)[0].mimeType }}",
+                    "rightValue": "application/pdf",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    },
+                    "id": "c6c28cbe-3929-4d95-bd67-11daf1d24416"
+                  }
+                ],
+                "combinator": "and"
+              }
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 3
+                },
+                "conditions": [
+                  {
+                    "id": "46320792-5769-4df7-b483-41a0b313b659",
+                    "leftValue": "={{ Object.values($binary)[0].mimeType }}",
+                    "rightValue": "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals",
+                      "name": "filter.operator.equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              }
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.switch",
+      "typeVersion": 3.4,
+      "position": [
+        416,
+        -384
+      ],
+      "id": "be8a935f-0882-4288-a5f7-9b5b6ffbf3a3",
+      "name": "Switch"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 3
+          },
+          "conditions": [
+            {
+              "id": "d9911431-9202-4959-945a-aaeddf5e3cbd",
+              "leftValue": "={{ $json.pdfContent }}",
+              "rightValue": "PDF NOT FOUND",
+              "operator": {
+                "type": "string",
+                "operation": "notEquals"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
+      "position": [
+        1808,
+        -384
+      ],
+      "id": "63c0f7af-1cc8-4157-805e-fcddd64f1be4",
+      "name": "If"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "incident_number",
+              "name": "incidentNumber",
+              "value": "={{ $json.incidentNumber }}",
+              "type": "string"
+            },
+            {
+              "id": "sales_order",
+              "name": "salesOrder",
+              "value": "={{ $json.salesOrder }}",
+              "type": "string"
+            },
+            {
+              "id": "0939732b-de49-4165-82c2-67f553e2801b",
+              "name": "description",
+              "value": "={{ $json.shortDescription }}",
+              "type": "string"
+            },
+            {
+              "id": "pdf_content",
+              "name": "pdfContent",
+              "value": "={{ $json.pdfContent }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        1568,
+        -480
+      ],
+      "id": "0d59fbe5-961d-41a0-95fc-46691788ae87",
+      "name": "Extract Key Fields"
+    },
+    {
+      "parameters": {
+        "jsonSchemaExample": "{\n  \"incidentNumber\": \"string\",\n  \"salesOrder\": \"string\",\n  \"customerNumber\": \"string\",\n  \"incidentCategory\": \"string\",\n  \"rootCause\": \"string\",\n  \"recommendation\": \"string\",\n  \"eccDataSummary\": \"string\",\n  \"confidenceScore\": \"string\"\n}"
+      },
+      "type": "@n8n/n8n-nodes-langchain.outputParserStructured",
+      "typeVersion": 1.3,
+      "position": [
+        2448,
+        -64
+      ],
+      "id": "4a52eb15-a1dc-4417-b50b-2d8c66300c74",
+      "name": "Structured Output Parser"
+    }
+  ],
+  "connections": {
+    "Form: Submit Incident Data": {
+      "main": [
+        [
+          {
+            "node": "Code in JavaScript",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Extract Excel Data": {
+      "main": [
+        [
+          {
+            "node": "Merge",
+            "type": "main",
+            "index": 1
+          }
+        ]
+      ]
+    },
+    "Merge Extracted Data": {
+      "main": [
+        [
+          {
+            "node": "Extract Key Fields",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "MCP Client: SAP Tools": {
+      "ai_tool": [
+        [
+          {
+            "node": "AI Agent: Incident Analyzer",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "AI Agent: Incident Analyzer": {
+      "main": [
+        [
+          {
+            "node": "Validate Response",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Validate Response": {
+      "main": [
+        [
+          {
+            "node": "Convert to File",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Azure OpenAI Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI Agent: Incident Analyzer",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Merge": {
+      "main": [
+        [
+          {
+            "node": "Merge Extracted Data",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Extract PDF Content": {
+      "main": [
+        [
+          {
+            "node": "Merge",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code in JavaScript": {
+      "main": [
+        [
+          {
+            "node": "Switch",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Switch": {
+      "main": [
+        [
+          {
+            "node": "Extract PDF Content",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Extract Excel Data",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If": {
+      "main": [
+        [
+          {
+            "node": "AI Agent: Incident Analyzer",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Extract Key Fields": {
+      "main": [
+        [
+          {
+            "node": "If",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Structured Output Parser": {
+      "ai_outputParser": [
+        [
+          {
+            "node": "AI Agent: Incident Analyzer",
+            "type": "ai_outputParser",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate",
+    "availableInMCP": false
+  },
+  "staticData": null,
+  "meta": {
+    "templateCredsSetupCompleted": true
+  },
+  "pinData": {},
+  "versionId": "0b5d004a-b496-4159-840c-3f2d0ec94554",
+  "activeVersionId": null,
+  "triggerCount": 0,
+  "shared": [
+    {
+      "updatedAt": "2026-06-04T10:46:54.357Z",
+      "createdAt": "2026-06-04T10:46:54.357Z",
+      "role": "workflow:owner",
+      "workflowId": "hPIU6XcX4RwClrjC",
+      "projectId": "R2OGQRrWYLraDwSj"
+    }
+  ],
+  "activeVersion": null,
+  "tags": []
+}
