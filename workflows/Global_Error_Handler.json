@@ -1,0 +1,223 @@
+{
+  "updatedAt": "2026-06-11T10:21:14.754Z",
+  "createdAt": "2026-06-11T09:08:06.806Z",
+  "id": "DL87EAlPvApX5uFg",
+  "name": "Global Error Handler",
+  "active": true,
+  "isArchived": false,
+  "nodes": [
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.errorTrigger",
+      "typeVersion": 1,
+      "position": [
+        0,
+        0
+      ],
+      "id": "f9674076-9cf3-47eb-9a92-6d9b7422a554",
+      "name": "Error Trigger"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "9da1e773-d7e5-4322-8853-cdad1880de5e",
+              "name": "Status",
+              "value": "Failed",
+              "type": "string"
+            },
+            {
+              "id": "73b86e65-03ea-4d36-a69b-84bca74ef050",
+              "name": "Message",
+              "value": "Workflow Failed",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        208,
+        0
+      ],
+      "id": "333818d3-2e22-4fef-bb43-46ecec975a79",
+      "name": "Edit Fields"
+    },
+    {
+      "parameters": {
+        "sendTo": "sanikashinde992@gmail.com",
+        "subject": "Workflow Failed",
+        "emailType": "text",
+        "message": "A workflow failed in n8n. Please check execution logs.",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.2,
+      "position": [
+        416,
+        0
+      ],
+      "id": "072c1012-6dc9-4b37-8055-efa2bec125d9",
+      "name": "Send a message",
+      "webhookId": "98371a2f-32e5-48b0-896a-cf97df040570",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "ufBHP0gOl5jBybIp",
+          "name": "Gmail account"
+        }
+      }
+    }
+  ],
+  "connections": {
+    "Error Trigger": {
+      "main": [
+        [
+          {
+            "node": "Edit Fields",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Edit Fields": {
+      "main": [
+        [
+          {
+            "node": "Send a message",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate",
+    "availableInMCP": false,
+    "timeSavedMode": "fixed",
+    "callerPolicy": "workflowsFromSameOwner"
+  },
+  "staticData": null,
+  "meta": {
+    "templateCredsSetupCompleted": true
+  },
+  "pinData": {},
+  "versionId": "d96bb3bd-fe88-4208-b3e0-e50a7274fcbd",
+  "activeVersionId": "d96bb3bd-fe88-4208-b3e0-e50a7274fcbd",
+  "triggerCount": 0,
+  "shared": [
+    {
+      "updatedAt": "2026-06-11T09:08:06.809Z",
+      "createdAt": "2026-06-11T09:08:06.809Z",
+      "role": "workflow:owner",
+      "workflowId": "DL87EAlPvApX5uFg",
+      "projectId": "R2OGQRrWYLraDwSj"
+    }
+  ],
+  "activeVersion": {
+    "updatedAt": "2026-06-11T09:28:36.000Z",
+    "createdAt": "2026-06-11T09:27:30.857Z",
+    "versionId": "d96bb3bd-fe88-4208-b3e0-e50a7274fcbd",
+    "workflowId": "DL87EAlPvApX5uFg",
+    "nodes": [
+      {
+        "parameters": {},
+        "type": "n8n-nodes-base.errorTrigger",
+        "typeVersion": 1,
+        "position": [
+          0,
+          0
+        ],
+        "id": "f9674076-9cf3-47eb-9a92-6d9b7422a554",
+        "name": "Error Trigger"
+      },
+      {
+        "parameters": {
+          "assignments": {
+            "assignments": [
+              {
+                "id": "9da1e773-d7e5-4322-8853-cdad1880de5e",
+                "name": "Status",
+                "value": "Failed",
+                "type": "string"
+              },
+              {
+                "id": "73b86e65-03ea-4d36-a69b-84bca74ef050",
+                "name": "Message",
+                "value": "Workflow Failed",
+                "type": "string"
+              }
+            ]
+          },
+          "options": {}
+        },
+        "type": "n8n-nodes-base.set",
+        "typeVersion": 3.4,
+        "position": [
+          208,
+          0
+        ],
+        "id": "333818d3-2e22-4fef-bb43-46ecec975a79",
+        "name": "Edit Fields"
+      },
+      {
+        "parameters": {
+          "sendTo": "sanikashinde992@gmail.com",
+          "subject": "Workflow Failed",
+          "emailType": "text",
+          "message": "A workflow failed in n8n. Please check execution logs.",
+          "options": {}
+        },
+        "type": "n8n-nodes-base.gmail",
+        "typeVersion": 2.2,
+        "position": [
+          416,
+          0
+        ],
+        "id": "072c1012-6dc9-4b37-8055-efa2bec125d9",
+        "name": "Send a message",
+        "webhookId": "98371a2f-32e5-48b0-896a-cf97df040570",
+        "credentials": {
+          "gmailOAuth2": {
+            "id": "ufBHP0gOl5jBybIp",
+            "name": "Gmail account"
+          }
+        }
+      }
+    ],
+    "connections": {
+      "Error Trigger": {
+        "main": [
+          [
+            {
+              "node": "Edit Fields",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Edit Fields": {
+        "main": [
+          [
+            {
+              "node": "Send a message",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      }
+    },
+    "authors": "Sanika Shinde",
+    "name": "Version d96bb3bd",
+    "description": "",
+    "autosaved": true
+  },
+  "tags": []
+}
