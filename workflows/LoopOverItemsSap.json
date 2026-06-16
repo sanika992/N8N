@@ -1,0 +1,300 @@
+{
+  "updatedAt": "2026-05-04T05:11:39.251Z",
+  "createdAt": "2026-04-28T08:49:14.926Z",
+  "id": "vxHe89ZaJ2EusV48",
+  "name": "LoopOverItemsSap",
+  "active": false,
+  "isArchived": false,
+  "nodes": [
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [
+        -1088,
+        -16
+      ],
+      "id": "52cd93fc-1d72-447c-9c0d-d8cfc1996bad",
+      "name": "When clicking ‘Execute workflow’"
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "n8n-nodes-base.splitInBatches",
+      "typeVersion": 3,
+      "position": [
+        -352,
+        -16
+      ],
+      "id": "0e9adcf2-6479-444c-8d93-38d6650336fc",
+      "name": "Loop Over Items"
+    },
+    {
+      "parameters": {
+        "jsCode": "const items = $input.all();\n\nreturn [\n  {\n    json: {\n      status: \"All SAP Products Updated Successfully\",\n      totalProductsUpdated: items.length,\n      completedAt: new Date().toISOString()\n    }\n  }\n];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -80,
+        -96
+      ],
+      "id": "a05f5134-95ae-4af4-ac54-b0edf0662224",
+      "name": "Code in JavaScript2"
+    },
+    {
+      "parameters": {
+        "method": "PATCH",
+        "url": "=https://e9hpathhdb.aws.capsapsl.com:44341/sap/opu/odata/sap/API_PRODUCT_SRV/A_Product('{{ $json.ProductID }}')",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpBasicAuth",
+        "sendHeaders": true,
+        "specifyHeaders": "json",
+        "jsonHeaders": "={\n  \"Content-Type\": \"application/json\",\n  \"Accept\": \"application/json\",\n  \"sap-client\": \"500\",\n  \"x-csrf-token\": \"{{ $json.csrfToken }}\",\n  \"Cookie\": \"{{ $json.cookie }}\",\n  \"If-Match\": \"*\"\n}",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"ProductGroup\": \"{{ $json.ProductGroup }}\"\n}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.4,
+      "position": [
+        288,
+        80
+      ],
+      "id": "ebe1d262-c682-4d0a-8190-ba7418c99889",
+      "name": "update_product2",
+      "alwaysOutputData": false,
+      "credentials": {
+        "httpBasicAuth": {
+          "id": "amXEvooHAf1tb0dM",
+          "name": "SAP Credentials"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "url": "https://e9hpathhdb.aws.capsapsl.com:44341/sap/opu/odata4/sap/api_product/srvd_a2x/sap/product/0002/Product",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpBasicAuth",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "X-CSRF-Token",
+              "value": "Fetch"
+            },
+            {
+              "name": "Accept",
+              "value": "application/json"
+            },
+            {
+              "name": "sap-client",
+              "value": "500"
+            }
+          ]
+        },
+        "options": {
+          "allowUnauthorizedCerts": false
+        }
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.4,
+      "position": [
+        -768,
+        -16
+      ],
+      "id": "990b3632-272f-4f65-8bd9-f0be017b8d9b",
+      "name": "product_details1",
+      "credentials": {
+        "httpBasicAuth": {
+          "id": "amXEvooHAf1tb0dM",
+          "name": "SAP Credentials"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "// SAP API returns data inside 'value' array\nconst response = $input.first().json;\nconst products = response.value;\n\n// Map each product into a clean n8n item\nreturn products.map(product => ({\n  json: {\n    ProductID: product.Product,\n    ProductType: product.ProductType,\n    BaseUnit: product.BaseUnit,\n    ProductGroup: product.ProductGroup,\n    CreationDate: product.CreationDate,\n    LastChangeDate: product.LastChangeDate\n  }\n}));"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -560,
+        -16
+      ],
+      "id": "9181b962-a7d3-456c-acbf-4904eaa3ed35",
+      "name": "Code in JavaScript"
+    },
+    {
+      "parameters": {
+        "url": "https://e9hpathhdb.aws.capsapsl.com:44341/sap/opu/odata4/sap/ api_product/srvd_a2x/sap/api_product/0002/",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpBasicAuth",
+        "sendHeaders": true,
+        "specifyHeaders": "json",
+        "jsonHeaders": "{\n  \"x-csrf-token\": \"Fetch\",\n  \"sap-client\": \"500\",\n  \"Accept\": \"application/json\",\n  \"Content-Type\": \"application/json\"\n}",
+        "options": {
+          "response": {
+            "response": {
+              "fullResponse": true,
+              "neverError": true,
+              "responseFormat": "json"
+            }
+          }
+        }
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.4,
+      "position": [
+        -160,
+        80
+      ],
+      "id": "f094bd30-5c5a-4e4b-bc68-6580f413244d",
+      "name": "Fetch CSRF Token",
+      "credentials": {
+        "httpBasicAuth": {
+          "id": "amXEvooHAf1tb0dM",
+          "name": "SAP Credentials"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "// Get the full response item\nconst item = $input.first();\n\n// Headers are inside item.json.headers\nconst headers = item.json.headers;\n\nconsole.log(\"All headers:\", JSON.stringify(headers));\n\n// Extract CSRF Token\nconst csrfToken = headers['x-csrf-token'] || \n                  headers['X-CSRF-Token'] || '';\n\n// Extract Cookies\nconst cookieArray = headers['set-cookie'] || [];\nconst cookie = Array.isArray(cookieArray) ? \n               cookieArray.join(';') : cookieArray;\n\nconsole.log(\"CSRF Token found:\", csrfToken);\nconsole.log(\"Cookie found:\", cookie);\n\n// Get Product data from Loop Over Items node\nconst product = $('Loop Over Items').first().json;\n\nreturn [\n  {\n    json: {\n      csrfToken: csrfToken,\n      cookie: cookie,\n      ProductID: product.ProductID,\n      ProductType: product.ProductType,\n      BaseUnit: product.BaseUnit,\n      ProductGroup: product.ProductGroup\n    }\n  }\n];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        64,
+        80
+      ],
+      "id": "72f1ca47-28ea-44f3-a9f6-3c89b89dccda",
+      "name": "Code in JavaScript1"
+    },
+    {
+      "parameters": {
+        "content": "Complete Visual Flow\n\n👆 Click Execute\n      │\n      ▼\n🌐 GET Products from SAP\n   (product_details1)\n      │\n      ▼\n⚙️ Clean & Extract 100 Products\n   (Code in JavaScript)\n      │\n      ▼\n🔄 Loop Over Items\n   Pick 1 product at a time\n      │\n      ├──────── LOOP BRANCH ────────┐\n      │                             │\n      │   🌐 GET CSRF Token         │\n      │   (Security Key from SAP)   │\n      │         │                   │\n      │   ⚙️ Extract Token          │\n      │   Package with Product      │\n      │         │                   │\n      │   🌐 PATCH Update Product   │\n      │   Update ProductGroup       │\n      │   in SAP ✅                 │\n      │         │                   │\n      └─────────────────────────────┘\n            (repeat 100 times)\n      │\n      └──── DONE BRANCH ────▶ 📊 Final Report\n                               All 100 Updated ✅\n\n\nThis n8n workflow automates the bulk update of SAP products. It starts by fetching all 100 products from SAP using a GET API call. These products are then passed into a Loop Over Items node which processes each product one at a time. For every product the workflow first fetches a CSRF security token from SAP — which is mandatory for any write operation. It then sends a PATCH API request to SAP to update the ProductGroup field of that specific product. Once all 100 products are updated the workflow prints a final success report. This entire process which would normally require 100 manual updates in SAP is completed automatically in seconds!\n\n\nBatch Size\tRecommendation\n1\tSafest for SAP — no overload\n5\tGood balance of speed and safety\n10+\tRisk of SAP timeout or overload\n💡 For demo purposes use Batch Size 5 to clearly show the difference without overloading SAP\n\n",
+        "height": 896,
+        "width": 1328
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        -2608,
+        -336
+      ],
+      "id": "843c7dc9-7835-42c9-9e14-93daa59bcdf2",
+      "name": "Sticky Note"
+    }
+  ],
+  "connections": {
+    "When clicking ‘Execute workflow’": {
+      "main": [
+        [
+          {
+            "node": "product_details1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Loop Over Items": {
+      "main": [
+        [
+          {
+            "node": "Code in JavaScript2",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Fetch CSRF Token",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "update_product2": {
+      "main": [
+        [
+          {
+            "node": "Loop Over Items",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "product_details1": {
+      "main": [
+        [
+          {
+            "node": "Code in JavaScript",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code in JavaScript": {
+      "main": [
+        [
+          {
+            "node": "Loop Over Items",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Fetch CSRF Token": {
+      "main": [
+        [
+          {
+            "node": "Code in JavaScript1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code in JavaScript1": {
+      "main": [
+        [
+          {
+            "node": "update_product2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate",
+    "availableInMCP": false
+  },
+  "staticData": null,
+  "meta": null,
+  "pinData": {},
+  "versionId": "9208f304-89f7-4027-a7e9-3c68a5b3c308",
+  "activeVersionId": null,
+  "triggerCount": 0,
+  "shared": [
+    {
+      "updatedAt": "2026-04-28T08:49:14.930Z",
+      "createdAt": "2026-04-28T08:49:14.930Z",
+      "role": "workflow:owner",
+      "workflowId": "vxHe89ZaJ2EusV48",
+      "projectId": "R2OGQRrWYLraDwSj"
+    }
+  ],
+  "activeVersion": null,
+  "tags": []
+}
