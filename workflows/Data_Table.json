@@ -1,0 +1,431 @@
+{
+  "updatedAt": "2026-06-08T08:56:18.524Z",
+  "createdAt": "2026-06-08T08:48:43.239Z",
+  "id": "S522y340rvDogj96",
+  "name": "Data Table",
+  "active": false,
+  "isArchived": false,
+  "nodes": [
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [
+        -320,
+        240
+      ],
+      "id": "7f294cdf-c51c-40d2-bc15-044805983a5e",
+      "name": "When clicking ‘Execute workflow’"
+    },
+    {
+      "parameters": {
+        "resource": "table",
+        "operation": "create",
+        "tableName": "EmployeeInfo",
+        "columns": {
+          "column": [
+            {
+              "name": "Name"
+            },
+            {
+              "name": "Task"
+            },
+            {
+              "name": "Status"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.dataTable",
+      "typeVersion": 1.1,
+      "position": [
+        0,
+        0
+      ],
+      "id": "3ec4275a-6898-428e-910e-adfb79990562",
+      "name": "Create a data table"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "0b89021c-13c4-4d98-a1c2-1fa7b4ee218e",
+              "name": "columns",
+              "value": "={{ $json.columns }}",
+              "type": "array"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        208,
+        0
+      ],
+      "id": "7ec1fbfe-f4b6-4408-a36e-2ed9b349438c",
+      "name": "Edit Fields"
+    },
+    {
+      "parameters": {
+        "dataTableId": {
+          "__rl": true,
+          "value": "GgL8VdMtumJnMF4b",
+          "mode": "list",
+          "cachedResultName": "EmployeeInfo",
+          "cachedResultUrl": "/projects/R2OGQRrWYLraDwSj/datatables/GgL8VdMtumJnMF4b"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "Name": "Sanika",
+            "Task": "DatabaseNodes",
+            "Status": "completed"
+          },
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "Name",
+              "displayName": "Name",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "Task",
+              "displayName": "Task",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "Status",
+              "displayName": "Status",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.dataTable",
+      "typeVersion": 1.1,
+      "position": [
+        0,
+        160
+      ],
+      "id": "203bf64c-ccf0-4587-84ef-84ec3cc6f17e",
+      "name": "Insert row"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "dc06f471-d91a-4ae4-89fb-c131872e1388",
+              "name": "Name",
+              "value": "={{ $json.Name }}",
+              "type": "string"
+            },
+            {
+              "id": "ad365476-4404-4af7-9f1c-78c88a209db1",
+              "name": "Task",
+              "value": "={{ $json.Task }}",
+              "type": "string"
+            },
+            {
+              "id": "f2d2d941-edcb-4414-9ad0-4c41713d7f96",
+              "name": "Status",
+              "value": "={{ $json.Status }}",
+              "type": "string"
+            },
+            {
+              "id": "25bea1b3-209e-41d5-bdd6-1fc4467963e3",
+              "name": "id",
+              "value": "={{ $json.id }}",
+              "type": "number"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        208,
+        160
+      ],
+      "id": "9f1f9d31-e788-4adc-93dc-b56942510994",
+      "name": "Edit Fields1"
+    },
+    {
+      "parameters": {
+        "operation": "get",
+        "dataTableId": {
+          "__rl": true,
+          "value": "GgL8VdMtumJnMF4b",
+          "mode": "list",
+          "cachedResultName": "EmployeeInfo",
+          "cachedResultUrl": "/projects/R2OGQRrWYLraDwSj/datatables/GgL8VdMtumJnMF4b"
+        },
+        "returnAll": true
+      },
+      "type": "n8n-nodes-base.dataTable",
+      "typeVersion": 1.1,
+      "position": [
+        0,
+        320
+      ],
+      "id": "7ad2063f-6d7e-45c3-997f-bbb566b944d3",
+      "name": "Get row(s)"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "02060cfc-d91e-4644-846a-eeeb8f30339f",
+              "name": "id",
+              "value": "={{ $json.id }}",
+              "type": "number"
+            },
+            {
+              "id": "9dc0c156-6c4c-4164-8767-7bde24bd2cd0",
+              "name": "Name",
+              "value": "={{ $json.Name }}",
+              "type": "string"
+            },
+            {
+              "id": "31308c5d-ac9f-4dc5-aedc-b248e72652f6",
+              "name": "Task",
+              "value": "={{ $json.Task }}",
+              "type": "string"
+            },
+            {
+              "id": "71ac1659-9fd7-4e3f-9d03-b5f72ae7a94d",
+              "name": "Status",
+              "value": "={{ $json.Status }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        208,
+        320
+      ],
+      "id": "969d606b-8c94-4928-bdaf-3b91a66ee6a0",
+      "name": "Edit Fields2"
+    },
+    {
+      "parameters": {
+        "operation": "update",
+        "dataTableId": {
+          "__rl": true,
+          "value": "GgL8VdMtumJnMF4b",
+          "mode": "list",
+          "cachedResultName": "EmployeeInfo",
+          "cachedResultUrl": "/projects/R2OGQRrWYLraDwSj/datatables/GgL8VdMtumJnMF4b"
+        },
+        "filters": {
+          "conditions": [
+            {
+              "keyName": "Name",
+              "keyValue": "Avanti"
+            }
+          ]
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "Task": "AI",
+            "Status": "Complete",
+            "Name": "Sanika"
+          },
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "Name",
+              "displayName": "Name",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "Task",
+              "displayName": "Task",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "Status",
+              "displayName": "Status",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.dataTable",
+      "typeVersion": 1.1,
+      "position": [
+        0,
+        480
+      ],
+      "id": "8b349561-eca2-4feb-8c25-79eaede353ed",
+      "name": "Update row(s)"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "6d07804a-bc7e-49fe-8f86-42de8e5c73ea",
+              "name": "id",
+              "value": "={{ $json.id }}",
+              "type": "number"
+            },
+            {
+              "id": "f601a22e-b453-415b-97cb-e23f440eebe8",
+              "name": "Name",
+              "value": "={{ $json.Name }}",
+              "type": "string"
+            },
+            {
+              "id": "034ef5f5-d702-4bc7-a9d3-b97283886840",
+              "name": "Task",
+              "value": "={{ $json.Task }}",
+              "type": "string"
+            },
+            {
+              "id": "43a36929-58d4-49b2-9f31-50217a5d760d",
+              "name": "Status",
+              "value": "={{ $json.Status }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        208,
+        480
+      ],
+      "id": "2d392ade-79e7-4fc9-aad6-d761f98eff5d",
+      "name": "Edit Fields3"
+    }
+  ],
+  "connections": {
+    "When clicking ‘Execute workflow’": {
+      "main": [
+        [
+          {
+            "node": "Update row(s)",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Create a data table": {
+      "main": [
+        [
+          {
+            "node": "Edit Fields",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Insert row": {
+      "main": [
+        [
+          {
+            "node": "Edit Fields1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get row(s)": {
+      "main": [
+        [
+          {
+            "node": "Edit Fields2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Update row(s)": {
+      "main": [
+        [
+          {
+            "node": "Edit Fields3",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate",
+    "availableInMCP": false
+  },
+  "staticData": null,
+  "meta": null,
+  "pinData": {},
+  "versionId": "0f53ef1a-a8a0-43d7-af36-52bfa59cabe4",
+  "activeVersionId": null,
+  "triggerCount": 0,
+  "shared": [
+    {
+      "updatedAt": "2026-06-08T08:48:43.247Z",
+      "createdAt": "2026-06-08T08:48:43.247Z",
+      "role": "workflow:owner",
+      "workflowId": "S522y340rvDogj96",
+      "projectId": "R2OGQRrWYLraDwSj"
+    }
+  ],
+  "activeVersion": null,
+  "tags": []
+}
