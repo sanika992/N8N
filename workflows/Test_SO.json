@@ -1,0 +1,351 @@
+{
+  "updatedAt": "2026-06-04T12:13:08.728Z",
+  "createdAt": "2026-06-04T07:14:44.365Z",
+  "id": "yYdpb4btTprviTVR",
+  "name": "Test SO",
+  "active": false,
+  "isArchived": false,
+  "nodes": [
+    {
+      "parameters": {
+        "public": true,
+        "initialMessages": "Hi there! 👋\nHow can I assist you today?\nProvide me Sales Quotation number I'll create for Sales Order",
+        "availableInChat": true,
+        "agentName": "Sales Order Creation ",
+        "agentDescription": "Hi there! 👋\nProvide me Sales Quotation number I'll create for Sales Order",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.chatTrigger",
+      "typeVersion": 1.4,
+      "position": [
+        -768,
+        96
+      ],
+      "id": "0b0c490e-82f6-441a-b282-39c5b84407ad",
+      "name": "When chat message received",
+      "webhookId": "6c679128-cabb-4ab9-b31d-e60e91466012"
+    },
+    {
+      "parameters": {
+        "jsCode": "// Loop over input items and add a new field called 'myNewField' to the JSON of each one\nconst userMessage = $input.first().json.chatInput;\n\n// Extract SQ number using Regex (7-10 digit number)\nconst match = userMessage.match(/\\b\\d{7,10}\\b/);\n\nif (match) {\n  return [{ json: { SalesQuotation: match[0] } }];\n} else {\n  return [{ json: { SalesQuotation: null, error: \"No Sales Quotation number found.\" } }];\n}"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -480,
+        -48
+      ],
+      "id": "3caac0ae-8733-4a09-bf8b-cc33ad55fe9d",
+      "name": "Code in JavaScript"
+    },
+    {
+      "parameters": {
+        "content": "## Code Node \n ",
+        "height": 192,
+        "color": 4
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        -544,
+        -96
+      ],
+      "id": "d3178ad0-4cfa-40cf-b899-251bb1c9f9b0",
+      "name": "Sticky Note1"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "f1f1ecaa-a243-4f0f-bfe4-300401b0da0d",
+              "name": "SalesQuotation",
+              "value": "={{ $json.SalesQuotation }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        -240,
+        96
+      ],
+      "id": "d00cd0b1-ef1b-4147-8b73-17551eb89f8e",
+      "name": "Edit Fields"
+    },
+    {
+      "parameters": {
+        "url": "=https://e9hpathhdb.aws.capsapsl.com:44341/sap/opu/odata/sap/API_SALES_QUOTATION_SRV/A_SalesQuotation",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpBasicAuth",
+        "sendQuery": true,
+        "queryParameters": {
+          "parameters": [
+            {
+              "name": "$filter",
+              "value": "=SalesQuotation eq '{{ $('Edit Fields').item.json.SalesQuotation }}'"
+            }
+          ]
+        },
+        "sendHeaders": true,
+        "specifyHeaders": "json",
+        "jsonHeaders": "{\n  \"Accept\": \"application/json\"\n}\n",
+        "options": {
+          "sendCredentialsOnCrossOriginRedirect": false
+        }
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.4,
+      "position": [
+        48,
+        96
+      ],
+      "id": "d34cf1fb-fe3e-49c7-b904-dea20a8662e3",
+      "name": "Sales Quotation (GET)",
+      "retryOnFail": false,
+      "alwaysOutputData": false,
+      "executeOnce": true,
+      "notesInFlow": false,
+      "credentials": {
+        "httpBasicAuth": {
+          "id": "amXEvooHAf1tb0dM",
+          "name": "SAP Credentials"
+        }
+      },
+      "onError": "continueRegularOutput"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 3
+          },
+          "conditions": [
+            {
+              "id": "dae6388b-d8d2-4426-a9cc-47cdfb0651ce",
+              "leftValue": "={{ $json.statusCode }}",
+              "rightValue": 200,
+              "operator": {
+                "type": "number",
+                "operation": "equals"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
+      "position": [
+        400,
+        -208
+      ],
+      "id": "bf9eb249-90de-4a10-a6cc-a3849054756f",
+      "name": "If",
+      "disabled": true
+    },
+    {
+      "parameters": {
+        "url": "https://e9hpathhdb.aws.capsapsl.com:44341/sap/opu/odata/sap/API_SALES_ORDER_SRV/A_SalesOrder?",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpBasicAuth",
+        "sendQuery": true,
+        "queryParameters": {
+          "parameters": [
+            {
+              "name": "$top",
+              "value": "1"
+            }
+          ]
+        },
+        "sendHeaders": true,
+        "specifyHeaders": "json",
+        "jsonHeaders": "{\n  \"x-csrf-token\": \"Fetch\",\n  \"Accept\": \"application/json\"\n}\n",
+        "options": {
+          "response": {
+            "response": {
+              "fullResponse": true
+            }
+          }
+        }
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.4,
+      "position": [
+        336,
+        96
+      ],
+      "id": "12aeebe8-9ec0-4243-82fa-552f02ae944d",
+      "name": "Get CSRF Token",
+      "credentials": {
+        "httpBasicAuth": {
+          "id": "amXEvooHAf1tb0dM",
+          "name": "SAP Credentials"
+        }
+      },
+      "onError": "continueRegularOutput"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://e9hpathhdb.aws.capsapsl.com:44341/sap/opu/odata/sap/API_SALES_ORDER_SRV/A_SalesOrder",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpBasicAuth",
+        "sendHeaders": true,
+        "specifyHeaders": "json",
+        "jsonHeaders": "={\n  \"x-csrf-token\":\"{{ $json.csrfToken }}\",\n  \"Cookie\":\"{{ $json.Cookie }}\",\n  \"sap-client\":\"500\",\n  \"Content-Type\":\"application/json\",\n  \"Accept\":\"application/json\"\n}\n",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "=",
+        "options": {
+          "response": {
+            "response": {
+              "fullResponse": true
+            }
+          }
+        }
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.4,
+      "position": [
+        880,
+        96
+      ],
+      "id": "d0a83d17-28ee-47d3-9683-c17aa380cbab",
+      "name": "Create Sales Order",
+      "alwaysOutputData": false,
+      "executeOnce": false,
+      "retryOnFail": false,
+      "credentials": {
+        "httpBasicAuth": {
+          "id": "amXEvooHAf1tb0dM",
+          "name": "SAP Credentials"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "// Loop over input items and add a new field called 'myNewField' to the JSON of each one\nfor (const item of $input.all()) {\n  item.json.myNewField = item.json.headers;\n  item.json.myNewField = $input.first().json.headers[\"x-csrf-token\"];\n}\n\nreturn $input.all();"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        640,
+        -192
+      ],
+      "id": "9573b962-5ac0-47a6-b408-758f29a7de72",
+      "name": "Code in JavaScript4",
+      "disabled": true
+    },
+    {
+      "parameters": {
+        "jsCode": "// Loop over input items and add a new field called 'myNewField' to the JSON of each one\n//for (const item of $input.all()) {\n // item.json.myNewField = 1;\n//}\n\n\nreturn [{\n  csrfToken: $input.first().json.headers[\"x-csrf-token\"],\n  Cookie: $input.first().json.headers[\"set-cookie\"]\n    .map(c => c.split(';')[0])   // keep only key=value\n    .join('; ')                  // join properly\n}];\n\n//return $input.all();"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        640,
+        304
+      ],
+      "id": "7071e078-24a5-4c28-bdbd-6f6b771bbfc7",
+      "name": "Code in JavaScript1"
+    }
+  ],
+  "connections": {
+    "When chat message received": {
+      "main": [
+        [
+          {
+            "node": "Code in JavaScript",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code in JavaScript": {
+      "main": [
+        [
+          {
+            "node": "Edit Fields",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Edit Fields": {
+      "main": [
+        [
+          {
+            "node": "Sales Quotation (GET)",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Sales Quotation (GET)": {
+      "main": [
+        [
+          {
+            "node": "Get CSRF Token",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get CSRF Token": {
+      "main": [
+        [
+          {
+            "node": "Code in JavaScript1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code in JavaScript1": {
+      "main": [
+        [
+          {
+            "node": "Create Sales Order",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate",
+    "availableInMCP": false
+  },
+  "staticData": null,
+  "meta": null,
+  "pinData": {},
+  "versionId": "03982c44-891d-443c-992e-6a2382fbeb46",
+  "activeVersionId": null,
+  "triggerCount": 0,
+  "shared": [
+    {
+      "updatedAt": "2026-06-04T07:14:44.367Z",
+      "createdAt": "2026-06-04T07:14:44.367Z",
+      "role": "workflow:owner",
+      "workflowId": "yYdpb4btTprviTVR",
+      "projectId": "R2OGQRrWYLraDwSj"
+    }
+  ],
+  "activeVersion": null,
+  "tags": []
+}
