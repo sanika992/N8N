@@ -1,0 +1,121 @@
+{
+  "updatedAt": "2026-06-11T10:24:37.295Z",
+  "createdAt": "2026-06-11T08:45:42.528Z",
+  "id": "D3ylAacxMGOM2v14",
+  "name": "Debugging Demo",
+  "active": false,
+  "isArchived": false,
+  "nodes": [
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [
+        0,
+        0
+      ],
+      "id": "2b3298d6-6734-4630-b5d9-d7b9f3f656ef",
+      "name": "When clicking ‘Execute workflow’"
+    },
+    {
+      "parameters": {
+        "mode": "raw",
+        "jsonOutput": "{\n\"name\":\"Sanika\"\n}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        208,
+        0
+      ],
+      "id": "0b42b3d7-e4ee-4435-959a-161d4e0c2275",
+      "name": "Edit Fields"
+    },
+    {
+      "parameters": {
+        "jsCode": "return [\n{\njson:{\nemployee:$json.employee_name\n}\n}\n];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        448,
+        144
+      ],
+      "id": "02069581-1be1-4562-ae4a-fe56667d384a",
+      "name": "Code in JavaScript"
+    },
+    {
+      "parameters": {
+        "jsCode": "return [\n{\njson:{\nemployee:$json.name\n}\n}\n];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        448,
+        -112
+      ],
+      "id": "842366c8-896e-4395-8103-55c67dc0df75",
+      "name": "Code in JavaScript1"
+    }
+  ],
+  "connections": {
+    "When clicking ‘Execute workflow’": {
+      "main": [
+        [
+          {
+            "node": "Edit Fields",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Edit Fields": {
+      "main": [
+        [
+          {
+            "node": "Code in JavaScript",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Code in JavaScript1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code in JavaScript": {
+      "main": [
+        []
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate",
+    "availableInMCP": false,
+    "timeSavedMode": "fixed",
+    "errorWorkflow": "DL87EAlPvApX5uFg",
+    "callerPolicy": "workflowsFromSameOwner"
+  },
+  "staticData": null,
+  "meta": null,
+  "pinData": {},
+  "versionId": "3e1a529e-8204-4bb1-a3ff-3343cb42bf1a",
+  "activeVersionId": null,
+  "triggerCount": 0,
+  "shared": [
+    {
+      "updatedAt": "2026-06-11T08:45:42.531Z",
+      "createdAt": "2026-06-11T08:45:42.531Z",
+      "role": "workflow:owner",
+      "workflowId": "D3ylAacxMGOM2v14",
+      "projectId": "R2OGQRrWYLraDwSj"
+    }
+  ],
+  "activeVersion": null,
+  "tags": []
+}
