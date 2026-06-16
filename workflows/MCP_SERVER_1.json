@@ -1,0 +1,161 @@
+{
+  "updatedAt": "2026-05-12T12:07:42.200Z",
+  "createdAt": "2026-05-12T10:06:37.244Z",
+  "id": "YRZfaJKtCf9jDdoH",
+  "name": "MCP SERVER 1",
+  "active": true,
+  "isArchived": false,
+  "nodes": [
+    {
+      "parameters": {
+        "workflowInputs": {
+          "values": [
+            {
+              "name": "messages",
+              "type": "any"
+            }
+          ]
+        }
+      },
+      "id": "b39ca955-f0dd-4ad2-ad3f-b380d8c7c960",
+      "typeVersion": 1.1,
+      "name": "Start",
+      "type": "n8n-nodes-base.executeWorkflowTrigger",
+      "position": [
+        0,
+        0
+      ]
+    },
+    {
+      "parameters": {
+        "workflowId": {
+          "__rl": true,
+          "value": "VFnBI8GW5LjvlvaI",
+          "mode": "list"
+        },
+        "workflowInputs": {
+          "mappingMode": "defineBelow",
+          "value": {},
+          "matchingColumns": [],
+          "schema": [],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": true
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.executeWorkflow",
+      "typeVersion": 1.2,
+      "position": [
+        368,
+        0
+      ],
+      "name": "Call My Sub-workflow",
+      "id": "a69db642-04aa-4b61-aedb-45cfd84cc71b"
+    }
+  ],
+  "connections": {
+    "Start": {
+      "main": [
+        [
+          {
+            "node": "Call My Sub-workflow",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate",
+    "availableInMCP": false
+  },
+  "staticData": null,
+  "meta": null,
+  "pinData": {},
+  "versionId": "30b5b987-0ddb-4171-9de1-91fc295d1331",
+  "activeVersionId": "30b5b987-0ddb-4171-9de1-91fc295d1331",
+  "triggerCount": 0,
+  "shared": [
+    {
+      "updatedAt": "2026-05-12T10:06:37.248Z",
+      "createdAt": "2026-05-12T10:06:37.248Z",
+      "role": "workflow:owner",
+      "workflowId": "YRZfaJKtCf9jDdoH",
+      "projectId": "R2OGQRrWYLraDwSj"
+    }
+  ],
+  "activeVersion": {
+    "updatedAt": "2026-05-12T12:08:13.000Z",
+    "createdAt": "2026-05-12T12:07:42.201Z",
+    "versionId": "30b5b987-0ddb-4171-9de1-91fc295d1331",
+    "workflowId": "YRZfaJKtCf9jDdoH",
+    "nodes": [
+      {
+        "parameters": {
+          "workflowInputs": {
+            "values": [
+              {
+                "name": "messages",
+                "type": "any"
+              }
+            ]
+          }
+        },
+        "id": "b39ca955-f0dd-4ad2-ad3f-b380d8c7c960",
+        "typeVersion": 1.1,
+        "name": "Start",
+        "type": "n8n-nodes-base.executeWorkflowTrigger",
+        "position": [
+          0,
+          0
+        ]
+      },
+      {
+        "parameters": {
+          "workflowId": {
+            "__rl": true,
+            "value": "VFnBI8GW5LjvlvaI",
+            "mode": "list"
+          },
+          "workflowInputs": {
+            "mappingMode": "defineBelow",
+            "value": {},
+            "matchingColumns": [],
+            "schema": [],
+            "attemptToConvertTypes": false,
+            "convertFieldsToString": true
+          },
+          "options": {}
+        },
+        "type": "n8n-nodes-base.executeWorkflow",
+        "typeVersion": 1.2,
+        "position": [
+          368,
+          0
+        ],
+        "name": "Call My Sub-workflow",
+        "id": "a69db642-04aa-4b61-aedb-45cfd84cc71b"
+      }
+    ],
+    "connections": {
+      "Start": {
+        "main": [
+          [
+            {
+              "node": "Call My Sub-workflow",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      }
+    },
+    "authors": "Sanika Shinde",
+    "name": "Version 30b5b987",
+    "description": "",
+    "autosaved": true
+  },
+  "tags": []
+}
