@@ -1,0 +1,292 @@
+{
+  "updatedAt": "2026-06-11T10:10:11.244Z",
+  "createdAt": "2026-05-11T11:50:32.219Z",
+  "id": "2Nhnz8I8sH5kMI2I",
+  "name": "Webhook",
+  "active": true,
+  "isArchived": false,
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "448c3c75-c950-40e4-a6cc-1aed19097035",
+        "responseMode": "lastNode",
+        "options": {
+          "responseHeaders": {
+            "entries": [
+              {
+                "name": "Access-Control-Allow-Origin",
+                "value": "*"
+              }
+            ]
+          }
+        }
+      },
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2.1,
+      "position": [
+        -208,
+        0
+      ],
+      "id": "9ee022df-ee6d-47f7-b087-6f50cc6fe0a8",
+      "name": "Webhook",
+      "webhookId": "448c3c75-c950-40e4-a6cc-1aed19097035"
+    },
+    {
+      "parameters": {
+        "sendTo": "sanikashinde992@gmail.com",
+        "subject": "New Form Submission",
+        "message": "Name: {{$json[\"name\"]}}  Email: {{$json[\"email\"]}}  Message: {{$json[\"message\"]}}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.2,
+      "position": [
+        256,
+        0
+      ],
+      "id": "a1526157-0e9f-4fc0-a4f4-48881e608199",
+      "name": "Send a message",
+      "webhookId": "e4fe0293-8347-42c2-ad91-3d5e6514e906",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "ufBHP0gOl5jBybIp",
+          "name": "Gmail account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "content": "\n**What is Webhook Node?**\n\nWebhook is an API endpoint in n8n.\n\nIt waits for data from:\nHTML Forms\nApps\nAPIs\nWebsites\nMobile apps\nPostman\nAI agents\nOther workflows\n\n\n**External App/Form\n        ↓\nWebhook URL\n        ↓\nn8n Workflow Starts**",
+        "height": 400,
+        "width": 912
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        -400,
+        -128
+      ],
+      "id": "68ff3f12-45e2-4613-a715-020d927a765a",
+      "name": "Sticky Note"
+    },
+    {
+      "parameters": {
+        "content": "Streaming is mainly visible when connected to nodes that support streaming output, such as AI Agent or LangChain nodes. In this demo, I am explaining the Webhook response mode conceptually, but in production it is commonly used for ChatGPT-like experiences where users see text appearing in real time.\"\n\nThat's usually sufficient for a Webhook response mode presentation because streaming doesn't make much sense with a simple HTML form + Gmail workflow. It shines when connected to AI nodes.\n\nReal Life Examples\nChatGPT\n\nWhen you see:\n\nThe\nThe weather\nThe weather today\nThe weather today is...\n\nthat's streaming.\n\nMicrosoft Copilot\nGenerating response...\n\nand text appears gradually.\n\nThat's streaming.\n\nAI Customer Support Bot\nHello!\nHow can I help you today?\n\nappears while the AI is still generating.\n\nHow to Explain the Webhook Setting\n\nIn the Webhook node:\n\nRespond = Streaming\n\nmeans:\n\n\"Instead of returning one final response, n8n can continuously send data back to the client while the workflow is still running.\"\n\nWITHOUT STREAMING\n\nBrowser\n   ↓\nWebhook\n   ↓\nAI Agent\n   ↓\nWait 10 sec\n   ↓\nFull Response Returned\n\nWITH STREAMING\n\nBrowser\n   ↓\nWebhook\n   ↓\nAI Agent\n   ↓\nToken 1\nToken 2\nToken 3\nToken 4\n...",
+        "height": 784,
+        "width": 1072
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        -400,
+        352
+      ],
+      "id": "5beb1022-aefc-413b-978e-59ffd41afd53",
+      "name": "Sticky Note1"
+    },
+    {
+      "parameters": {
+        "amount": 10
+      },
+      "type": "n8n-nodes-base.wait",
+      "typeVersion": 1.1,
+      "position": [
+        0,
+        0
+      ],
+      "id": "5b3c66ea-58a6-4e1b-830f-9b740c81ac0e",
+      "name": "Wait",
+      "webhookId": "6ea59e1e-3bcb-42ca-a405-a9a92b9113d9"
+    }
+  ],
+  "connections": {
+    "Webhook": {
+      "main": [
+        [
+          {
+            "node": "Wait",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Send a message": {
+      "main": [
+        []
+      ]
+    },
+    "Wait": {
+      "main": [
+        [
+          {
+            "node": "Send a message",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1",
+    "availableInMCP": false,
+    "timeSavedMode": "fixed",
+    "errorWorkflow": "DL87EAlPvApX5uFg",
+    "callerPolicy": "workflowsFromSameOwner",
+    "binaryMode": "separate"
+  },
+  "staticData": null,
+  "meta": {
+    "templateCredsSetupCompleted": true
+  },
+  "pinData": {},
+  "versionId": "b1ce8b5a-c9ba-460a-96ff-dd82a476214e",
+  "activeVersionId": "b1ce8b5a-c9ba-460a-96ff-dd82a476214e",
+  "triggerCount": 1,
+  "shared": [
+    {
+      "updatedAt": "2026-05-11T11:50:32.222Z",
+      "createdAt": "2026-05-11T11:50:32.222Z",
+      "role": "workflow:owner",
+      "workflowId": "2Nhnz8I8sH5kMI2I",
+      "projectId": "R2OGQRrWYLraDwSj"
+    }
+  ],
+  "activeVersion": {
+    "updatedAt": "2026-06-11T10:10:21.000Z",
+    "createdAt": "2026-05-29T12:43:32.377Z",
+    "versionId": "b1ce8b5a-c9ba-460a-96ff-dd82a476214e",
+    "workflowId": "2Nhnz8I8sH5kMI2I",
+    "nodes": [
+      {
+        "parameters": {
+          "httpMethod": "POST",
+          "path": "448c3c75-c950-40e4-a6cc-1aed19097035",
+          "responseMode": "lastNode",
+          "options": {
+            "responseHeaders": {
+              "entries": [
+                {
+                  "name": "Access-Control-Allow-Origin",
+                  "value": "*"
+                }
+              ]
+            }
+          }
+        },
+        "type": "n8n-nodes-base.webhook",
+        "typeVersion": 2.1,
+        "position": [
+          -208,
+          0
+        ],
+        "id": "9ee022df-ee6d-47f7-b087-6f50cc6fe0a8",
+        "name": "Webhook",
+        "webhookId": "448c3c75-c950-40e4-a6cc-1aed19097035"
+      },
+      {
+        "parameters": {
+          "sendTo": "sanikashinde992@gmail.com",
+          "subject": "New Form Submission",
+          "message": "Name: {{$json[\"name\"]}}  Email: {{$json[\"email\"]}}  Message: {{$json[\"message\"]}}",
+          "options": {}
+        },
+        "type": "n8n-nodes-base.gmail",
+        "typeVersion": 2.2,
+        "position": [
+          256,
+          0
+        ],
+        "id": "a1526157-0e9f-4fc0-a4f4-48881e608199",
+        "name": "Send a message",
+        "webhookId": "e4fe0293-8347-42c2-ad91-3d5e6514e906",
+        "credentials": {
+          "gmailOAuth2": {
+            "id": "ufBHP0gOl5jBybIp",
+            "name": "Gmail account"
+          }
+        }
+      },
+      {
+        "parameters": {
+          "content": "\n**What is Webhook Node?**\n\nWebhook is an API endpoint in n8n.\n\nIt waits for data from:\nHTML Forms\nApps\nAPIs\nWebsites\nMobile apps\nPostman\nAI agents\nOther workflows\n\n\n**External App/Form\n        ↓\nWebhook URL\n        ↓\nn8n Workflow Starts**",
+          "height": 400,
+          "width": 912
+        },
+        "type": "n8n-nodes-base.stickyNote",
+        "typeVersion": 1,
+        "position": [
+          -400,
+          -128
+        ],
+        "id": "68ff3f12-45e2-4613-a715-020d927a765a",
+        "name": "Sticky Note"
+      },
+      {
+        "parameters": {
+          "content": "Streaming is mainly visible when connected to nodes that support streaming output, such as AI Agent or LangChain nodes. In this demo, I am explaining the Webhook response mode conceptually, but in production it is commonly used for ChatGPT-like experiences where users see text appearing in real time.\"\n\nThat's usually sufficient for a Webhook response mode presentation because streaming doesn't make much sense with a simple HTML form + Gmail workflow. It shines when connected to AI nodes.\n\nReal Life Examples\nChatGPT\n\nWhen you see:\n\nThe\nThe weather\nThe weather today\nThe weather today is...\n\nthat's streaming.\n\nMicrosoft Copilot\nGenerating response...\n\nand text appears gradually.\n\nThat's streaming.\n\nAI Customer Support Bot\nHello!\nHow can I help you today?\n\nappears while the AI is still generating.\n\nHow to Explain the Webhook Setting\n\nIn the Webhook node:\n\nRespond = Streaming\n\nmeans:\n\n\"Instead of returning one final response, n8n can continuously send data back to the client while the workflow is still running.\"\n\nWITHOUT STREAMING\n\nBrowser\n   ↓\nWebhook\n   ↓\nAI Agent\n   ↓\nWait 10 sec\n   ↓\nFull Response Returned\n\nWITH STREAMING\n\nBrowser\n   ↓\nWebhook\n   ↓\nAI Agent\n   ↓\nToken 1\nToken 2\nToken 3\nToken 4\n...",
+          "height": 784,
+          "width": 1072
+        },
+        "type": "n8n-nodes-base.stickyNote",
+        "typeVersion": 1,
+        "position": [
+          -400,
+          352
+        ],
+        "id": "5beb1022-aefc-413b-978e-59ffd41afd53",
+        "name": "Sticky Note1"
+      },
+      {
+        "parameters": {
+          "amount": 10
+        },
+        "type": "n8n-nodes-base.wait",
+        "typeVersion": 1.1,
+        "position": [
+          0,
+          0
+        ],
+        "id": "5b3c66ea-58a6-4e1b-830f-9b740c81ac0e",
+        "name": "Wait",
+        "webhookId": "6ea59e1e-3bcb-42ca-a405-a9a92b9113d9"
+      }
+    ],
+    "connections": {
+      "Webhook": {
+        "main": [
+          [
+            {
+              "node": "Wait",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Send a message": {
+        "main": [
+          []
+        ]
+      },
+      "Wait": {
+        "main": [
+          [
+            {
+              "node": "Send a message",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      }
+    },
+    "authors": "Sanika Shinde",
+    "name": "Version b1ce8b5a",
+    "description": "",
+    "autosaved": true
+  },
+  "tags": []
+}
