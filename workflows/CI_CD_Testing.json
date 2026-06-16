@@ -1,0 +1,1013 @@
+{
+  "updatedAt": "2026-06-15T13:24:13.933Z",
+  "createdAt": "2026-06-12T10:44:25.304Z",
+  "id": "GwlqW2ui74loqxer",
+  "name": "CI/CD Testing",
+  "active": true,
+  "isArchived": false,
+  "nodes": [
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 3
+          },
+          "conditions": [
+            {
+              "id": "12019ecd-78a1-4d76-9c18-ff8acec94a55",
+              "leftValue": "={{ $json.success }}",
+              "rightValue": true,
+              "operator": {
+                "type": "boolean",
+                "operation": "equals"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
+      "position": [
+        192,
+        272
+      ],
+      "id": "2d6ed337-ac72-44b6-9f8d-d5f7984600b1",
+      "name": "If"
+    },
+    {
+      "parameters": {
+        "jsCode": "const { appendFileSync } = require('fs');\nconst d = $input.first().json;\nappendFileSync('C:\\\\myapp\\\\jest-log.txt',\n  `FAILED | ${d.timestamp} | ${d.numFailed} failed\\n`\n);\nreturn [{ json: { status: 'FAILED', failed: d.numFailed } }];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        400,
+        368
+      ],
+      "id": "3777971d-9036-4057-a907-0f583da4010e",
+      "name": "FAIL"
+    },
+    {
+      "parameters": {
+        "jsCode": "const { appendFileSync } = require('fs');\nconst d = $input.first().json;\nappendFileSync('C:\\\\myapp\\\\jest-log.txt',\n  `PASSED | ${d.timestamp} | ${d.numPassed} passed\\n`\n);\nreturn [{ json: { status: 'PASSED', passed: d.numPassed } }];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        400,
+        176
+      ],
+      "id": "f1a859c4-ee70-4fcc-869c-7e45d1bf9d74",
+      "name": "PASS"
+    },
+    {
+      "parameters": {
+        "jsCode": "const result = JSON.parse($input.first().json.stdout);\nreturn [{ json: {\n  success: result.success,\n  numPassed: result.numPassedTests || 0,\n  numFailed: result.numFailedTests || 0,\n  timestamp: new Date().toISOString()\n}}];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -16,
+        272
+      ],
+      "id": "cf98ca5f-d291-4366-a188-a62e379ce8bc",
+      "name": "Parse Output"
+    },
+    {
+      "parameters": {
+        "jsCode": "const { execSync } = require('child_process');\nlet stdout = '';\ntry {\n  stdout = execSync(\n    'cd C:\\\\myapp && npx jest --json 2>nul',\n    { encoding: 'utf8', timeout: 60000 }\n  );\n} catch (e) {\n  stdout = e.stdout || '';\n}\nreturn [{ json: { stdout } }];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -224,
+        272
+      ],
+      "id": "a74e27f9-ffb3-4fbb-bcb7-6316da7fe14f",
+      "name": "Run Jest"
+    },
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "mock/payment",
+        "responseMode": "responseNode",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2.1,
+      "position": [
+        -304,
+        1248
+      ],
+      "id": "79e063fb-bdb3-42aa-9676-46ed4211719e",
+      "name": "Webhook",
+      "webhookId": "0760f29c-fb2c-4046-9e12-2b7a9a9fe2c9"
+    },
+    {
+      "parameters": {
+        "jsCode": "const body = $input.first().json.body || {};\n\nconst mockResponse = {\n  status: \"success\",\n  transaction_id: \"MOCK-\" + Date.now(),\n  amount: body.amount || 0,\n  currency: body.currency || \"USD\",\n  timestamp: new Date().toISOString(),\n  mocked: true\n};\n\nreturn [{ json: mockResponse }];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -96,
+        1248
+      ],
+      "id": "ebeaf6cb-f8cf-4e0d-b826-03fc20d441a3",
+      "name": "Code in JavaScript"
+    },
+    {
+      "parameters": {
+        "jsCode": "const { appendFileSync } = require('fs');\nconst d = $input.first().json;\n\nconst line = `${d.timestamp} | ${d.transaction_id} | amount: ${d.amount}\\n`;\nappendFileSync('C:\\\\myapp\\\\mock-log.txt', line);\n\nreturn [{ json: d }];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        112,
+        1248
+      ],
+      "id": "21e77365-7888-4ae9-9f92-e1bee0f166cd",
+      "name": "Code in JavaScript1"
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "={{ $json }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.5,
+      "position": [
+        320,
+        1248
+      ],
+      "id": "cc7a2552-6476-44e0-8de6-ee5d9a93780b",
+      "name": "Respond to Webhook"
+    },
+    {
+      "parameters": {
+        "content": "**MOKING HTTP**",
+        "height": 368,
+        "width": 1312
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        -576,
+        1152
+      ],
+      "id": "7e8f9b73-7977-4eb3-b5cd-4fd0cf29d928",
+      "name": "Sticky Note"
+    },
+    {
+      "parameters": {
+        "content": "**JEST**",
+        "height": 496,
+        "width": 1312
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        -624,
+        48
+      ],
+      "id": "7be3e21e-0342-4ae6-a5e3-7a8fdcb43f49",
+      "name": "Sticky Note1"
+    },
+    {
+      "parameters": {
+        "content": "**Snapshot**",
+        "height": 368,
+        "width": 1824
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        -880,
+        640
+      ],
+      "id": "8ba08a93-1fa7-4d78-b255-71eb2cac57fd",
+      "name": "Sticky Note2"
+    },
+    {
+      "parameters": {
+        "url": "http://localhost:3000",
+        "options": {
+          "response": {
+            "response": {
+              "fullResponse": true
+            }
+          }
+        }
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.4,
+      "position": [
+        -464,
+        752
+      ],
+      "id": "35595c5c-8754-4855-88f4-8b0863b46e8f",
+      "name": "HTTP Request1"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 3
+          },
+          "conditions": [
+            {
+              "id": "c7072679-1be5-4b5d-9d86-1017648b336f",
+              "leftValue": "={{ $json.status }}",
+              "rightValue": "MATCH",
+              "operator": {
+                "type": "string",
+                "operation": "equals"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
+      "position": [
+        -48,
+        752
+      ],
+      "id": "fbfb8b1a-8e63-44e3-882e-87a0f6d38aeb",
+      "name": "If2"
+    },
+    {
+      "parameters": {
+        "jsCode": "const { readFileSync, writeFileSync, existsSync } = require('fs');\nconst snapshotPath = 'C:\\\\myapp\\\\api-snapshot.json';\n\n// ✅ Only compare the body, ignore headers/date\nconst raw = $input.first().json;\nconst bodyOnly = raw.body || raw;  // HTTP Request puts body in .body\nconst current = JSON.stringify(bodyOnly, null, 2);\n\nif (!existsSync(snapshotPath)) {\n  writeFileSync(snapshotPath, current);\n  return [{ json: {\n    status: 'CREATED',\n    message: 'First snapshot saved.',\n    snapshot: current\n  }}];\n}\n\nconst previous = readFileSync(snapshotPath, 'utf8');\n\nif (current === previous) {\n  return [{ json: {\n    status: 'MATCH',\n    message: 'API response unchanged.',\n    snapshot: current\n  }}];\n} else {\n  return [{ json: {\n    status: 'DIFF',\n    message: 'API response has changed!',\n    previous: previous,\n    current: current\n  }}];\n}"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -256,
+        752
+      ],
+      "id": "538db2e8-ed34-4b57-82cc-f59611b803aa",
+      "name": "1ST CODE NODE1"
+    },
+    {
+      "parameters": {
+        "jsCode": "const { execSync } = require('child_process');\nlet output = '';\ntry {\n  output = execSync('node C:\\\\myapp\\\\screenshot.js', { encoding: 'utf8', timeout: 60000 });\n} catch(e) {\n  output = e.stdout || e.message || 'error';\n}\nlet result;\ntry {\n  result = JSON.parse(output.trim());\n} catch(e) {\n  result = { status: 'ERROR', message: output };\n}\nreturn [{ json: result }];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        432,
+        672
+      ],
+      "id": "ea2867e5-e282-4197-a4fb-496121171935",
+      "name": "2ND CODE NODE1"
+    },
+    {
+      "parameters": {
+        "jsCode": "const { appendFileSync, writeFileSync } = require('fs');\nconst d = $input.first().json;\n\nappendFileSync('C:\\\\myapp\\\\snapshot-log.txt',\n  `${new Date().toISOString()} | API: DIFF ⚠️ | API response changed!\\n`\n);\n\n// Update snapshot to new value so next run is clean\nwriteFileSync('C:\\\\myapp\\\\api-snapshot.json', d.current);\n\nreturn [{ json: {\n  status: 'API DIFF ⚠️',\n  message: 'API changed — snapshot updated',\n  previous: d.previous,\n  current: d.current\n}}];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        448,
+        832
+      ],
+      "id": "0042e438-34f0-44c3-8d2f-d324aaf70ab3",
+      "name": "3RD CODE NODE1"
+    },
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [
+        -736,
+        752
+      ],
+      "id": "ca05dc00-a173-46c7-acd3-a81921121965",
+      "name": "When clicking ‘Execute workflow’"
+    },
+    {
+      "parameters": {
+        "url": "http://localhost:3000",
+        "options": {
+          "response": {
+            "response": {
+              "fullResponse": true
+            }
+          }
+        }
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.4,
+      "position": [
+        -64,
+        1680
+      ],
+      "id": "99e90085-9d3b-4e89-a602-5c3c678bb5b6",
+      "name": "HTTP Request"
+    },
+    {
+      "parameters": {
+        "jsCode": "const { readFileSync, writeFileSync, existsSync } = require('fs');\nconst snapshotPath = 'C:\\\\myapp\\\\api-snapshot.json';\n\n// ✅ Only compare the body, ignore headers/date\nconst raw = $input.first().json;\nconst bodyOnly = raw.body || raw;  // HTTP Request puts body in .body\nconst current = JSON.stringify(bodyOnly, null, 2);\n\nif (!existsSync(snapshotPath)) {\n  writeFileSync(snapshotPath, current);\n  return [{ json: {\n    status: 'CREATED',\n    message: 'First snapshot saved.',\n    snapshot: current\n  }}];\n}\n\nconst previous = readFileSync(snapshotPath, 'utf8');\n\nif (current === previous) {\n  return [{ json: {\n    status: 'MATCH',\n    message: 'API response unchanged.',\n    snapshot: current\n  }}];\n} else {\n  return [{ json: {\n    status: 'DIFF',\n    message: 'API response has changed!',\n    previous: previous,\n    current: current\n  }}];\n}"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        144,
+        1680
+      ],
+      "id": "a80b74c3-42be-40df-9fe9-af2ee3bc9fd6",
+      "name": "1ST CODE NODE"
+    },
+    {
+      "parameters": {
+        "jsCode": "const puppeteer = require('puppeteer');\nconst { writeFileSync, existsSync, readFileSync } = require('fs');\n\nconst screenshotPath = 'C:\\\\myapp\\\\current-screenshot.png';\nconst snapshotPath   = 'C:\\\\myapp\\\\saved-screenshot.png';\nconst logPath        = 'C:\\\\myapp\\\\snapshot-log.txt';\n\nconst browser = await puppeteer.launch({\n  headless: true,\n  executablePath: 'C:\\\\Program Files\\\\Google\\\\Chrome\\\\Application\\\\chrome.exe',\n  args: [\n    '--no-sandbox',\n    '--disable-setuid-sandbox',\n    '--disable-gpu',\n    '--disable-dev-shm-usage'\n  ]\n});\n\nconst page = await browser.newPage();\nawait page.setViewport({ width: 1280, height: 720 });\nawait page.goto('http://localhost:3000', { waitUntil: 'networkidle0' });\n\nconst screenshot = await page.screenshot({ fullPage: true });\nawait browser.close();\n\nwriteFileSync(screenshotPath, screenshot);\n\nif (!existsSync(snapshotPath)) {\n  writeFileSync(snapshotPath, screenshot);\n  const line = `${new Date().toISOString()} | Screenshot: CREATED ✅\\n`;\n  writeFileSync(logPath, line, { flag: 'a' });\n  return [{ json: { \n    status: 'CREATED', \n    message: 'First screenshot snapshot saved!',\n    path: screenshotPath\n  }}];\n}\n\nconst saved  = readFileSync(snapshotPath);\nconst isSame = Buffer.compare(saved, screenshot) === 0;\n\nconst line = `${new Date().toISOString()} | Screenshot: ${isSame ? 'MATCH ✅' : 'DIFF ⚠️'}\\n`;\nwriteFileSync(logPath, line, { flag: 'a' });\n\nif (isSame) {\n  return [{ json: { \n    status: 'MATCH', \n    message: 'Screenshot unchanged ✅',\n    path: screenshotPath\n  }}];\n} else {\n  writeFileSync(snapshotPath, screenshot);\n  return [{ json: { \n    status: 'DIFF', \n    message: 'Screenshot changed ⚠️ snapshot updated',\n    path: screenshotPath\n  }}];\n}"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        560,
+        1584
+      ],
+      "id": "a37225b5-1d74-42d1-b6e9-0f89e36ebd53",
+      "name": "2ND CODE NODE"
+    },
+    {
+      "parameters": {
+        "jsCode": "const { appendFileSync, writeFileSync } = require('fs');\nconst d = $input.first().json;\n\nappendFileSync('C:\\\\myapp\\\\snapshot-log.txt',\n  `${new Date().toISOString()} | API: DIFF ⚠️ | API response changed!\\n`\n);\n\n// Update snapshot to new value so next run is clean\nwriteFileSync('C:\\\\myapp\\\\api-snapshot.json', d.current);\n\nreturn [{ json: {\n  status: 'API DIFF ⚠️',\n  message: 'API changed — snapshot updated',\n  previous: d.previous,\n  current: d.current\n}}];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        560,
+        1776
+      ],
+      "id": "79c7360a-85af-4675-a495-eb6ec80b71e2",
+      "name": "3RD CODE NODE"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 3
+          },
+          "conditions": [
+            {
+              "id": "c7072679-1be5-4b5d-9d86-1017648b336f",
+              "leftValue": "={{ $json.status }}",
+              "rightValue": "MATCH",
+              "operator": {
+                "type": "string",
+                "operation": "equals"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
+      "position": [
+        352,
+        1680
+      ],
+      "id": "9a2f4da0-7bbd-410b-b718-985524994824",
+      "name": "If1"
+    },
+    {
+      "parameters": {
+        "content": "# CI/CD Testing Workflow using n8n\n\n## Objective\n\nThe objective of this workflow is to demonstrate three important testing concepts commonly used in CI/CD pipelines:\n\n1. Jest Testing\n2. Snapshot Testing\n3. HTTP Mocking\n\nThese techniques help ensure that applications work correctly before deployment.\n\n---\n\n# Part 1: Jest Testing\n\n## What is Jest?\n\nJest is a JavaScript testing framework used to verify that code behaves as expected.\n\nExample:\n\nIf a function adds two numbers:\n\n```javascript\nadd(2,3)\n```\n\nThe expected result is:\n\n```javascript\n5\n```\n\nJest automatically checks whether the result is correct.\n\n---\n\n## Workflow\n\n```text\nManual Trigger\n      ↓\nRun Jest\n      ↓\nParse Output\n      ↓\nIF\n   ↙     ↘\nPASS    FAIL\n```\n\n### Step 1 – Manual Trigger\n\nThe workflow starts when the user clicks:\n\n```text\nExecute Workflow\n```\n\n---\n\n### Step 2 – Run Jest\n\nThis node executes:\n\n```bash\nnpx jest --json\n```\n\nJest runs all test cases and returns the results.\n\nExample Output:\n\n```json\n{\n  \"numPassedTests\": 1,\n  \"numFailedTests\": 0\n}\n```\n\n---\n\n### Step 3 – Parse Output\n\nThe Parse Output node converts the Jest result into a structured JSON format.\n\nExample:\n\n```json\n{\n  \"success\": true,\n  \"numPassed\": 1,\n  \"numFailed\": 0\n}\n```\n\n---\n\n### Step 4 – IF Condition\n\nThe IF node checks:\n\n```text\nnumFailedTests == 0 ?\n```\n\nIf true:\n\n```text\nPASS\n```\n\nIf false:\n\n```text\nFAIL\n```\n\n---\n\n### PASS Scenario\n\n```json\n{\n  \"numPassedTests\": 1,\n  \"numFailedTests\": 0\n}\n```\n\nResult:\n\n```text\nPASS\n```\n\nMeaning:\n\nAll tests executed successfully.\n\n---\n\n### FAIL Scenario\n\n```json\n{\n  \"numPassedTests\": 0,\n  \"numFailedTests\": 1\n}\n```\n\nResult:\n\n```text\nFAIL\n```\n\nMeaning:\n\nOne or more tests failed and deployment should be stopped.\n\n---\n\n# Part 2: Snapshot Testing\n\n## What is Snapshot Testing?\n\nSnapshot testing stores a copy of a previous API response and compares future responses against it.\n\nThis helps detect unexpected changes.\n\n---\n\n## Workflow\n\n```text\nHTTP Request\n      ↓\nSnapshot Comparison\n      ↓\nIF\n   ↙      ↘\nMATCH     DIFF\n```\n\n---\n\n### Step 1 – Call API\n\nThe workflow sends a request to:\n\n```text\nhttp://localhost:3000\n```\n\nand receives a response.\n\nExample:\n\n```json\n{\n  \"message\": \"Hello World\"\n}\n```\n\n---\n\n### Step 2 – Save Snapshot\n\nDuring the first execution, the response is saved as:\n\n```text\napi-snapshot.json\n```\n\nThis becomes the reference snapshot.\n\n---\n\n### Step 3 – Compare Response\n\nEvery future execution compares:\n\n```text\nCurrent Response\n       VS\nSaved Snapshot\n```\n\n---\n\n### MATCH Scenario\n\nCurrent Response:\n\n```json\n{\n  \"message\": \"Hello World\"\n}\n```\n\nSaved Snapshot:\n\n```json\n{\n  \"message\": \"Hello World\"\n}\n```\n\nResult:\n\n```text\nMATCH\n```\n\nMeaning:\n\nNo change detected.\n\n---\n\n### DIFF Scenario\n\nCurrent Response:\n\n```json\n{\n  \"message\": \"Hello Sanika\"\n}\n```\n\nSaved Snapshot:\n\n```json\n{\n  \"message\": \"Hello World\"\n}\n```\n\nResult:\n\n```text\nDIFF\n```\n\nMeaning:\n\nThe API response changed.\n\nThe workflow logs the change and updates the snapshot.\n\n---\n\n# Screenshot Validation\n\nWhen a snapshot matches, the workflow runs:\n\n```bash\nnode screenshot.js\n```\n\nPurpose:\n\nCapture a screenshot of the application and verify that the user interface remains unchanged.\n\nThis is a simple example of visual testing.\n\n---\n\n# Part 3: HTTP Mocking\n\n## What is Mocking?\n\nMocking means creating a fake version of an external service so that testing can be performed without using the real service.\n\n---\n\n## Workflow\n\n```text\nWebhook\n     ↓\nGenerate Mock Response\n     ↓\nLog Request\n     ↓\nReturn Response\n```\n\n---\n\n### Example\n\nA client sends:\n\n```json\n{\n  \"amount\": 100,\n  \"currency\": \"USD\"\n}\n```\n\nThe workflow generates:\n\n```json\n{\n  \"status\": \"success\",\n  \"transaction_id\": \"MOCK-12345\",\n  \"amount\": 100,\n  \"currency\": \"USD\",\n  \"mocked\": true\n}\n```\n\n---\n\n### Why Use Mocking?\n\nMock APIs are useful because:\n\n* Real APIs may not be available.\n* Real APIs may cost money.\n* Testing becomes faster.\n* Testing becomes more predictable.\n\n---\n\n# Benefits of This Workflow\n\n1. Automates testing.\n2. Detects code failures early.\n3. Detects unexpected API changes.\n4. Simulates external systems safely.\n5. Demonstrates real CI/CD testing concepts.\n\n---\n\n# Conclusion\n\nThis n8n workflow demonstrates three major testing strategies used in software development:\n\n* Jest Testing for code validation.\n* Snapshot Testing for API change detection.\n* HTTP Mocking for simulating external services.\n\nTogether, these techniques help improve software quality and reliability before deployment.\n",
+        "height": 9008,
+        "width": 1328
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        -2048,
+        -64
+      ],
+      "id": "7a178bcd-d323-42c4-90d5-33584fc8e7c6",
+      "name": "Sticky Note3"
+    }
+  ],
+  "connections": {
+    "If": {
+      "main": [
+        [
+          {
+            "node": "PASS",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "FAIL",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Parse Output": {
+      "main": [
+        [
+          {
+            "node": "If",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Run Jest": {
+      "main": [
+        [
+          {
+            "node": "Parse Output",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Webhook": {
+      "main": [
+        [
+          {
+            "node": "Code in JavaScript",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code in JavaScript": {
+      "main": [
+        [
+          {
+            "node": "Code in JavaScript1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code in JavaScript1": {
+      "main": [
+        [
+          {
+            "node": "Respond to Webhook",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "HTTP Request1": {
+      "main": [
+        [
+          {
+            "node": "1ST CODE NODE1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If2": {
+      "main": [
+        [
+          {
+            "node": "2ND CODE NODE1",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "3RD CODE NODE1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "1ST CODE NODE1": {
+      "main": [
+        [
+          {
+            "node": "If2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "When clicking ‘Execute workflow’": {
+      "main": [
+        [
+          {
+            "node": "HTTP Request1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "HTTP Request": {
+      "main": [
+        [
+          {
+            "node": "1ST CODE NODE",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "1ST CODE NODE": {
+      "main": [
+        [
+          {
+            "node": "If1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If1": {
+      "main": [
+        [
+          {
+            "node": "2ND CODE NODE",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "3RD CODE NODE",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate",
+    "availableInMCP": false
+  },
+  "staticData": null,
+  "meta": null,
+  "pinData": {},
+  "versionId": "e28fb255-d479-46c0-ae60-ddb80025c417",
+  "activeVersionId": "52281bc4-c37b-4534-8314-94112abea010",
+  "triggerCount": 1,
+  "shared": [
+    {
+      "updatedAt": "2026-06-12T10:44:25.308Z",
+      "createdAt": "2026-06-12T10:44:25.308Z",
+      "role": "workflow:owner",
+      "workflowId": "GwlqW2ui74loqxer",
+      "projectId": "R2OGQRrWYLraDwSj"
+    }
+  ],
+  "activeVersion": {
+    "updatedAt": "2026-06-15T10:43:39.000Z",
+    "createdAt": "2026-06-15T10:43:37.226Z",
+    "versionId": "52281bc4-c37b-4534-8314-94112abea010",
+    "workflowId": "GwlqW2ui74loqxer",
+    "nodes": [
+      {
+        "parameters": {
+          "conditions": {
+            "options": {
+              "caseSensitive": true,
+              "leftValue": "",
+              "typeValidation": "strict",
+              "version": 3
+            },
+            "conditions": [
+              {
+                "id": "12019ecd-78a1-4d76-9c18-ff8acec94a55",
+                "leftValue": "={{ $json.success }}",
+                "rightValue": true,
+                "operator": {
+                  "type": "boolean",
+                  "operation": "equals"
+                }
+              }
+            ],
+            "combinator": "and"
+          },
+          "options": {}
+        },
+        "type": "n8n-nodes-base.if",
+        "typeVersion": 2.3,
+        "position": [
+          192,
+          272
+        ],
+        "id": "2d6ed337-ac72-44b6-9f8d-d5f7984600b1",
+        "name": "If"
+      },
+      {
+        "parameters": {
+          "jsCode": "const { appendFileSync } = require('fs');\nconst d = $input.first().json;\nappendFileSync('C:\\\\myapp\\\\jest-log.txt',\n  `FAILED | ${d.timestamp} | ${d.numFailed} failed\\n`\n);\nreturn [{ json: { status: 'FAILED', failed: d.numFailed } }];"
+        },
+        "type": "n8n-nodes-base.code",
+        "typeVersion": 2,
+        "position": [
+          400,
+          368
+        ],
+        "id": "3777971d-9036-4057-a907-0f583da4010e",
+        "name": "FAIL"
+      },
+      {
+        "parameters": {
+          "jsCode": "const { appendFileSync } = require('fs');\nconst d = $input.first().json;\nappendFileSync('C:\\\\myapp\\\\jest-log.txt',\n  `PASSED | ${d.timestamp} | ${d.numPassed} passed\\n`\n);\nreturn [{ json: { status: 'PASSED', passed: d.numPassed } }];"
+        },
+        "type": "n8n-nodes-base.code",
+        "typeVersion": 2,
+        "position": [
+          400,
+          176
+        ],
+        "id": "f1a859c4-ee70-4fcc-869c-7e45d1bf9d74",
+        "name": "PASS"
+      },
+      {
+        "parameters": {
+          "jsCode": "const result = JSON.parse($input.first().json.stdout);\nreturn [{ json: {\n  success: result.success,\n  numPassed: result.numPassedTests || 0,\n  numFailed: result.numFailedTests || 0,\n  timestamp: new Date().toISOString()\n}}];"
+        },
+        "type": "n8n-nodes-base.code",
+        "typeVersion": 2,
+        "position": [
+          -16,
+          272
+        ],
+        "id": "cf98ca5f-d291-4366-a188-a62e379ce8bc",
+        "name": "Parse Output"
+      },
+      {
+        "parameters": {
+          "jsCode": "const { execSync } = require('child_process');\nlet stdout = '';\ntry {\n  stdout = execSync(\n    'cd C:\\\\myapp && npx jest --json 2>nul',\n    { encoding: 'utf8', timeout: 60000 }\n  );\n} catch (e) {\n  stdout = e.stdout || '';\n}\nreturn [{ json: { stdout } }];"
+        },
+        "type": "n8n-nodes-base.code",
+        "typeVersion": 2,
+        "position": [
+          -224,
+          272
+        ],
+        "id": "a74e27f9-ffb3-4fbb-bcb7-6316da7fe14f",
+        "name": "Run Jest"
+      },
+      {
+        "parameters": {
+          "httpMethod": "POST",
+          "path": "mock/payment",
+          "responseMode": "responseNode",
+          "options": {}
+        },
+        "type": "n8n-nodes-base.webhook",
+        "typeVersion": 2.1,
+        "position": [
+          -304,
+          1248
+        ],
+        "id": "79e063fb-bdb3-42aa-9676-46ed4211719e",
+        "name": "Webhook",
+        "webhookId": "0760f29c-fb2c-4046-9e12-2b7a9a9fe2c9"
+      },
+      {
+        "parameters": {
+          "jsCode": "const body = $input.first().json.body || {};\n\nconst mockResponse = {\n  status: \"success\",\n  transaction_id: \"MOCK-\" + Date.now(),\n  amount: body.amount || 0,\n  currency: body.currency || \"USD\",\n  timestamp: new Date().toISOString(),\n  mocked: true\n};\n\nreturn [{ json: mockResponse }];"
+        },
+        "type": "n8n-nodes-base.code",
+        "typeVersion": 2,
+        "position": [
+          -96,
+          1248
+        ],
+        "id": "ebeaf6cb-f8cf-4e0d-b826-03fc20d441a3",
+        "name": "Code in JavaScript"
+      },
+      {
+        "parameters": {
+          "jsCode": "const { appendFileSync } = require('fs');\nconst d = $input.first().json;\n\nconst line = `${d.timestamp} | ${d.transaction_id} | amount: ${d.amount}\\n`;\nappendFileSync('C:\\\\myapp\\\\mock-log.txt', line);\n\nreturn [{ json: d }];"
+        },
+        "type": "n8n-nodes-base.code",
+        "typeVersion": 2,
+        "position": [
+          112,
+          1248
+        ],
+        "id": "21e77365-7888-4ae9-9f92-e1bee0f166cd",
+        "name": "Code in JavaScript1"
+      },
+      {
+        "parameters": {
+          "respondWith": "json",
+          "responseBody": "={{ $json }}",
+          "options": {}
+        },
+        "type": "n8n-nodes-base.respondToWebhook",
+        "typeVersion": 1.5,
+        "position": [
+          320,
+          1248
+        ],
+        "id": "cc7a2552-6476-44e0-8de6-ee5d9a93780b",
+        "name": "Respond to Webhook"
+      },
+      {
+        "parameters": {
+          "content": "**MOKING HTTP**",
+          "height": 368,
+          "width": 1312
+        },
+        "type": "n8n-nodes-base.stickyNote",
+        "typeVersion": 1,
+        "position": [
+          -576,
+          1152
+        ],
+        "id": "7e8f9b73-7977-4eb3-b5cd-4fd0cf29d928",
+        "name": "Sticky Note"
+      },
+      {
+        "parameters": {
+          "content": "**JEST**",
+          "height": 496,
+          "width": 1312
+        },
+        "type": "n8n-nodes-base.stickyNote",
+        "typeVersion": 1,
+        "position": [
+          -608,
+          80
+        ],
+        "id": "7be3e21e-0342-4ae6-a5e3-7a8fdcb43f49",
+        "name": "Sticky Note1"
+      },
+      {
+        "parameters": {
+          "content": "**Snapshot**",
+          "height": 368,
+          "width": 1824
+        },
+        "type": "n8n-nodes-base.stickyNote",
+        "typeVersion": 1,
+        "position": [
+          -880,
+          640
+        ],
+        "id": "8ba08a93-1fa7-4d78-b255-71eb2cac57fd",
+        "name": "Sticky Note2"
+      },
+      {
+        "parameters": {
+          "url": "http://localhost:3000",
+          "options": {
+            "response": {
+              "response": {
+                "fullResponse": true
+              }
+            }
+          }
+        },
+        "type": "n8n-nodes-base.httpRequest",
+        "typeVersion": 4.4,
+        "position": [
+          -464,
+          752
+        ],
+        "id": "35595c5c-8754-4855-88f4-8b0863b46e8f",
+        "name": "HTTP Request1"
+      },
+      {
+        "parameters": {
+          "conditions": {
+            "options": {
+              "caseSensitive": true,
+              "leftValue": "",
+              "typeValidation": "strict",
+              "version": 3
+            },
+            "conditions": [
+              {
+                "id": "c7072679-1be5-4b5d-9d86-1017648b336f",
+                "leftValue": "={{ $json.status }}",
+                "rightValue": "MATCH",
+                "operator": {
+                  "type": "string",
+                  "operation": "equals"
+                }
+              }
+            ],
+            "combinator": "and"
+          },
+          "options": {}
+        },
+        "type": "n8n-nodes-base.if",
+        "typeVersion": 2.3,
+        "position": [
+          -48,
+          752
+        ],
+        "id": "fbfb8b1a-8e63-44e3-882e-87a0f6d38aeb",
+        "name": "If2"
+      },
+      {
+        "parameters": {
+          "jsCode": "const { readFileSync, writeFileSync, existsSync } = require('fs');\nconst snapshotPath = 'C:\\\\myapp\\\\api-snapshot.json';\n\n// ✅ Only compare the body, ignore headers/date\nconst raw = $input.first().json;\nconst bodyOnly = raw.body || raw;  // HTTP Request puts body in .body\nconst current = JSON.stringify(bodyOnly, null, 2);\n\nif (!existsSync(snapshotPath)) {\n  writeFileSync(snapshotPath, current);\n  return [{ json: {\n    status: 'CREATED',\n    message: 'First snapshot saved.',\n    snapshot: current\n  }}];\n}\n\nconst previous = readFileSync(snapshotPath, 'utf8');\n\nif (current === previous) {\n  return [{ json: {\n    status: 'MATCH',\n    message: 'API response unchanged.',\n    snapshot: current\n  }}];\n} else {\n  return [{ json: {\n    status: 'DIFF',\n    message: 'API response has changed!',\n    previous: previous,\n    current: current\n  }}];\n}"
+        },
+        "type": "n8n-nodes-base.code",
+        "typeVersion": 2,
+        "position": [
+          -256,
+          752
+        ],
+        "id": "538db2e8-ed34-4b57-82cc-f59611b803aa",
+        "name": "1ST CODE NODE1"
+      },
+      {
+        "parameters": {
+          "jsCode": "const { execSync } = require('child_process');\nlet output = '';\ntry {\n  output = execSync('node C:\\\\myapp\\\\screenshot.js', { encoding: 'utf8', timeout: 60000 });\n} catch(e) {\n  output = e.stdout || e.message || 'error';\n}\nlet result;\ntry {\n  result = JSON.parse(output.trim());\n} catch(e) {\n  result = { status: 'ERROR', message: output };\n}\nreturn [{ json: result }];"
+        },
+        "type": "n8n-nodes-base.code",
+        "typeVersion": 2,
+        "position": [
+          432,
+          672
+        ],
+        "id": "ea2867e5-e282-4197-a4fb-496121171935",
+        "name": "2ND CODE NODE1"
+      },
+      {
+        "parameters": {
+          "jsCode": "const { appendFileSync, writeFileSync } = require('fs');\nconst d = $input.first().json;\n\nappendFileSync('C:\\\\myapp\\\\snapshot-log.txt',\n  `${new Date().toISOString()} | API: DIFF ⚠️ | API response changed!\\n`\n);\n\n// Update snapshot to new value so next run is clean\nwriteFileSync('C:\\\\myapp\\\\api-snapshot.json', d.current);\n\nreturn [{ json: {\n  status: 'API DIFF ⚠️',\n  message: 'API changed — snapshot updated',\n  previous: d.previous,\n  current: d.current\n}}];"
+        },
+        "type": "n8n-nodes-base.code",
+        "typeVersion": 2,
+        "position": [
+          448,
+          832
+        ],
+        "id": "0042e438-34f0-44c3-8d2f-d324aaf70ab3",
+        "name": "3RD CODE NODE1"
+      },
+      {
+        "parameters": {},
+        "type": "n8n-nodes-base.manualTrigger",
+        "typeVersion": 1,
+        "position": [
+          -656,
+          752
+        ],
+        "id": "ca05dc00-a173-46c7-acd3-a81921121965",
+        "name": "When clicking ‘Execute workflow’"
+      }
+    ],
+    "connections": {
+      "If": {
+        "main": [
+          [
+            {
+              "node": "PASS",
+              "type": "main",
+              "index": 0
+            }
+          ],
+          [
+            {
+              "node": "FAIL",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Parse Output": {
+        "main": [
+          [
+            {
+              "node": "If",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Run Jest": {
+        "main": [
+          [
+            {
+              "node": "Parse Output",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Webhook": {
+        "main": [
+          [
+            {
+              "node": "Code in JavaScript",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Code in JavaScript": {
+        "main": [
+          [
+            {
+              "node": "Code in JavaScript1",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Code in JavaScript1": {
+        "main": [
+          [
+            {
+              "node": "Respond to Webhook",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "HTTP Request1": {
+        "main": [
+          [
+            {
+              "node": "1ST CODE NODE1",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "If2": {
+        "main": [
+          [
+            {
+              "node": "2ND CODE NODE1",
+              "type": "main",
+              "index": 0
+            }
+          ],
+          [
+            {
+              "node": "3RD CODE NODE1",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "1ST CODE NODE1": {
+        "main": [
+          [
+            {
+              "node": "If2",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      }
+    },
+    "authors": "Sanika Shinde",
+    "name": "Version 52281bc4",
+    "description": "",
+    "autosaved": true
+  },
+  "tags": []
+}
