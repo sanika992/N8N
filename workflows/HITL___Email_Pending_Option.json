@@ -1,0 +1,1536 @@
+{
+  "updatedAt": "2026-06-09T11:43:37.227Z",
+  "createdAt": "2026-06-09T06:54:32.068Z",
+  "id": "iDZBu0WZIoyuU9tp",
+  "name": "HITL — Email Pending Option",
+  "active": true,
+  "isArchived": false,
+  "nodes": [
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "ac182d10-2dd2-4225-90fc-29d7e19b18e5",
+              "name": "employee_name",
+              "value": "Sanika Shinde",
+              "type": "string"
+            },
+            {
+              "id": "d9930a57-55fd-4197-9b2e-b2a85ecd4d92",
+              "name": "email",
+              "value": "sanikashinde992@gmail.com",
+              "type": "string"
+            },
+            {
+              "id": "efeb8f1f-e8cb-4e22-bfc6-8afec930f6bf",
+              "name": "department",
+              "value": "AI",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        208,
+        0
+      ],
+      "id": "33e7a5b5-b73b-4731-81c3-179fa6d9d95c",
+      "name": "Edit Fields"
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "=Generate a professional welcome email for {{$json.employee_name}} who is joining {{$json.department}} department.",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 3.1,
+      "position": [
+        448,
+        0
+      ],
+      "id": "16a0aad7-2f96-491e-9275-684fb4497ee9",
+      "name": "AI Agent"
+    },
+    {
+      "parameters": {
+        "model": "gpt-4o-mini",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatAzureOpenAi",
+      "typeVersion": 1,
+      "position": [
+        448,
+        208
+      ],
+      "id": "d9ac9b4b-9b78-4c80-bab6-4de3902759b9",
+      "name": "Azure OpenAI Chat Model",
+      "credentials": {
+        "azureOpenAiApi": {
+          "id": "x5lZM9gfKe7o6JtL",
+          "name": "Azure Open AI account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 3
+          },
+          "conditions": [
+            {
+              "id": "c17f209f-a954-40db-8237-acdfc159ec6b",
+              "leftValue": "={{ $json.approval_status }}",
+              "rightValue": "approved",
+              "operator": {
+                "type": "string",
+                "operation": "equals",
+                "name": "filter.operator.equals"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
+      "position": [
+        1232,
+        0
+      ],
+      "id": "78f6661e-66ca-4d1f-9fe3-2b557762ff93",
+      "name": "If"
+    },
+    {
+      "parameters": {
+        "sendTo": "={{ $('Edit Fields').item.json.email }}",
+        "subject": "You are selected",
+        "emailType": "text",
+        "message": "=HI {{ $('Edit Fields').item.json.employee_name }}\nWELCOME TO THE TEAM!",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.2,
+      "position": [
+        1504,
+        -160
+      ],
+      "id": "b04cace4-fad8-4968-a6a9-bd0998412798",
+      "name": "Send a message1",
+      "webhookId": "1e320fef-178a-4abb-937b-5b1032621e2e",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "ufBHP0gOl5jBybIp",
+          "name": "Gmail account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "sendAndWait",
+        "sendTo": "sanikashinde992@gmail.com",
+        "subject": "Approval Required",
+        "message": "=Manager Approval Required for {{$node[\"Edit Fields\"].json.employee_name}}\nAI Generated Email:\n\n{{$node[\"AI Agent\"].json.output}}\n\nPlease review and approve.",
+        "approvalOptions": {
+          "values": {
+            "approvalType": "double"
+          }
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.2,
+      "position": [
+        784,
+        0
+      ],
+      "id": "7070bace-f084-4cfe-b5e9-508ec906b887",
+      "name": "Send message and wait for response",
+      "webhookId": "1816154e-e254-4cea-b5f4-714b776e7d35",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "ufBHP0gOl5jBybIp",
+          "name": "Gmail account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "sendTo": "={{ $('Edit Fields').item.json.email }}",
+        "subject": "You are NOT selected",
+        "emailType": "text",
+        "message": "=HI {{ $('Edit Fields').item.json.employee_name }}\nSoooooorrry YOUR ARE NOT Selected!",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.2,
+      "position": [
+        1504,
+        48
+      ],
+      "id": "e4e1d8cc-2ef5-402b-86f3-274ebff27e97",
+      "name": "Send a message",
+      "webhookId": "1e320fef-178a-4abb-937b-5b1032621e2e",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "ufBHP0gOl5jBybIp",
+          "name": "Gmail account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "2bb8ee1c-2840-4fbd-b693-7f662cd07058",
+              "name": "approval_status",
+              "value": "approved",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        992,
+        0
+      ],
+      "id": "d93677a1-692c-4eb9-a0ad-8c4ff7fe8ed8",
+      "name": "Edit Fields1"
+    },
+    {
+      "parameters": {
+        "public": true,
+        "availableInChat": true,
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.chatTrigger",
+      "typeVersion": 1.4,
+      "position": [
+        0,
+        0
+      ],
+      "id": "1e5a46e5-987d-4499-8b39-8004d9788318",
+      "name": "When chat message received",
+      "webhookId": "80371184-64e8-4092-906d-bb1c32c353ea"
+    },
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [
+        -672,
+        1696
+      ],
+      "id": "fbcf2f0f-3305-4a2a-a9d7-720cd88ae533",
+      "name": "When clicking ‘Execute workflow’"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "e813b43f-1827-4e95-9fa0-69a5ad7b8bf4",
+              "name": "customer_name",
+              "value": "Sparsh",
+              "type": "string"
+            },
+            {
+              "id": "72c41fb6-f0cf-4133-9e93-6c0086e2839a",
+              "name": "customer_email",
+              "value": "jsparsh11@gmail.com",
+              "type": "string"
+            },
+            {
+              "id": "1e468176-b23c-4193-80b5-d1366065db5f",
+              "name": "subject",
+              "value": "Invoice Query",
+              "type": "string"
+            },
+            {
+              "id": "779f1fe3-94ad-4da8-afc7-7818cf459616",
+              "name": "message",
+              "value": "Hi, I have not received my invoice for order #12345. Can you help?",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        -368,
+        480
+      ],
+      "id": "74e7a558-fb46-41a5-8af8-97d7ea087ca3",
+      "name": "Customer Email Data"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "6c358a1f-9c10-4012-88cf-bf0d934d28ed",
+              "name": "ai_draft",
+              "value": "={{ $json.output }}",
+              "type": "string"
+            },
+            {
+              "id": "0629d232-8523-4d62-8371-4e4847a68d78",
+              "name": "customer_name",
+              "value": "={{ $('Customer Email Data').item.json.customer_name }}",
+              "type": "string"
+            },
+            {
+              "id": "a8100136-2e65-4f5e-8bd0-e41d02b60363",
+              "name": "=customer_email",
+              "value": "={{ $('Customer Email Data').item.json.customer_email }}",
+              "type": "string"
+            },
+            {
+              "id": "789220e7-f777-4209-a1f4-f8395343d70d",
+              "name": "subject",
+              "value": "={{ $('Customer Email Data').item.json.subject }}",
+              "type": "string"
+            },
+            {
+              "id": "e3fde81f-b7e0-4fd6-adb9-b8f6b51df439",
+              "name": "original_query",
+              "value": "={{ $('Customer Email Data').item.json.message }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        160,
+        480
+      ],
+      "id": "3691b211-4426-4cb3-83c7-ae7d4e6bd02a",
+      "name": "Format Review Data"
+    },
+    {
+      "parameters": {
+        "resume": "webhook",
+        "limitWaitTime": true,
+        "resumeAmount": 24,
+        "options": {}
+      },
+      "type": "n8n-nodes-base.wait",
+      "typeVersion": 1.1,
+      "position": [
+        784,
+        480
+      ],
+      "id": "bc56bf2b-56a4-4ea8-9a80-61d81e5530fa",
+      "name": "Wait",
+      "webhookId": "cf4b8be3-ce20-40bc-9ac0-4cbeacd84895"
+    },
+    {
+      "parameters": {
+        "errorMessage": "error"
+      },
+      "type": "n8n-nodes-base.stopAndError",
+      "typeVersion": 1,
+      "position": [
+        1376,
+        624
+      ],
+      "id": "d2df5935-e8bf-4561-92c5-9686785c2ef3",
+      "name": "Stop and Error"
+    },
+    {
+      "parameters": {
+        "content": "## Workflow of each node \nNode 1: Manual Trigger\n  Starts the workflow\n  ↓ passes: nothing (just a trigger)\n\nNode 2: Customer Email Data\n  Sets the customer information\n  ↓ passes: name, email, subject, message\n\nNode 3: AI Agent\n  Reads the customer message and drafts a reply\n  ↓ passes: ai output (the drafted email text)\n\nNode 4: Format Review Data\n  Combines AI draft + original customer details\n  ↓ passes: ai_draft + name + email + subject + query\n\nNode 5: Send Review Email\n  Emails the manager with draft + approve/reject links\n  ↓ passes: same data package (unchanged)\n\nNode 6: WAIT — workflow completely pauses here\n  ↓ nothing moves until manager clicks a link\n  ↓ passes: original data + action (approve/reject)\n\nNode 7: IF Check Decision\n  Reads the action parameter\n  ↓ TRUE (approve) → Node 8A\n  ↓ FALSE (reject) → Node 8B\n\nNode 8A: Send Email to Customer\n  Delivers the approved draft to the customer\n  ↓ passes: sent email confirmation\n\nNode 8B: Log Rejection\n  Records that draft was rejected\n  ↓ passes: rejection status\n\nNode 9: Postgres Log\n  Saves the decision permanently to database\n  ↓ end of workflow\n",
+        "height": 672,
+        "width": 448
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        -1408,
+        320
+      ],
+      "typeVersion": 1,
+      "id": "0bd48ca5-2848-45ce-863f-216a803affc2",
+      "name": "Sticky Note"
+    },
+    {
+      "parameters": {
+        "sendTo": "sanikashinde992@gmail.com",
+        "subject": "=ACTION REQUIRED — Review AI Draft for {{ $('Format Review Data').item.json.customer_name }}",
+        "message": "=html\n<!DOCTYPE html>\n<html>\n<head>\n<style>\nbody {\n  font-family: Arial, sans-serif;\n  background: #f5f5f5;\n  padding: 20px;\n}\n\n.container {\n  background: white;\n  max-width: 700px;\n  margin: auto;\n  border-radius: 10px;\n  padding: 30px;\n  border: 1px solid #ddd;\n}\n\nh2 {\n  color: #333;\n  border-bottom: 2px solid #eee;\n  padding-bottom: 10px;\n}\n\n.label {\n  font-weight: bold;\n  color: #555;\n}\n\n.draft-box {\n  background: #f9f9f9;\n  border-left: 4px solid #007bff;\n  padding: 15px;\n  margin: 15px 0;\n  border-radius: 4px;\n  white-space: pre-wrap;\n  font-size: 14px;\n}\n\n.buttons {\n  margin-top: 25px;\n  text-align: center;\n}\n\n.btn {\n  display: inline-block;\n  padding: 14px 24px;\n  margin: 8px;\n  border-radius: 6px;\n  font-size: 15px;\n  font-weight: bold;\n  text-decoration: none;\n  color: white !important;\n}\n\n.approve {\n  background-color: #28a745;\n}\n\n.reject {\n  background-color: #dc3545;\n}\n\n.warning {\n  color: #856404;\n  background: #fff3cd;\n  padding: 10px;\n  border-radius: 4px;\n  margin-top: 20px;\n  font-size: 13px;\n  text-align: center;\n}\n</style>\n</head>\n\n<body>\n\n<div class=\"container\">\n\n<h2>📧 Welcome Email Approval Request</h2>\n\n<p>\n<span class=\"label\">Employee Name:</span>\n{{ $('Format Review Data').item.json.employee_name }}\n</p>\n\n<p>\n<span class=\"label\">Employee Email:</span>\n{{ $('Format Review Data').item.json.employee_email }}\n</p>\n\n<p>\n<span class=\"label\">Department:</span>\n{{ $('Format Review Data').item.json.department }}\n</p>\n\n<p>\n<span class=\"label\">AI Generated Welcome Email:</span>\n</p>\n\n<div class=\"draft-box\">\n{{ $('Format Review Data').item.json.ai_draft }}\n</div>\n\n<div class=\"buttons\">\n\n<a class=\"btn approve\"\nhref=\"{{ $execution.resumeUrl }}?decision=approved\">\n✅ Approve & Send\n</a>\n\n<a class=\"btn reject\"\nhref=\"{{ $execution.resumeUrl }}?decision=rejected\">\n❌ Reject\n</a>\n\n</div>\n\n<div class=\"warning\">\n⚠️ Manager approval is required before the welcome email is sent to the employee.\n</div>\n\n</div>\n\n</body>\n</html>",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.2,
+      "position": [
+        576,
+        480
+      ],
+      "id": "1640f33d-f507-4da8-be83-5a1a25c7fdd1",
+      "name": "Send Review Email to Manager",
+      "webhookId": "b62bfe72-88c4-4d7f-8e47-17659c1a3ccd",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "ufBHP0gOl5jBybIp",
+          "name": "Gmail account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "html": "<!DOCTYPE html>\n<html>\n<head>\n  <style>\n    body { font-family: Arial, sans-serif; background: #f5f5f5; padding: 20px; }\n    .container { background: white; max-width: 600px; margin: auto; border-radius: 10px; padding: 30px; border: 1px solid #ddd; }\n    h2 { color: #333; border-bottom: 2px solid #eee; padding-bottom: 10px; }\n    .label { font-weight: bold; color: #555; }\n    .draft-box { background: #f9f9f9; border-left: 4px solid #007bff; padding: 15px; margin: 15px 0; border-radius: 4px; white-space: pre-wrap; font-size: 14px; }\n    .buttons { margin-top: 25px; display: flex; flex-wrap: wrap; gap: 12px; justify-content: center; }\n    .btn-link { display: inline-block; padding: 14px 24px; border-radius: 6px; font-size: 15px; font-weight: bold; text-decoration: none; color: white !important; text-align: center; cursor: pointer; border: none; }\n    .approve { background-color: #28a745; }\n    .approve:hover { background-color: #218838; }\n    .reject { background-color: #dc3545; }\n    .reject:hover { background-color: #c82333; }\n    .pending { background-color: #6c757d; }\n    .pending:hover { background-color: #5a6268; }\n    .edit-btn { background-color: #f59e0b; color: white !important; }\n    .edit-btn:hover { background-color: #d97706; }\n    #editSection {\n      display: none;\n      margin-top: 24px;\n      background: #fffbea;\n      border: 1px solid #f59e0b;\n      border-radius: 8px;\n      padding: 20px;\n    }\n    .warning { color: #856404; background: #fff3cd; padding: 10px; border-radius: 4px; margin-top: 20px; font-size: 13px; text-align: center; }\n  </style>\n</head>\n<body>\n<div class=\"container\">\n  <h2>📧 Email Approval Request</h2>\n  <p><span class=\"label\">Customer Name:</span> {{ $json.customer_name }}</p>\n  <p><span class=\"label\">Customer Email:</span> {{ $json.customer_email }}</p>\n  <p><span class=\"label\">Subject:</span> {{ $json.subject }}</p>\n  <p><span class=\"label\">Original Query:</span> {{ $json.original_query }}</p>\n  <p><span class=\"label\">AI Drafted Reply:</span></p>\n  <div class=\"draft-box\">{{ $json.ai_draft }}</div>\n\n  <!-- ALL 4 BUTTONS -->\n  <div class=\"buttons\">\n    <a class=\"btn-link approve\" href=\"{{ $execution.resumeUrl }}?decision=approved\">\n      ✅ Approve — Send to Customer\n    </a>\n    <a class=\"btn-link reject\" href=\"{{ $execution.resumeUrl }}?decision=rejected\">\n      ❌ Reject — Do Not Send\n    </a>\n    <a class=\"btn-link pending\" href=\"{{ $execution.resumeUrl }}?decision=pending\">\n      ⏳ Pending — Review Later\n    </a>\n\n  </div>\n\n  <!-- EDIT SECTION (only textarea + submit, no heading text) -->\n  <div id=\"editSection\">\n    <form method=\"POST\" action=\"{{ $execution.resumeUrl }}?decision=edited\">\n      <textarea\n        name=\"editedContent\"\n        style=\"width:100%; height:160px; padding:12px; border:1px solid #ccc; border-radius:6px; font-size:14px; font-family:Arial; resize:vertical; box-sizing:border-box;\"\n      >{{ $json.ai_draft }}</textarea>\n      <br/>\n      <button\n        type=\"submit\"\n        style=\"margin-top:12px; background-color:#3b82f6; color:white; padding:12px 24px; border:none; border-radius:6px; font-size:15px; font-weight:bold; cursor:pointer; width:100%;\"\n      >\n        📨 Submit\n      </button>\n    </form>\n  </div>\n\n  <div class=\"warning\">\n    ⚠️ This approval link expires in 24 hours. Please click one button above.\n  </div>\n</div>\n\n<script>\n  function toggleEdit() {\n    var section = document.getElementById('editSection');\n    section.style.display = (section.style.display === 'block') ? 'none' : 'block';\n  }\n</script>\n</body>\n</html>"
+      },
+      "type": "n8n-nodes-base.html",
+      "typeVersion": 1.2,
+      "position": [
+        368,
+        480
+      ],
+      "id": "c2733667-fd07-4788-9ce8-af1838fefb45",
+      "name": "HTML"
+    },
+    {
+      "parameters": {
+        "rules": {
+          "values": [
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 3
+                },
+                "conditions": [
+                  {
+                    "leftValue": "={{ $json.query.decision }}",
+                    "rightValue": "=approved",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    },
+                    "id": "6dec3f04-c705-44fc-a8d4-e8ce15dcaa0d"
+                  }
+                ],
+                "combinator": "and"
+              }
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 3
+                },
+                "conditions": [
+                  {
+                    "id": "c98e3361-d27c-4e0b-bf3e-d2be75afef71",
+                    "leftValue": "={{ $json.query.decision }}",
+                    "rightValue": "rejected",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals",
+                      "name": "filter.operator.equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              }
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 3
+                },
+                "conditions": [
+                  {
+                    "id": "b541c97f-527e-4c39-9888-923d658c25c2",
+                    "leftValue": "={{ $json.query.decision }}",
+                    "rightValue": "pending ",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals",
+                      "name": "filter.operator.equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              }
+            }
+          ]
+        },
+        "options": {
+          "fallbackOutput": "none"
+        }
+      },
+      "type": "n8n-nodes-base.switch",
+      "typeVersion": 3.4,
+      "position": [
+        1008,
+        496
+      ],
+      "id": "fda995de-076e-4835-9576-538ebcf43775",
+      "name": "Switch"
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "=Customer Name: {{ $json.customer_name }}\nCustomer Email: {{ $json.customer_email }}\nSubject: {{ $json.subject }}\nCustomer Query: {{ $json.original_query || $json.message }}\n\n{{ $json.editedDraft ? 'The manager reviewed and edited the draft. Use this version exactly — do NOT rewrite it, only clean up formatting: ' + $json.editedDraft : 'Please draft a professional email reply to the customer.' }}",
+        "options": {
+          "systemMessage": "You are a professional customer service agent.\nDraft a helpful, polite email reply to the\ncustomer's query. Keep it concise and professional.\nSign off as \"Customer Support Team\""
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 3.1,
+      "position": [
+        -144,
+        480
+      ],
+      "id": "69aef56b-5508-4496-8731-fcd58648a46d",
+      "name": "AI Agent1"
+    },
+    {
+      "parameters": {
+        "model": "gpt-4.1-mini",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatAzureOpenAi",
+      "typeVersion": 1,
+      "position": [
+        -144,
+        800
+      ],
+      "id": "1c730927-6f68-4fe3-87cb-9cd65588ef6a",
+      "name": "Azure OpenAI Chat Model1",
+      "credentials": {
+        "azureOpenAiApi": {
+          "id": "x5lZM9gfKe7o6JtL",
+          "name": "Azure Open AI account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "sendTo": "={{ $('Format Review Data').item.json.customer_email }}",
+        "subject": "=Re: {{ $('Format Review Data').item.json.subject }}",
+        "emailType": "text",
+        "message": "={{ $('Format Review Data').item.json.ai_draft }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.2,
+      "position": [
+        1328,
+        384
+      ],
+      "id": "80a6f797-c450-4ce6-92dc-6f1d70606ade",
+      "name": "Send a message2",
+      "webhookId": "b6b13877-ecf2-40c5-a221-f2468a5157a0",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "ufBHP0gOl5jBybIp",
+          "name": "Gmail account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "sendTo": "={{ $('Format Review Data').item.json.customer_email }}",
+        "subject": "=⏳ Pending Review — {{ $('Format Review Data').item.json.subject }}",
+        "message": "=Hi,\n\nThe following email draft has been marked as Pending Review and will need your attention later.\n\nCustomer: {{ $('Format Review Data').item.json.customer_name }}\nEmail: {{ $('Format Review Data').item.json.customer_email }}\nSubject: {{ $('Format Review Data').item.json.subject }}\n\nAI Draft:\n{{ $('Format Review Data').item.json.ai_draft }}\n\nPlease review and take action when ready.\n\nRegards,\nAutomation System",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.2,
+      "position": [
+        1376,
+        880
+      ],
+      "id": "da87ef54-a00a-419f-aee3-1d4d697c7e89",
+      "name": "Send a message3",
+      "webhookId": "70a5b1c9-0cfb-4b07-9b74-330ea9bcc9ec",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "ufBHP0gOl5jBybIp",
+          "name": "Gmail account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "e813b43f-1827-4e95-9fa0-69a5ad7b8bf4",
+              "name": "customer_name",
+              "value": "Sparsh",
+              "type": "string"
+            },
+            {
+              "id": "72c41fb6-f0cf-4133-9e93-6c0086e2839a",
+              "name": "customer_email",
+              "value": "sanikashinde992@gmail.com",
+              "type": "string"
+            },
+            {
+              "id": "1e468176-b23c-4193-80b5-d1366065db5f",
+              "name": "subject",
+              "value": "Invoice Query",
+              "type": "string"
+            },
+            {
+              "id": "779f1fe3-94ad-4da8-afc7-7818cf459616",
+              "name": "message",
+              "value": "Hi, I have not received my invoice for order #12345. Can you help?",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        -256,
+        1584
+      ],
+      "id": "220fc21e-0c91-49c2-9d78-82b7ce85b77c",
+      "name": "Customer Email Data1"
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "=Customer Name: {{ $json.customer_name }}\nCustomer Email: {{ $json.customer_email }}\nSubject: {{ $json.subject }}\nCustomer Query: {{ $json.original_query || $json.message }}\n\n{{ $json.editedDraft ? 'The manager reviewed and edited the draft. Use this version exactly — do NOT rewrite it, only clean up formatting: ' + $json.editedDraft : 'Please draft a professional email reply to the customer.' }}",
+        "options": {
+          "systemMessage": "You are a professional customer service agent.\nDraft a helpful, polite email reply to the\ncustomer's query. Keep it concise and professional.\nSign off as \"Customer Support Team\""
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 3.1,
+      "position": [
+        -32,
+        1584
+      ],
+      "id": "e17468d7-f68c-4060-ba13-650a369e22d3",
+      "name": "AI Agent2"
+    },
+    {
+      "parameters": {
+        "model": "gpt-4.1-mini",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatAzureOpenAi",
+      "typeVersion": 1,
+      "position": [
+        -32,
+        1904
+      ],
+      "id": "69f178c5-c5fe-4caf-bd22-888e0dfb07c7",
+      "name": "Azure OpenAI Chat Model2",
+      "credentials": {
+        "azureOpenAiApi": {
+          "id": "x5lZM9gfKe7o6JtL",
+          "name": "Azure Open AI account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "6c358a1f-9c10-4012-88cf-bf0d934d28ed",
+              "name": "ai_draft",
+              "value": "={{ $json.output }}",
+              "type": "string"
+            },
+            {
+              "id": "0629d232-8523-4d62-8371-4e4847a68d78",
+              "name": "customer_name",
+              "value": "={{ $('Customer Email Data1').item.json.customer_name }}",
+              "type": "string"
+            },
+            {
+              "id": "a8100136-2e65-4f5e-8bd0-e41d02b60363",
+              "name": "=customer_email",
+              "value": "={{ $('Customer Email Data1').item.json.customer_email }}",
+              "type": "string"
+            },
+            {
+              "id": "789220e7-f777-4209-a1f4-f8395343d70d",
+              "name": "subject",
+              "value": "={{ $('Customer Email Data1').item.json.subject }}",
+              "type": "string"
+            },
+            {
+              "id": "e3fde81f-b7e0-4fd6-adb9-b8f6b51df439",
+              "name": "original_query",
+              "value": "={{ $('Customer Email Data1').item.json.message }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        272,
+        1584
+      ],
+      "id": "51ff7e01-1ac8-4c4c-8581-feba38025691",
+      "name": "Format Review Data1"
+    },
+    {
+      "parameters": {
+        "resume": "webhook",
+        "limitWaitTime": true,
+        "resumeAmount": 24,
+        "options": {}
+      },
+      "type": "n8n-nodes-base.wait",
+      "typeVersion": 1.1,
+      "position": [
+        896,
+        1584
+      ],
+      "id": "1d628e21-defd-4ef4-ab29-34fbcfad2de3",
+      "name": "Wait1",
+      "webhookId": "cf4b8be3-ce20-40bc-9ac0-4cbeacd84895"
+    },
+    {
+      "parameters": {
+        "sendTo": "={{ $('Format Review Data1').item.json.customer_email }}",
+        "subject": "=Re: {{ $('Format Review Data1').item.json.subject }}",
+        "emailType": "text",
+        "message": "={{ $('Format Review Data1').item.json.ai_draft }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.2,
+      "position": [
+        1488,
+        1488
+      ],
+      "id": "2e504863-33c9-40b2-92f8-ad9c99571dcb",
+      "name": "Send a message4",
+      "webhookId": "b6b13877-ecf2-40c5-a221-f2468a5157a0",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "ufBHP0gOl5jBybIp",
+          "name": "Gmail account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "errorMessage": "error"
+      },
+      "type": "n8n-nodes-base.stopAndError",
+      "typeVersion": 1,
+      "position": [
+        1488,
+        1728
+      ],
+      "id": "739fc7b8-f849-49fa-b341-61c79c9c706d",
+      "name": "Stop and Error1"
+    },
+    {
+      "parameters": {
+        "sendTo": "sanikashinde992@gmail.com",
+        "subject": "=ACTION REQUIRED — Review AI Draft for {{ $('Format Review Data1').item.json.customer_name }}",
+        "message": "=<!DOCTYPE html>\n<html>\n<head>\n<style>\n  body { font-family: Arial, sans-serif; background: #f5f5f5; padding: 20px; }\n  .container { background: white; max-width: 600px; margin: auto; border-radius: 10px; padding: 30px; border: 1px solid #ddd; }\n  h2 { color: #333; border-bottom: 2px solid #eee; padding-bottom: 10px; }\n  .label { font-weight: bold; color: #555; }\n  .draft-box { background: #f9f9f9; border-left: 4px solid #007bff; padding: 15px; margin: 15px 0; border-radius: 4px; white-space: pre-wrap; font-size: 14px; }\n  .buttons { margin-top: 25px; text-align: center; }\n  .btn { display: inline-block; padding: 14px 24px; margin: 8px; border-radius: 6px; font-size: 15px; font-weight: bold; text-decoration: none; color: white; }\n  .approve { background-color: #28a745; }\n  .reject  { background-color: #dc3545; }\n  .edit    { background-color: #f59e0b; }\n  .warning { color: #856404; background: #fff3cd; padding: 10px; border-radius: 4px; margin-top: 20px; font-size: 13px; text-align: center; }\n</style>\n</head>\n<body>\n<div class=\"container\">\n  <h2>📧 Email Approval Request</h2>\n\n  <p><span class=\"label\">Customer Name:</span> {{ $('Format Review Data1').item.json.customer_name }}</p>\n  <p><span class=\"label\">Customer Email:</span> {{ $('Format Review Data1').item.json.customer_email }}</p>\n  <p><span class=\"label\">Subject:</span> {{ $('Format Review Data1').item.json.subject }}</p>\n  <p><span class=\"label\">Original Query:</span> {{ $('Format Review Data1').item.json.original_query }}</p>\n\n  <p><span class=\"label\">AI Drafted Reply:</span></p>\n  <div class=\"draft-box\">{{ $('Format Review Data1').item.json.ai_draft }}</div>\n\n  <div class=\"buttons\">\n    <a class=\"btn approve\" href=\"{{ $execution.resumeUrl }}?decision=approved\">\n      ✅ Approve — Send to Customer\n    </a>\n    <a class=\"btn reject\" href=\"{{ $execution.resumeUrl }}?decision=rejected\">\n      ❌ Reject — Do Not Send\n    </a>\n    <a class=\"btn edit\" href=\"{{ $execution.resumeUrl }}\">\n      ✏️ Edit &amp; Revise\n    </a>\n  </div>\n\n  <div class=\"warning\">\n    ⚠️ This approval link expires in 24 hours. Please click one button above.\n  </div>\n</div>\n</body>\n</html>",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.2,
+      "position": [
+        688,
+        1584
+      ],
+      "id": "3472f6c1-8299-45de-b995-55556cca4675",
+      "name": "Send Review Email to Manager1",
+      "webhookId": "b62bfe72-88c4-4d7f-8e47-17659c1a3ccd",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "ufBHP0gOl5jBybIp",
+          "name": "Gmail account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "html": "<!DOCTYPE html>\n<html>\n<head>\n  <style>\n    body { font-family: Arial, sans-serif; background: #f5f5f5; padding: 20px; }\n    .container { background: white; max-width: 600px; margin: auto; border-radius: 10px; padding: 30px; border: 1px solid #ddd; }\n    h2 { color: #333; border-bottom: 2px solid #eee; padding-bottom: 10px; }\n    .label { font-weight: bold; color: #555; }\n    .draft-box { background: #f9f9f9; border-left: 4px solid #007bff; padding: 15px; margin: 15px 0; border-radius: 4px; white-space: pre-wrap; font-size: 14px; }\n    .buttons { margin-top: 25px; display: flex; flex-wrap: wrap; gap: 12px; justify-content: center; }\n    .btn-link { display: inline-block; padding: 14px 24px; border-radius: 6px; font-size: 15px; font-weight: bold; text-decoration: none; color: white !important; text-align: center; cursor: pointer; border: none; }\n    .approve { background-color: #28a745; }\n    .approve:hover { background-color: #218838; }\n    .reject { background-color: #dc3545; }\n    .reject:hover { background-color: #c82333; }\n    .pending { background-color: #6c757d; }\n    .pending:hover { background-color: #5a6268; }\n    .edit-btn { background-color: #f59e0b; color: white !important; }\n    .edit-btn:hover { background-color: #d97706; }\n    #editSection {\n      display: none;\n      margin-top: 24px;\n      background: #fffbea;\n      border: 1px solid #f59e0b;\n      border-radius: 8px;\n      padding: 20px;\n    }\n    .warning { color: #856404; background: #fff3cd; padding: 10px; border-radius: 4px; margin-top: 20px; font-size: 13px; text-align: center; }\n  </style>\n</head>\n<body>\n<div class=\"container\">\n  <h2>📧 Email Approval Request</h2>\n  <p><span class=\"label\">Customer Name:</span> {{ $json.customer_name }}</p>\n  <p><span class=\"label\">Customer Email:</span> {{ $json.customer_email }}</p>\n  <p><span class=\"label\">Subject:</span> {{ $json.subject }}</p>\n  <p><span class=\"label\">Original Query:</span> {{ $json.original_query }}</p>\n  <p><span class=\"label\">AI Drafted Reply:</span></p>\n  <div class=\"draft-box\">{{ $json.ai_draft }}</div>\n\n  <!-- ALL 4 BUTTONS -->\n  <div class=\"buttons\">\n    <a class=\"btn-link approve\" href=\"{{ $execution.resumeUrl }}?decision=approved\">\n      ✅ Approve — Send to Customer\n    </a>\n    <a class=\"btn-link reject\" href=\"{{ $execution.resumeUrl }}?decision=rejected\">\n      ❌ Reject — Do Not Send\n    </a>\n    <a class=\"btn-link pending\" href=\"{{ $execution.resumeUrl }}?decision=pending\">\n      ⏳ Pending — Review Later\n    </a>\n\n  </div>\n\n  <!-- EDIT SECTION (only textarea + submit, no heading text) -->\n  <div id=\"editSection\">\n    <form method=\"POST\" action=\"{{ $execution.resumeUrl }}?decision=edited\">\n      <textarea\n        name=\"editedContent\"\n        style=\"width:100%; height:160px; padding:12px; border:1px solid #ccc; border-radius:6px; font-size:14px; font-family:Arial; resize:vertical; box-sizing:border-box;\"\n      >{{ $json.ai_draft }}</textarea>\n      <br/>\n      <button\n        type=\"submit\"\n        style=\"margin-top:12px; background-color:#3b82f6; color:white; padding:12px 24px; border:none; border-radius:6px; font-size:15px; font-weight:bold; cursor:pointer; width:100%;\"\n      >\n        📨 Submit\n      </button>\n    </form>\n  </div>\n\n  <div class=\"warning\">\n    ⚠️ This approval link expires in 24 hours. Please click one button above.\n  </div>\n</div>\n\n<script>\n  function toggleEdit() {\n    var section = document.getElementById('editSection');\n    section.style.display = (section.style.display === 'block') ? 'none' : 'block';\n  }\n</script>\n</body>\n</html>"
+      },
+      "type": "n8n-nodes-base.html",
+      "typeVersion": 1.2,
+      "position": [
+        480,
+        1584
+      ],
+      "id": "d9bf62af-686a-4b12-b6fd-0d1bcc65e276",
+      "name": "HTML1"
+    },
+    {
+      "parameters": {
+        "rules": {
+          "values": [
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 3
+                },
+                "conditions": [
+                  {
+                    "leftValue": "={{ $json.query.decision }}",
+                    "rightValue": "=approved",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    },
+                    "id": "6dec3f04-c705-44fc-a8d4-e8ce15dcaa0d"
+                  }
+                ],
+                "combinator": "and"
+              }
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 3
+                },
+                "conditions": [
+                  {
+                    "id": "c98e3361-d27c-4e0b-bf3e-d2be75afef71",
+                    "leftValue": "={{ $json.query.decision }}",
+                    "rightValue": "rejected",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals",
+                      "name": "filter.operator.equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              }
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 3
+                },
+                "conditions": [
+                  {
+                    "id": "b541c97f-527e-4c39-9888-923d658c25c2",
+                    "leftValue": "={{ $json.query.decision }}",
+                    "rightValue": "pending ",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals",
+                      "name": "filter.operator.equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              }
+            }
+          ]
+        },
+        "options": {
+          "fallbackOutput": "none"
+        }
+      },
+      "type": "n8n-nodes-base.switch",
+      "typeVersion": 3.4,
+      "position": [
+        1104,
+        1600
+      ],
+      "id": "64e05d6b-8078-48d3-b2a3-6b3540a8a157",
+      "name": "Switch1"
+    },
+    {
+      "parameters": {
+        "sendTo": "={{ $('Format Review Data1').item.json.customer_email }}",
+        "subject": "=⏳ Pending Review — {{ $('Format Review Data1').item.json.subject }}",
+        "message": "=Hi,\n\nThe following email draft has been marked as Pending Review and will need your attention later.\n\nCustomer: {{ $('Format Review Data1').item.json.customer_name }}\nEmail: {{ $('Format Review Data1').item.json.customer_email }}\nSubject: {{ $('Format Review Data1').item.json.subject }}\n\nAI Draft:\n{{ $('Format Review Data1').item.json.ai_draft }}\n\nPlease review and take action when ready.\n\nRegards,\nAutomation System",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.2,
+      "position": [
+        1488,
+        1984
+      ],
+      "id": "29d5e296-973f-4f44-856e-7c71e866eb24",
+      "name": "Send a message5",
+      "webhookId": "70a5b1c9-0cfb-4b07-9b74-330ea9bcc9ec",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "ufBHP0gOl5jBybIp",
+          "name": "Gmail account"
+        }
+      }
+    }
+  ],
+  "connections": {
+    "Edit Fields": {
+      "main": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Azure OpenAI Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "AI Agent": {
+      "main": [
+        [
+          {
+            "node": "Send message and wait for response",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If": {
+      "main": [
+        [
+          {
+            "node": "Send a message1",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Send a message",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Send message and wait for response": {
+      "main": [
+        [
+          {
+            "node": "Edit Fields1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Edit Fields1": {
+      "main": [
+        [
+          {
+            "node": "If",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "When chat message received": {
+      "main": [
+        [
+          {
+            "node": "Edit Fields",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "When clicking ‘Execute workflow’": {
+      "main": [
+        [
+          {
+            "node": "Customer Email Data1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Customer Email Data": {
+      "main": [
+        [
+          {
+            "node": "AI Agent1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Format Review Data": {
+      "main": [
+        [
+          {
+            "node": "HTML",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Wait": {
+      "main": [
+        [
+          {
+            "node": "Switch",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Send Review Email to Manager": {
+      "main": [
+        []
+      ]
+    },
+    "HTML": {
+      "main": [
+        []
+      ]
+    },
+    "Switch": {
+      "main": [
+        [
+          {
+            "node": "Send a message2",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Stop and Error",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Send a message3",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "AI Agent1": {
+      "main": [
+        [
+          {
+            "node": "Format Review Data",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Azure OpenAI Chat Model1": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI Agent1",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Customer Email Data1": {
+      "main": [
+        [
+          {
+            "node": "AI Agent2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "AI Agent2": {
+      "main": [
+        [
+          {
+            "node": "Format Review Data1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Azure OpenAI Chat Model2": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI Agent2",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Format Review Data1": {
+      "main": [
+        [
+          {
+            "node": "HTML1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Wait1": {
+      "main": [
+        [
+          {
+            "node": "Switch1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Send Review Email to Manager1": {
+      "main": [
+        [
+          {
+            "node": "Wait1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "HTML1": {
+      "main": [
+        [
+          {
+            "node": "Send Review Email to Manager1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Switch1": {
+      "main": [
+        [
+          {
+            "node": "Send a message4",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Stop and Error1",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Send a message5",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate",
+    "availableInMCP": false
+  },
+  "staticData": null,
+  "meta": {
+    "templateCredsSetupCompleted": true
+  },
+  "pinData": {},
+  "versionId": "e65be325-e5b1-4537-a488-1699e3a58786",
+  "activeVersionId": "db55fad8-61c7-4e1a-aeae-3f7d421ff9ff",
+  "triggerCount": 1,
+  "shared": [
+    {
+      "updatedAt": "2026-06-09T06:54:32.075Z",
+      "createdAt": "2026-06-09T06:54:32.075Z",
+      "role": "workflow:owner",
+      "workflowId": "iDZBu0WZIoyuU9tp",
+      "projectId": "R2OGQRrWYLraDwSj"
+    }
+  ],
+  "activeVersion": {
+    "updatedAt": "2026-06-09T09:18:34.000Z",
+    "createdAt": "2026-06-09T09:18:19.932Z",
+    "versionId": "db55fad8-61c7-4e1a-aeae-3f7d421ff9ff",
+    "workflowId": "iDZBu0WZIoyuU9tp",
+    "nodes": [
+      {
+        "parameters": {
+          "assignments": {
+            "assignments": [
+              {
+                "id": "ac182d10-2dd2-4225-90fc-29d7e19b18e5",
+                "name": "employee_name",
+                "value": "Sanika Shinde",
+                "type": "string"
+              },
+              {
+                "id": "d9930a57-55fd-4197-9b2e-b2a85ecd4d92",
+                "name": "email",
+                "value": "sanikashinde992@gmail.com",
+                "type": "string"
+              },
+              {
+                "id": "efeb8f1f-e8cb-4e22-bfc6-8afec930f6bf",
+                "name": "department",
+                "value": "AI",
+                "type": "string"
+              }
+            ]
+          },
+          "options": {}
+        },
+        "type": "n8n-nodes-base.set",
+        "typeVersion": 3.4,
+        "position": [
+          208,
+          0
+        ],
+        "id": "33e7a5b5-b73b-4731-81c3-179fa6d9d95c",
+        "name": "Edit Fields"
+      },
+      {
+        "parameters": {
+          "promptType": "define",
+          "text": "=Generate a professional welcome email for {{$json.employee_name}} who is joining {{$json.department}} department.",
+          "options": {}
+        },
+        "type": "@n8n/n8n-nodes-langchain.agent",
+        "typeVersion": 3.1,
+        "position": [
+          448,
+          0
+        ],
+        "id": "16a0aad7-2f96-491e-9275-684fb4497ee9",
+        "name": "AI Agent"
+      },
+      {
+        "parameters": {
+          "model": "gpt-4o-mini",
+          "options": {}
+        },
+        "type": "@n8n/n8n-nodes-langchain.lmChatAzureOpenAi",
+        "typeVersion": 1,
+        "position": [
+          416,
+          160
+        ],
+        "id": "d9ac9b4b-9b78-4c80-bab6-4de3902759b9",
+        "name": "Azure OpenAI Chat Model",
+        "credentials": {
+          "azureOpenAiApi": {
+            "id": "x5lZM9gfKe7o6JtL",
+            "name": "Azure Open AI account"
+          }
+        }
+      },
+      {
+        "parameters": {
+          "conditions": {
+            "options": {
+              "caseSensitive": true,
+              "leftValue": "",
+              "typeValidation": "strict",
+              "version": 3
+            },
+            "conditions": [
+              {
+                "id": "c17f209f-a954-40db-8237-acdfc159ec6b",
+                "leftValue": "={{ $json.approval_status }}",
+                "rightValue": "approved",
+                "operator": {
+                  "type": "string",
+                  "operation": "equals",
+                  "name": "filter.operator.equals"
+                }
+              }
+            ],
+            "combinator": "and"
+          },
+          "options": {}
+        },
+        "type": "n8n-nodes-base.if",
+        "typeVersion": 2.3,
+        "position": [
+          1232,
+          0
+        ],
+        "id": "78f6661e-66ca-4d1f-9fe3-2b557762ff93",
+        "name": "If"
+      },
+      {
+        "parameters": {
+          "sendTo": "={{ $('Edit Fields').item.json.email }}",
+          "subject": "You are selected",
+          "emailType": "text",
+          "message": "=HI {{ $('Edit Fields').item.json.employee_name }}\nWELCOME TO THE TEAM!",
+          "options": {}
+        },
+        "type": "n8n-nodes-base.gmail",
+        "typeVersion": 2.2,
+        "position": [
+          1504,
+          -160
+        ],
+        "id": "b04cace4-fad8-4968-a6a9-bd0998412798",
+        "name": "Send a message1",
+        "webhookId": "1e320fef-178a-4abb-937b-5b1032621e2e",
+        "credentials": {
+          "gmailOAuth2": {
+            "id": "ufBHP0gOl5jBybIp",
+            "name": "Gmail account"
+          }
+        }
+      },
+      {
+        "parameters": {
+          "operation": "sendAndWait",
+          "sendTo": "sanikashinde992@gmail.com",
+          "subject": "Approval Required",
+          "message": "=Manager Approval Required for {{$node[\"Edit Fields\"].json.employee_name}}\nAI Generated Email:\n\n{{$node[\"AI Agent\"].json.output}}\n\nPlease review and approve.",
+          "approvalOptions": {
+            "values": {
+              "approvalType": "double"
+            }
+          },
+          "options": {}
+        },
+        "type": "n8n-nodes-base.gmail",
+        "typeVersion": 2.2,
+        "position": [
+          784,
+          0
+        ],
+        "id": "7070bace-f084-4cfe-b5e9-508ec906b887",
+        "name": "Send message and wait for response",
+        "webhookId": "1816154e-e254-4cea-b5f4-714b776e7d35",
+        "credentials": {
+          "gmailOAuth2": {
+            "id": "ufBHP0gOl5jBybIp",
+            "name": "Gmail account"
+          }
+        }
+      },
+      {
+        "parameters": {
+          "sendTo": "={{ $('Edit Fields').item.json.email }}",
+          "subject": "You are NOT selected",
+          "emailType": "text",
+          "message": "=HI {{ $('Edit Fields').item.json.employee_name }}\nSoooooorrry YOUR ARE NOT Selected!",
+          "options": {}
+        },
+        "type": "n8n-nodes-base.gmail",
+        "typeVersion": 2.2,
+        "position": [
+          1504,
+          48
+        ],
+        "id": "e4e1d8cc-2ef5-402b-86f3-274ebff27e97",
+        "name": "Send a message",
+        "webhookId": "1e320fef-178a-4abb-937b-5b1032621e2e",
+        "credentials": {
+          "gmailOAuth2": {
+            "id": "ufBHP0gOl5jBybIp",
+            "name": "Gmail account"
+          }
+        }
+      },
+      {
+        "parameters": {
+          "assignments": {
+            "assignments": [
+              {
+                "id": "2bb8ee1c-2840-4fbd-b693-7f662cd07058",
+                "name": "approval_status",
+                "value": "approved",
+                "type": "string"
+              }
+            ]
+          },
+          "options": {}
+        },
+        "type": "n8n-nodes-base.set",
+        "typeVersion": 3.4,
+        "position": [
+          992,
+          0
+        ],
+        "id": "d93677a1-692c-4eb9-a0ad-8c4ff7fe8ed8",
+        "name": "Edit Fields1"
+      },
+      {
+        "parameters": {
+          "public": true,
+          "availableInChat": true,
+          "options": {}
+        },
+        "type": "@n8n/n8n-nodes-langchain.chatTrigger",
+        "typeVersion": 1.4,
+        "position": [
+          0,
+          0
+        ],
+        "id": "1e5a46e5-987d-4499-8b39-8004d9788318",
+        "name": "When chat message received",
+        "webhookId": "80371184-64e8-4092-906d-bb1c32c353ea"
+      }
+    ],
+    "connections": {
+      "Edit Fields": {
+        "main": [
+          [
+            {
+              "node": "AI Agent",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Azure OpenAI Chat Model": {
+        "ai_languageModel": [
+          [
+            {
+              "node": "AI Agent",
+              "type": "ai_languageModel",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "AI Agent": {
+        "main": [
+          [
+            {
+              "node": "Send message and wait for response",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "If": {
+        "main": [
+          [
+            {
+              "node": "Send a message1",
+              "type": "main",
+              "index": 0
+            }
+          ],
+          [
+            {
+              "node": "Send a message",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Send message and wait for response": {
+        "main": [
+          [
+            {
+              "node": "Edit Fields1",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Edit Fields1": {
+        "main": [
+          [
+            {
+              "node": "If",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "When chat message received": {
+        "main": [
+          [
+            {
+              "node": "Edit Fields",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      }
+    },
+    "authors": "Sanika Shinde",
+    "name": "Version db55fad8",
+    "description": "",
+    "autosaved": true
+  },
+  "tags": []
+}
