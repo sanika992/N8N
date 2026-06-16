@@ -1,0 +1,114 @@
+{
+  "updatedAt": "2026-05-11T12:07:17.052Z",
+  "createdAt": "2026-05-11T11:43:26.941Z",
+  "id": "gnUmmzng0yBxIvYZ",
+  "name": "MCP Server - Demo",
+  "active": false,
+  "isArchived": false,
+  "nodes": [
+    {
+      "parameters": {
+        "authentication": "bearerAuth",
+        "path": "7cc2f33c-ab95-4e73-b010-d6320f7cb3b1"
+      },
+      "type": "@n8n/n8n-nodes-langchain.mcpTrigger",
+      "typeVersion": 2,
+      "position": [
+        384,
+        -80
+      ],
+      "id": "6f598b21-3a47-41f4-95f8-0d6f6fec48e5",
+      "name": "MCP Server Trigger",
+      "webhookId": "7cc2f33c-ab95-4e73-b010-d6320f7cb3b1"
+    },
+    {
+      "parameters": {
+        "url": "=https://wttr.in/{{$json.city}}?format=3",
+        "options": {
+          "allowUnauthorizedCerts": true
+        }
+      },
+      "type": "n8n-nodes-base.httpRequestTool",
+      "typeVersion": 4.4,
+      "position": [
+        400,
+        144
+      ],
+      "id": "039e2e31-2eeb-4637-bdb0-ed7b6a1a7e87",
+      "name": "HTTP Request"
+    },
+    {
+      "parameters": {
+        "description": "Gets current weather for a city",
+        "workflowId": {
+          "__rl": true,
+          "mode": "list",
+          "value": "2Nhnz8I8sH5kMI2I",
+          "cachedResultName": "My Sub-Workflow 1"
+        },
+        "workflowInputs": {
+          "mappingMode": "defineBelow",
+          "value": {},
+          "matchingColumns": [],
+          "schema": [],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.toolWorkflow",
+      "typeVersion": 2.2,
+      "position": [
+        528,
+        144
+      ],
+      "id": "05c296a9-1f01-408c-a84c-3cb74b5b17f4",
+      "name": "Call 'My Sub-Workflow 1'"
+    }
+  ],
+  "connections": {
+    "HTTP Request": {
+      "ai_tool": [
+        [
+          {
+            "node": "MCP Server Trigger",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Call 'My Sub-Workflow 1'": {
+      "ai_tool": [
+        [
+          {
+            "node": "MCP Server Trigger",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate",
+    "availableInMCP": false
+  },
+  "staticData": null,
+  "meta": null,
+  "pinData": {},
+  "versionId": "85312300-6425-4f8a-a2ee-9d59c8fa2e29",
+  "activeVersionId": null,
+  "triggerCount": 0,
+  "shared": [
+    {
+      "updatedAt": "2026-05-11T11:43:26.951Z",
+      "createdAt": "2026-05-11T11:43:26.951Z",
+      "role": "workflow:owner",
+      "workflowId": "gnUmmzng0yBxIvYZ",
+      "projectId": "R2OGQRrWYLraDwSj"
+    }
+  ],
+  "activeVersion": null,
+  "tags": []
+}
