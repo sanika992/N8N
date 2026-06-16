@@ -1,0 +1,184 @@
+{
+  "updatedAt": "2026-05-27T13:30:32.417Z",
+  "createdAt": "2026-05-07T07:06:01.959Z",
+  "id": "mxTUGOTwp0MNUOxC",
+  "name": "SplitBinaryPdf",
+  "active": false,
+  "isArchived": false,
+  "nodes": [
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [
+        -160,
+        48
+      ],
+      "id": "3a586239-4063-4ea5-a290-97bf973c6363",
+      "name": "When clicking ‘Execute workflow’"
+    },
+    {
+      "parameters": {
+        "url": "https://www.learningcontainer.com/wp-content/uploads/2019/09/sample-pdf-file.pdf",
+        "options": {
+          "allowUnauthorizedCerts": true
+        }
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.4,
+      "position": [
+        48,
+        48
+      ],
+      "id": "7009caa6-31d2-4446-a027-28ec7f8cb8eb",
+      "name": "HTTP Request"
+    },
+    {
+      "parameters": {
+        "jsCode": "// Get the PDF binary from previous node\nconst binaryData = $input.first().binary;\n\n// Return students list with PDF attached\nreturn [\n  {\n    json: {\n      students: [\n        { roll_no: 1, name: \"Alice\", class: \"A\" },\n        { roll_no: 2, name: \"Bob\",   class: \"B\" },\n        { roll_no: 3, name: \"Charlie\", class: \"C\" }\n      ],\n      school_name: \"Capgemini Academy\",\n      year: 2024\n    },\n    binary: {\n      report_card: binaryData.data\n    }\n  }\n];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        256,
+        48
+      ],
+      "id": "e9e49bf0-466a-4370-a94c-b8961a34cd26",
+      "name": "Code in JavaScript"
+    },
+    {
+      "parameters": {
+        "fieldToSplitOut": "students",
+        "include": "allOtherFields",
+        "options": {
+          "includeBinary": true
+        }
+      },
+      "type": "n8n-nodes-base.splitOut",
+      "typeVersion": 1,
+      "position": [
+        464,
+        48
+      ],
+      "id": "fb480f9d-6810-46c1-8343-3345d54163b2",
+      "name": "Split Out"
+    },
+    {
+      "parameters": {
+        "content": "STEP 1 - HTTP Request\n━━━━━━━━━━━━━━━━━━━\n📄 Downloads PDF\n      ↓\nSTEP 2 - Code Node\n━━━━━━━━━━━━━━━━━━━\n📦 1 Item Created:\n   [Alice, Bob, Charlie]\n   + 📄 PDF\n      ↓\nSTEP 3 - Split Out\n━━━━━━━━━━━━━━━━━━━\n📦 Item 1: Alice + 📄 PDF\n📦 Item 2: Bob   + 📄 PDF\n📦 Item 3: Charlie + 📄 PDF\n\n\"The whole flow shows how we can:\n\nDownload a real file from internet\nCombine it with structured data\nSplit the data into individual items\nAttach the file to every single item\nThis is useful in real scenarios like sending a report card PDF to each student individually\"**",
+        "height": 480,
+        "width": 416
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        -688,
+        -112
+      ],
+      "id": "c39fbb6b-a04e-4d00-b5d9-d46334774f3f",
+      "name": "Sticky Note"
+    },
+    {
+      "parameters": {
+        "sendTo": "sanikashinde992@gmail.com",
+        "subject": "Get Report Card",
+        "emailType": "text",
+        "message": "This is your report card",
+        "options": {
+          "attachmentsUi": {
+            "attachmentsBinary": [
+              {
+                "property": "report_card"
+              }
+            ]
+          }
+        }
+      },
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.2,
+      "position": [
+        672,
+        48
+      ],
+      "id": "89641480-3e00-4a18-bbf8-966bccf618e9",
+      "name": "Send a message",
+      "webhookId": "09d07b21-7b72-4c8e-9fed-06e30d5cfd7a",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "ufBHP0gOl5jBybIp",
+          "name": "Gmail account"
+        }
+      }
+    }
+  ],
+  "connections": {
+    "When clicking ‘Execute workflow’": {
+      "main": [
+        [
+          {
+            "node": "HTTP Request",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "HTTP Request": {
+      "main": [
+        [
+          {
+            "node": "Code in JavaScript",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code in JavaScript": {
+      "main": [
+        [
+          {
+            "node": "Split Out",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Split Out": {
+      "main": [
+        [
+          {
+            "node": "Send a message",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate",
+    "availableInMCP": false
+  },
+  "staticData": null,
+  "meta": {
+    "templateCredsSetupCompleted": true
+  },
+  "pinData": {},
+  "versionId": "65562da7-5010-469d-b201-252a15f589b4",
+  "activeVersionId": null,
+  "triggerCount": 0,
+  "shared": [
+    {
+      "updatedAt": "2026-05-07T07:06:01.972Z",
+      "createdAt": "2026-05-07T07:06:01.972Z",
+      "role": "workflow:owner",
+      "workflowId": "mxTUGOTwp0MNUOxC",
+      "projectId": "R2OGQRrWYLraDwSj"
+    }
+  ],
+  "activeVersion": null,
+  "tags": []
+}
