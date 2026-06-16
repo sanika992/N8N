@@ -1,0 +1,111 @@
+{
+  "updatedAt": "2026-06-04T07:06:13.000Z",
+  "createdAt": "2026-05-12T06:57:43.007Z",
+  "id": "2a1UyWFTyA4NCD5K",
+  "name": "Enterprise AI Workflow Automation",
+  "active": false,
+  "isArchived": true,
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "d2aa4da5-f882-4be6-914e-619cb610007f",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2.1,
+      "position": [
+        -432,
+        0
+      ],
+      "id": "82366e8b-0ffd-4f24-bed7-47eaa4251dfd",
+      "name": "Webhook",
+      "webhookId": "d2aa4da5-f882-4be6-914e-619cb610007f"
+    },
+    {
+      "parameters": {
+        "url": "https://jsonplaceholder.typicode.com/users/1",
+        "options": {
+          "allowUnauthorizedCerts": true
+        }
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.4,
+      "position": [
+        -80,
+        0
+      ],
+      "id": "7a7aff4d-aca0-476e-9647-9b3f93ad3b62",
+      "name": "HTTP Request"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "e034399f-04e9-481e-9cfc-908e00c30fec",
+              "name": "Name",
+              "value": "",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        224,
+        0
+      ],
+      "id": "38a1c0b3-8bc6-4d1b-98ba-54803f071a0c",
+      "name": "Edit Fields"
+    }
+  ],
+  "connections": {
+    "Webhook": {
+      "main": [
+        [
+          {
+            "node": "HTTP Request",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "HTTP Request": {
+      "main": [
+        [
+          {
+            "node": "Edit Fields",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate",
+    "availableInMCP": false
+  },
+  "staticData": null,
+  "meta": null,
+  "pinData": {},
+  "versionId": "4e0435ee-bd45-4eff-b1fa-67ab375d4493",
+  "activeVersionId": null,
+  "triggerCount": 0,
+  "shared": [
+    {
+      "updatedAt": "2026-05-12T06:57:43.012Z",
+      "createdAt": "2026-05-12T06:57:43.012Z",
+      "role": "workflow:owner",
+      "workflowId": "2a1UyWFTyA4NCD5K",
+      "projectId": "R2OGQRrWYLraDwSj"
+    }
+  ],
+  "activeVersion": null,
+  "tags": []
+}
