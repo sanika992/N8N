@@ -1,0 +1,247 @@
+{
+  "updatedAt": "2026-05-12T12:09:14.073Z",
+  "createdAt": "2026-05-12T10:06:04.524Z",
+  "id": "E1bu0IeSm29YfJiV",
+  "name": "MCP SERVER 2",
+  "active": true,
+  "isArchived": false,
+  "nodes": [
+    {
+      "parameters": {
+        "workflowInputs": {
+          "values": [
+            {
+              "name": "messages",
+              "type": "any"
+            }
+          ]
+        }
+      },
+      "id": "174ccb76-a926-4a63-bdf0-22e98da3fc77",
+      "typeVersion": 1.1,
+      "name": "Start",
+      "type": "n8n-nodes-base.executeWorkflowTrigger",
+      "position": [
+        0,
+        0
+      ]
+    },
+    {
+      "parameters": {
+        "workflowId": {
+          "__rl": true,
+          "value": "H6uz1V4GtpI5UcaP",
+          "mode": "list"
+        },
+        "workflowInputs": {
+          "mappingMode": "defineBelow",
+          "value": {},
+          "matchingColumns": [],
+          "schema": [],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": true
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.executeWorkflow",
+      "typeVersion": 1.2,
+      "position": [
+        368,
+        0
+      ],
+      "name": "Call My Sub-workflow",
+      "id": "d4793419-c40b-4622-a463-d40f70605fd2"
+    }
+  ],
+  "connections": {
+    "Start": {
+      "main": [
+        [
+          {
+            "node": "Call My Sub-workflow",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate",
+    "availableInMCP": false
+  },
+  "staticData": null,
+  "meta": null,
+  "pinData": {},
+  "versionId": "98d14ce6-2ce9-42f8-862c-c782ce4f33a1",
+  "activeVersionId": "678526e0-9fa9-424a-92a3-70f89cabc755",
+  "triggerCount": 0,
+  "shared": [
+    {
+      "updatedAt": "2026-05-12T10:06:04.530Z",
+      "createdAt": "2026-05-12T10:06:04.530Z",
+      "role": "workflow:owner",
+      "workflowId": "E1bu0IeSm29YfJiV",
+      "projectId": "R2OGQRrWYLraDwSj"
+    }
+  ],
+  "activeVersion": {
+    "updatedAt": "2026-05-12T12:01:28.000Z",
+    "createdAt": "2026-05-12T12:01:07.158Z",
+    "versionId": "678526e0-9fa9-424a-92a3-70f89cabc755",
+    "workflowId": "E1bu0IeSm29YfJiV",
+    "nodes": [
+      {
+        "parameters": {
+          "method": "PATCH",
+          "url": "=https://e9hpathhdb.aws.capsapsl.com:44341/sap/opu/odata4/sap/api_product/srvd_a2x/sap/product/0002/Product('{{ $json.body.Product }}')",
+          "authentication": "genericCredentialType",
+          "genericAuthType": "httpBasicAuth",
+          "sendHeaders": true,
+          "specifyHeaders": "json",
+          "jsonHeaders": "={\n  \"x-csrf-token\": \"{{ $json.headers['x-csrf-token'] }}\",\n  \"Cookie\": \"{{ $json.headers['set-cookie'][1] }}\",\n  \"Content-Type\": \"application/json\",\n  \"Accept\": \"application/json\",\n  \"sap-client\": \"500\",\n  \"If-Match\": \"*\"\n}",
+          "sendBody": true,
+          "specifyBody": "json",
+          "jsonBody": "={\n  \"CrossPlantStatus\": \"02\"\n}",
+          "options": {}
+        },
+        "type": "n8n-nodes-base.httpRequest",
+        "typeVersion": 4.4,
+        "position": [
+          592,
+          0
+        ],
+        "id": "2247446e-108a-4a0f-855c-bc96b6793262",
+        "name": "update_product2",
+        "alwaysOutputData": false,
+        "credentials": {
+          "httpBasicAuth": {
+            "id": "amXEvooHAf1tb0dM",
+            "name": "SAP Credentials"
+          }
+        }
+      },
+      {
+        "parameters": {
+          "url": "=https://e9hpathhdb.aws.capsapsl.com:44341/sap/opu/odata4/sap/api_product/srvd_a2x/sap/product/0002/Product('{{ $json.productNumber }}')",
+          "authentication": "genericCredentialType",
+          "genericAuthType": "httpBasicAuth",
+          "sendHeaders": true,
+          "headerParameters": {
+            "parameters": [
+              {
+                "name": "X-CSRF-Token",
+                "value": "Fetch"
+              },
+              {
+                "name": "Accept",
+                "value": "application/json"
+              },
+              {
+                "name": "sap-client",
+                "value": "500"
+              }
+            ]
+          },
+          "options": {
+            "allowUnauthorizedCerts": true,
+            "response": {
+              "response": {
+                "fullResponse": true,
+                "responseFormat": "json"
+              }
+            }
+          }
+        },
+        "type": "n8n-nodes-base.httpRequest",
+        "typeVersion": 4.4,
+        "position": [
+          352,
+          0
+        ],
+        "id": "06822186-1517-4253-b05a-639224f78d7d",
+        "name": "get_csrf3",
+        "credentials": {
+          "httpBasicAuth": {
+            "id": "amXEvooHAf1tb0dM",
+            "name": "SAP Credentials"
+          }
+        }
+      },
+      {
+        "parameters": {
+          "workflowInputs": {
+            "values": [
+              {
+                "name": "messages",
+                "type": "any"
+              }
+            ]
+          }
+        },
+        "id": "174ccb76-a926-4a63-bdf0-22e98da3fc77",
+        "typeVersion": 1.1,
+        "name": "Start",
+        "type": "n8n-nodes-base.executeWorkflowTrigger",
+        "position": [
+          0,
+          0
+        ]
+      },
+      {
+        "parameters": {
+          "jsCode": "const input = $input.first().json;\n\n// Convert everything to string safely\nconst raw = typeof input === 'string'\n  ? input\n  : JSON.stringify(input);\n\n// Extract first number (product code)\nconst match = raw.match(/\\b\\d+\\b/);\n\nif (!match) {\n  throw new Error(\"No product number found in input\");\n}\n\nconst productNumber = match[0];\n\nreturn [{\n  json: {\n    productNumber\n  }\n}];"
+        },
+        "type": "n8n-nodes-base.code",
+        "typeVersion": 2,
+        "position": [
+          160,
+          0
+        ],
+        "id": "61fb2c46-5e41-438b-9915-5650213a6466",
+        "name": "Code in JavaScript"
+      }
+    ],
+    "connections": {
+      "get_csrf3": {
+        "main": [
+          [
+            {
+              "node": "update_product2",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Start": {
+        "main": [
+          [
+            {
+              "node": "Code in JavaScript",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Code in JavaScript": {
+        "main": [
+          [
+            {
+              "node": "get_csrf3",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      }
+    },
+    "authors": "Sanika Shinde",
+    "name": "Version 678526e0",
+    "description": "",
+    "autosaved": true
+  },
+  "tags": []
+}
