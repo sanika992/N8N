@@ -1,0 +1,349 @@
+{
+  "updatedAt": "2026-05-15T13:10:54.099Z",
+  "createdAt": "2026-05-05T11:33:49.037Z",
+  "id": "XbBoKuFALXq7Ozw2",
+  "name": "File Nodes Demo",
+  "active": false,
+  "isArchived": false,
+  "nodes": [
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [
+        -272,
+        80
+      ],
+      "id": "44e5376f-9d32-417a-9de9-c79ab55d4915",
+      "name": "When clicking ‘Execute workflow’"
+    },
+    {
+      "parameters": {
+        "fileSelector": "C:\\Users\\sanivija\\.n8n-files\\employees.xlsx",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.readWriteFile",
+      "typeVersion": 1.1,
+      "position": [
+        32,
+        -96
+      ],
+      "id": "a3bf6b92-3a4e-4007-a94e-95aa0eac4e0e",
+      "name": "Read/Write Files from Disk"
+    },
+    {
+      "parameters": {
+        "operation": "pdf",
+        "binaryPropertyName": "=data",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.extractFromFile",
+      "typeVersion": 1.1,
+      "position": [
+        256,
+        -96
+      ],
+      "id": "d54141b7-67a5-4502-9ad4-e18cbae86852",
+      "name": "Extract from File1"
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "n8n-nodes-base.convertToFile",
+      "typeVersion": 1.1,
+      "position": [
+        464,
+        -96
+      ],
+      "id": "4dcb528b-00f2-4311-9ae3-e5622a5eb045",
+      "name": "Convert to File1"
+    },
+    {
+      "parameters": {
+        "operation": "write",
+        "fileName": "C:\\Users\\sanivija\\.n8n-files\\employees.csv",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.readWriteFile",
+      "typeVersion": 1.1,
+      "position": [
+        672,
+        -96
+      ],
+      "id": "1fb46349-326f-4bd0-94b8-16eeb999ccb4",
+      "name": "Read/Write Files from Disk1"
+    },
+    {
+      "parameters": {
+        "content": "**Reading XLSX** ",
+        "height": 288,
+        "width": 432
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        -32,
+        -176
+      ],
+      "id": "7a85f65c-0236-4af1-a25b-42c008e8f929",
+      "name": "Sticky Note1"
+    },
+    {
+      "parameters": {
+        "content": "**Creating CSV** ",
+        "height": 288,
+        "width": 400
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        416,
+        -176
+      ],
+      "id": "c22c264b-ea33-4caa-a13d-c71c4921328e",
+      "name": "Sticky Note2"
+    },
+    {
+      "parameters": {
+        "fileSelector": "C:/Users/sanivija/.n8n-files/Sample.pdf",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.readWriteFile",
+      "typeVersion": 1.1,
+      "position": [
+        48,
+        240
+      ],
+      "id": "e4c45a62-6571-4fdf-b737-e3db54fad125",
+      "name": "Read/Write Files from Disk2"
+    },
+    {
+      "parameters": {
+        "operation": "pdf",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.extractFromFile",
+      "typeVersion": 1.1,
+      "position": [
+        256,
+        240
+      ],
+      "id": "7a80aec0-fe0f-4d9f-ae9c-45a3c0dc14a4",
+      "name": "Extract from File"
+    },
+    {
+      "parameters": {
+        "operation": "toText",
+        "sourceProperty": "text",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.convertToFile",
+      "typeVersion": 1.1,
+      "position": [
+        688,
+        240
+      ],
+      "id": "b9c23b60-2003-40f7-95d4-db28eefcb6f4",
+      "name": "Convert to File"
+    },
+    {
+      "parameters": {
+        "operation": "write",
+        "fileName": "C:/Users/sanivija/.n8n-files/Sample.txt",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.readWriteFile",
+      "typeVersion": 1.1,
+      "position": [
+        896,
+        240
+      ],
+      "id": "5dfa6209-a0d9-4262-b6b0-3e7af4997968",
+      "name": "Read/Write Files from Disk3"
+    },
+    {
+      "parameters": {
+        "content": "**Reading PDF** ",
+        "height": 288,
+        "width": 416
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        -16,
+        160
+      ],
+      "id": "fd917e37-69a0-4fef-bc4e-289a0721787c",
+      "name": "Sticky Note3"
+    },
+    {
+      "parameters": {
+        "content": "**Creating TXT** ",
+        "height": 288,
+        "width": 400
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        640,
+        160
+      ],
+      "id": "6dcc7a20-be48-44c7-b676-af8ad972f72d",
+      "name": "Sticky Note4"
+    },
+    {
+      "parameters": {
+        "content": "\n\n**This workflow automates complete file processing in n8n:**\nRead file\nExtract content\nConvert format\nSave output\n\n**It demonstrates how n8n handles:**\nbinary files\nJSON transformation\nfile conversion workflows\n\nField         \n**Operation** - Select what type of file to extract (CSV, Excel, JSON, etc.) \n**Input Binary Field** - Tells n8n where the file is stored (usually `data`)       \n**Add Option**  -  Extra settings for how to read the file    \n\nOption      |Purpose                    \n**Compression** - Reduce file size using ZIP \n**File Name**    -Set output file name       \n**Header Row**  -Add column names           \n**Sheet Name** - Set Excel worksheet name   \n",
+        "height": 512,
+        "width": 544
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        -832,
+        -144
+      ],
+      "id": "533d8a6b-f9b3-4c74-9533-cc0c900f4230",
+      "name": "Sticky Note5"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "beb46715-46ec-40bf-b11c-4382e12bae17",
+              "name": "text",
+              "value": "=",
+              "type": "string"
+            }
+          ]
+        },
+        "includeOtherFields": true,
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        464,
+        240
+      ],
+      "id": "7f19c229-8bca-478b-9a97-9ac8e06ac84d",
+      "name": "Edit Fields"
+    }
+  ],
+  "connections": {
+    "When clicking ‘Execute workflow’": {
+      "main": [
+        [
+          {
+            "node": "Read/Write Files from Disk2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Read/Write Files from Disk": {
+      "main": [
+        [
+          {
+            "node": "Extract from File1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Extract from File1": {
+      "main": [
+        [
+          {
+            "node": "Convert to File1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Convert to File1": {
+      "main": [
+        [
+          {
+            "node": "Read/Write Files from Disk1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Read/Write Files from Disk2": {
+      "main": [
+        [
+          {
+            "node": "Extract from File",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Extract from File": {
+      "main": [
+        [
+          {
+            "node": "Edit Fields",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Convert to File": {
+      "main": [
+        [
+          {
+            "node": "Read/Write Files from Disk3",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Edit Fields": {
+      "main": [
+        [
+          {
+            "node": "Convert to File",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate",
+    "availableInMCP": false
+  },
+  "staticData": null,
+  "meta": {
+    "templateCredsSetupCompleted": true
+  },
+  "pinData": {},
+  "versionId": "9ca47690-08db-4d90-83fa-7024ba2b572d",
+  "activeVersionId": null,
+  "triggerCount": 0,
+  "shared": [
+    {
+      "updatedAt": "2026-05-05T11:33:49.037Z",
+      "createdAt": "2026-05-05T11:33:49.037Z",
+      "role": "workflow:owner",
+      "workflowId": "XbBoKuFALXq7Ozw2",
+      "projectId": "R2OGQRrWYLraDwSj"
+    }
+  ],
+  "activeVersion": null,
+  "tags": []
+}
