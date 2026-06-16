@@ -1,0 +1,318 @@
+{
+  "updatedAt": "2026-05-12T12:08:53.069Z",
+  "createdAt": "2026-05-12T12:07:40.429Z",
+  "id": "VFnBI8GW5LjvlvaI",
+  "name": "server1",
+  "active": true,
+  "isArchived": false,
+  "nodes": [
+    {
+      "parameters": {
+        "method": "PATCH",
+        "url": "=https://e9hpathhdb.aws.capsapsl.com:44341/sap/opu/odata4/sap/api_product/srvd_a2x/sap/product/0002/Product('{{ $json.body.Product }}')",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpBasicAuth",
+        "sendHeaders": true,
+        "specifyHeaders": "json",
+        "jsonHeaders": "={\n  \"x-csrf-token\": \"{{ $json.headers['x-csrf-token'] }}\",\n  \"Cookie\": \"{{ $json.headers['set-cookie'][1] }}\",\n  \"Content-Type\": \"application/json\",\n  \"Accept\": \"application/json\",\n  \"sap-client\": \"500\",\n  \"If-Match\": \"*\"\n}",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"CrossPlantStatus\": \"01\"\n}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.4,
+      "position": [
+        592,
+        0
+      ],
+      "id": "4dc22c67-409f-44ca-85a8-a3587a626fbb",
+      "name": "update_product2",
+      "alwaysOutputData": false,
+      "credentials": {
+        "httpBasicAuth": {
+          "id": "amXEvooHAf1tb0dM",
+          "name": "SAP Credentials"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "url": "=https://e9hpathhdb.aws.capsapsl.com:44341/sap/opu/odata4/sap/api_product/srvd_a2x/sap/product/0002/Product('{{ $json.productNumber }}')",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpBasicAuth",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "X-CSRF-Token",
+              "value": "Fetch"
+            },
+            {
+              "name": "Accept",
+              "value": "application/json"
+            },
+            {
+              "name": "sap-client",
+              "value": "500"
+            }
+          ]
+        },
+        "options": {
+          "allowUnauthorizedCerts": true,
+          "response": {
+            "response": {
+              "fullResponse": true,
+              "responseFormat": "json"
+            }
+          }
+        }
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.4,
+      "position": [
+        352,
+        0
+      ],
+      "id": "a4b29806-fab5-4718-aa4f-58d3a2643717",
+      "name": "get_csrf3",
+      "credentials": {
+        "httpBasicAuth": {
+          "id": "amXEvooHAf1tb0dM",
+          "name": "SAP Credentials"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "const input = $input.first().json;\n\n// Convert everything to string safely\nconst raw = typeof input === 'string'\n  ? input\n  : JSON.stringify(input);\n\n// Extract first number (product code)\nconst match = raw.match(/\\b\\d+\\b/);\n\nif (!match) {\n  throw new Error(\"No product number found in input\");\n}\n\nconst productNumber = match[0];\n\nreturn [{\n  json: {\n    productNumber\n  }\n}];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        160,
+        0
+      ],
+      "id": "3a6e5f6b-cc9f-4421-a233-cc2cb5887467",
+      "name": "Code in JavaScript"
+    },
+    {
+      "parameters": {
+        "inputSource": "passthrough"
+      },
+      "id": "16324b4b-3126-431b-a410-5d4be663dd62",
+      "typeVersion": 1.1,
+      "name": "Start",
+      "type": "n8n-nodes-base.executeWorkflowTrigger",
+      "position": [
+        -48,
+        0
+      ]
+    }
+  ],
+  "connections": {
+    "get_csrf3": {
+      "main": [
+        [
+          {
+            "node": "update_product2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code in JavaScript": {
+      "main": [
+        [
+          {
+            "node": "get_csrf3",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Start": {
+      "main": [
+        [
+          {
+            "node": "Code in JavaScript",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1",
+    "availableInMCP": false
+  },
+  "staticData": null,
+  "meta": null,
+  "pinData": {},
+  "versionId": "d1a940cd-1dbe-44f8-8156-01272853c995",
+  "activeVersionId": "d1a940cd-1dbe-44f8-8156-01272853c995",
+  "triggerCount": 0,
+  "shared": [
+    {
+      "updatedAt": "2026-05-12T12:07:40.432Z",
+      "createdAt": "2026-05-12T12:07:40.432Z",
+      "role": "workflow:owner",
+      "workflowId": "VFnBI8GW5LjvlvaI",
+      "projectId": "R2OGQRrWYLraDwSj"
+    }
+  ],
+  "activeVersion": {
+    "updatedAt": "2026-05-12T12:08:59.000Z",
+    "createdAt": "2026-05-12T12:08:41.005Z",
+    "versionId": "d1a940cd-1dbe-44f8-8156-01272853c995",
+    "workflowId": "VFnBI8GW5LjvlvaI",
+    "nodes": [
+      {
+        "parameters": {
+          "method": "PATCH",
+          "url": "=https://e9hpathhdb.aws.capsapsl.com:44341/sap/opu/odata4/sap/api_product/srvd_a2x/sap/product/0002/Product('{{ $json.body.Product }}')",
+          "authentication": "genericCredentialType",
+          "genericAuthType": "httpBasicAuth",
+          "sendHeaders": true,
+          "specifyHeaders": "json",
+          "jsonHeaders": "={\n  \"x-csrf-token\": \"{{ $json.headers['x-csrf-token'] }}\",\n  \"Cookie\": \"{{ $json.headers['set-cookie'][1] }}\",\n  \"Content-Type\": \"application/json\",\n  \"Accept\": \"application/json\",\n  \"sap-client\": \"500\",\n  \"If-Match\": \"*\"\n}",
+          "sendBody": true,
+          "specifyBody": "json",
+          "jsonBody": "={\n  \"CrossPlantStatus\": \"01\"\n}",
+          "options": {}
+        },
+        "type": "n8n-nodes-base.httpRequest",
+        "typeVersion": 4.4,
+        "position": [
+          592,
+          0
+        ],
+        "id": "4dc22c67-409f-44ca-85a8-a3587a626fbb",
+        "name": "update_product2",
+        "alwaysOutputData": false,
+        "credentials": {
+          "httpBasicAuth": {
+            "id": "amXEvooHAf1tb0dM",
+            "name": "SAP Credentials"
+          }
+        }
+      },
+      {
+        "parameters": {
+          "url": "=https://e9hpathhdb.aws.capsapsl.com:44341/sap/opu/odata4/sap/api_product/srvd_a2x/sap/product/0002/Product('{{ $json.productNumber }}')",
+          "authentication": "genericCredentialType",
+          "genericAuthType": "httpBasicAuth",
+          "sendHeaders": true,
+          "headerParameters": {
+            "parameters": [
+              {
+                "name": "X-CSRF-Token",
+                "value": "Fetch"
+              },
+              {
+                "name": "Accept",
+                "value": "application/json"
+              },
+              {
+                "name": "sap-client",
+                "value": "500"
+              }
+            ]
+          },
+          "options": {
+            "allowUnauthorizedCerts": true,
+            "response": {
+              "response": {
+                "fullResponse": true,
+                "responseFormat": "json"
+              }
+            }
+          }
+        },
+        "type": "n8n-nodes-base.httpRequest",
+        "typeVersion": 4.4,
+        "position": [
+          352,
+          0
+        ],
+        "id": "a4b29806-fab5-4718-aa4f-58d3a2643717",
+        "name": "get_csrf3",
+        "credentials": {
+          "httpBasicAuth": {
+            "id": "amXEvooHAf1tb0dM",
+            "name": "SAP Credentials"
+          }
+        }
+      },
+      {
+        "parameters": {
+          "jsCode": "const input = $input.first().json;\n\n// Convert everything to string safely\nconst raw = typeof input === 'string'\n  ? input\n  : JSON.stringify(input);\n\n// Extract first number (product code)\nconst match = raw.match(/\\b\\d+\\b/);\n\nif (!match) {\n  throw new Error(\"No product number found in input\");\n}\n\nconst productNumber = match[0];\n\nreturn [{\n  json: {\n    productNumber\n  }\n}];"
+        },
+        "type": "n8n-nodes-base.code",
+        "typeVersion": 2,
+        "position": [
+          160,
+          0
+        ],
+        "id": "3a6e5f6b-cc9f-4421-a233-cc2cb5887467",
+        "name": "Code in JavaScript"
+      },
+      {
+        "parameters": {
+          "inputSource": "passthrough"
+        },
+        "id": "16324b4b-3126-431b-a410-5d4be663dd62",
+        "typeVersion": 1.1,
+        "name": "Start",
+        "type": "n8n-nodes-base.executeWorkflowTrigger",
+        "position": [
+          -48,
+          0
+        ]
+      }
+    ],
+    "connections": {
+      "get_csrf3": {
+        "main": [
+          [
+            {
+              "node": "update_product2",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Code in JavaScript": {
+        "main": [
+          [
+            {
+              "node": "get_csrf3",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Start": {
+        "main": [
+          [
+            {
+              "node": "Code in JavaScript",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      }
+    },
+    "authors": "Sanika Shinde",
+    "name": "Version d1a940cd",
+    "description": "",
+    "autosaved": true
+  },
+  "tags": []
+}
