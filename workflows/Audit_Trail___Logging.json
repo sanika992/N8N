@@ -1,0 +1,231 @@
+{
+  "updatedAt": "2026-06-12T10:41:36.503Z",
+  "createdAt": "2026-06-12T08:31:51.205Z",
+  "id": "J2ed6ViWmSrJdyQs",
+  "name": "Audit Trail & Logging",
+  "active": false,
+  "isArchived": false,
+  "nodes": [
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [
+        32,
+        256
+      ],
+      "id": "42df5caf-d1ca-437e-ae3c-e82b77e88e5f",
+      "name": "When clicking ‘Execute workflow’"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "f451f5d6-6432-4c18-9a28-6c943967fa77",
+              "name": "employee",
+              "value": "Sanika",
+              "type": "string"
+            },
+            {
+              "id": "81f633ee-a2b2-49fa-8a39-04f6ac0e7f2b",
+              "name": "action",
+              "value": "Leave Request",
+              "type": "string"
+            },
+            {
+              "id": "28ec3845-639b-441e-b566-122250a3a1e8",
+              "name": "status",
+              "value": "Submitted",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        240,
+        256
+      ],
+      "id": "a58513d6-d2a7-41f5-a806-860085c4ba83",
+      "name": "Edit Fields"
+    },
+    {
+      "parameters": {
+        "jsCode": "return [\n{\n json:{\n   employee:\"Sanika\",\n   action:\"Leave Request\",\n   status:\"Submitted\",\n   timestamp:new Date().toISOString()\n }\n},\n{\n json:{\n   employee:\"Rahul\",\n   action:\"Leave Request\",\n   status:\"Approved\",\n   timestamp:new Date().toISOString()\n }\n},\n{\n json:{\n   employee:\"Priya\",\n   action:\"Leave Request\",\n   status:\"Rejected\",\n   timestamp:new Date().toISOString()\n }\n}\n];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        448,
+        256
+      ],
+      "id": "1c451b66-3a31-4ffd-a4b8-2e5512b97ed8",
+      "name": "Code in JavaScript2"
+    },
+    {
+      "parameters": {
+        "operation": "append",
+        "documentId": {
+          "__rl": true,
+          "value": "1HfmPlX8d2Ykw99GrtWmUVstTWSqzeREs6U41XtURCeQ",
+          "mode": "list",
+          "cachedResultName": "Save log",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1HfmPlX8d2Ykw99GrtWmUVstTWSqzeREs6U41XtURCeQ/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": 919786516,
+          "mode": "list",
+          "cachedResultName": "Sheet1",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1HfmPlX8d2Ykw99GrtWmUVstTWSqzeREs6U41XtURCeQ/edit#gid=919786516"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "employee": "={{ $json.employee }}",
+            "action": "={{ $json.action }}",
+            "timestamp": "={{ $json.timestamp }}",
+            "status": "={{ $json.status }}"
+          },
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "employee",
+              "displayName": "employee",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "action",
+              "displayName": "action",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "status",
+              "displayName": "status",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "timestamp",
+              "displayName": "timestamp",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        656,
+        256
+      ],
+      "id": "6a6dc7ce-3020-49ee-ab36-b95e80f76a88",
+      "name": "Append row in sheet",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "hPflNIDs6n00WE1f",
+          "name": "Google Sheets account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "content": "## Workflow Purpose\n\n**Goal:\n\nWhenever an employee performs an action, record it in a log so we can track:\n\nWho did it?\nWhat action was performed?\nWhat was the status?\nWhen did it happen?\n\nThis is called an Audit Trail.\n\nWorkflow Architecture\nManual Trigger\n      ↓\nEdit Fields\n      ↓\nCode Node\n      ↓\nGoogle Sheets\nStep 1: Manual Trigger\n\nNode:\n\nWhen clicking 'Execute Workflow'\nWhat it does\n\nStarts the workflow.\n\nFor demo purposes, we are manually simulating an employee action.\n\nWhat to say\n\nIn a real project this could be a Webhook, Form Submission, SAP Event, or API call. For demonstration, I'm using a Manual Trigger.\n\nStep 2: Edit Fields\n\nHere we create sample business data.\n\nOutput:\n\n{\n  \"employee\":\"Sanika\",\n  \"action\":\"Leave Request\",\n  \"status\":\"Submitted\"\n}\nWhat to say\n\nThis represents a user action. Here, employee Sanika has submitted a leave request.\n\nStep 3: Code Node\n\nThe Code node adds a timestamp.\n\nExample output:\n\n{\n  \"employee\":\"Sanika\",\n  \"action\":\"Leave Request\",\n  \"status\":\"Submitted\",\n  \"timestamp\":\"2026-06-12T10:28:48Z\"\n}\nWhy do this?\n\nAudit logs must contain:\n\nWho?\nWhat?\nWhen?\n\nThe timestamp answers:\n\nWhen did the action happen?\nWhat to say\n\nThe Code node enriches the data by adding a timestamp so that every audit record contains the exact time of the event.\n\nStep 4: Google Sheets (Append Row)\n\nThis is the most important node.\n\nIt writes the record into Google Sheets.\n\nSheet contents become:\n\nemployee\taction\tstatus\ttimestamp\nSanika\tLeave Request\tSubmitted\t12-Jun\n\nRun again:\n\nemployee\taction\tstatus\ttimestamp\nSanika\tLeave Request\tSubmitted\t12-Jun\nRahul\tLeave Request\tApproved\t12-Jun\nWhat to say\n\nEvery workflow execution creates a new audit record. Instead of overwriting existing data, we append a new row. This creates a historical record of all actions performed.\n\nWhy This Is Called Audit Trail\n\nBecause we can answer:\n\nQuestion 1\nWho submitted the request?\n\nAnswer:\n\nSanika\nQuestion 2\nWhat action was performed?\n\nAnswer:\n\nLeave Request\nQuestion 3\nWhen was it performed?\n\nAnswer:\n\nTimestamp\nQuestion 4\nWhat was the outcome?\n\nAnswer:\n\nSubmitted\nWhy Managers Care\n\nSuppose someone asks:\n\nWhy was leave approved?\nWho approved it?\nWhen was it approved?\n\nWithout logs:\n\n❌ No information\n\nWith logs:\n\n✅ Complete history available\n\nHow This Relates to Logging\n\nThis workflow demonstrates Structured Logging.\n\nInstead of storing:\n\nLeave Request Submitted\n\nwe store structured information:\n\n{\n  \"employee\":\"Sanika\",\n  \"action\":\"Leave Request\",\n  \"status\":\"Submitted\",\n  \"timestamp\":\"2026-06-12T10:28:48Z\"\n}\n\nStructured logs are easier to search, report on, and audit.\n\n\nThis workflow demonstrates Audit Trails and Logging in n8n. A user action is simulated using the Manual Trigger. The Edit Fields node creates business data such as employee name, action, and status. The Code node enriches the record with a timestamp. Finally, the Google Sheets node appends the information as a new row, creating a permanent audit record. This allows organizations to track who performed an action, when it occurred, and what the outcome was, which is important for troubleshooting, compliance, and monitoring.**",
+        "height": 528,
+        "width": 416
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        -496,
+        80
+      ],
+      "id": "f1598e2e-3c96-4e6a-94b1-ce7c930a2ddc",
+      "name": "Sticky Note"
+    }
+  ],
+  "connections": {
+    "When clicking ‘Execute workflow’": {
+      "main": [
+        [
+          {
+            "node": "Edit Fields",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Edit Fields": {
+      "main": [
+        [
+          {
+            "node": "Code in JavaScript2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code in JavaScript2": {
+      "main": [
+        [
+          {
+            "node": "Append row in sheet",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate",
+    "availableInMCP": false
+  },
+  "staticData": null,
+  "meta": {
+    "templateCredsSetupCompleted": true
+  },
+  "pinData": {},
+  "versionId": "f56778c1-4fe2-4792-b68e-e8c77b7029b5",
+  "activeVersionId": null,
+  "triggerCount": 0,
+  "shared": [
+    {
+      "updatedAt": "2026-06-12T08:31:51.211Z",
+      "createdAt": "2026-06-12T08:31:51.211Z",
+      "role": "workflow:owner",
+      "workflowId": "J2ed6ViWmSrJdyQs",
+      "projectId": "R2OGQRrWYLraDwSj"
+    }
+  ],
+  "activeVersion": null,
+  "tags": []
+}
