@@ -1,0 +1,239 @@
+{
+  "updatedAt": "2026-06-03T12:33:41.023Z",
+  "createdAt": "2026-06-02T10:43:02.758Z",
+  "id": "uos2qrhg1ZGyR7FJ",
+  "name": "HMAC Demo",
+  "active": false,
+  "isArchived": false,
+  "nodes": [
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "c22049a1-42b6-48bf-8f1f-e4e2ffa4f4c3",
+              "name": "raw_body",
+              "value": "={{ JSON.stringify($json.body) }}",
+              "type": "string"
+            },
+            {
+              "id": "e118f289-e8cc-4f6f-90f6-2a3ffb7b1a88",
+              "name": "received_signature",
+              "value": "={{$json.headers[\"x-signature\"]}}",
+              "type": "string"
+            },
+            {
+              "id": "df7b6dfc-296e-4827-83af-15d3503c6ff1",
+              "name": "secret_key",
+              "value": "mySecretKey123",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        992,
+        16
+      ],
+      "id": "a48bb3a0-e62c-4ab4-8ad7-c300a5e6e146",
+      "name": "Prepare Data"
+    },
+    {
+      "parameters": {
+        "action": "hmac",
+        "value": "={{ $json.raw_body }}",
+        "dataPropertyName": "hmac_result"
+      },
+      "type": "n8n-nodes-base.crypto",
+      "typeVersion": 2,
+      "position": [
+        1216,
+        16
+      ],
+      "id": "7368dbef-ce94-4d48-8ce8-272a992c6b85",
+      "name": "Generate HMAC",
+      "credentials": {
+        "crypto": {
+          "id": "HFu0UdNVdByVvoVY",
+          "name": "Crypto account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 3
+          },
+          "conditions": [
+            {
+              "id": "9c2dc510-df2a-4a11-a1cf-32b56083796f",
+              "leftValue": "={{ $json.hmac_result }}",
+              "rightValue": "={{ $json.received_signature }}",
+              "operator": {
+                "type": "string",
+                "operation": "equals",
+                "name": "filter.operator.equals"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
+      "position": [
+        1424,
+        16
+      ],
+      "id": "6253fcc7-6c47-4a51-a173-cec4d0e73534",
+      "name": "Signature Match?"
+    },
+    {
+      "parameters": {
+        "respondWith": "text",
+        "responseBody": "=<!DOCTYPE html>\n<html>\n<body>\n<h1>Application Submitted Successfully</h1>\n</body>\n</html>",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.5,
+      "position": [
+        1712,
+        -160
+      ],
+      "id": "8ce2be9f-1ca0-44c4-b4a4-4bd95b465388",
+      "name": "Respond to Webhook"
+    },
+    {
+      "parameters": {
+        "respondWith": "text",
+        "responseBody": "<!DOCTYPE html>\n<html>\n<body>\n<h1>Sorry! Invalid Signature</h1>\n</body>\n</html>",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.5,
+      "position": [
+        1712,
+        192
+      ],
+      "id": "b6d14a7a-0057-4507-a3b9-601cdf3fde89",
+      "name": "Respond to Webhook1"
+    },
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "crypto-hmac",
+        "responseMode": "responseNode",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2.1,
+      "position": [
+        784,
+        16
+      ],
+      "id": "c0687ae6-6223-4e24-85c1-f0153a6cdf96",
+      "name": "Webhook1",
+      "webhookId": "2ed70052-1923-4187-a638-c0291b47024f"
+    },
+    {
+      "parameters": {
+        "content": "HMAC is a digital signature used to verify that a webhook request came from a trusted source and wasn't modified during transmission.",
+        "height": 80,
+        "width": 576
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        880,
+        -176
+      ],
+      "id": "684c12bc-819b-4ee0-8385-0a50f46800ca",
+      "name": "Sticky Note"
+    }
+  ],
+  "connections": {
+    "Prepare Data": {
+      "main": [
+        [
+          {
+            "node": "Generate HMAC",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Generate HMAC": {
+      "main": [
+        [
+          {
+            "node": "Signature Match?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Signature Match?": {
+      "main": [
+        [
+          {
+            "node": "Respond to Webhook",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Respond to Webhook1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Webhook1": {
+      "main": [
+        [
+          {
+            "node": "Prepare Data",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate",
+    "availableInMCP": false
+  },
+  "staticData": null,
+  "meta": {
+    "templateCredsSetupCompleted": true
+  },
+  "pinData": {},
+  "versionId": "d8e814ad-2117-4eaf-b3f9-14dc4ed3c946",
+  "activeVersionId": null,
+  "triggerCount": 0,
+  "shared": [
+    {
+      "updatedAt": "2026-06-02T10:43:02.764Z",
+      "createdAt": "2026-06-02T10:43:02.764Z",
+      "role": "workflow:owner",
+      "workflowId": "uos2qrhg1ZGyR7FJ",
+      "projectId": "R2OGQRrWYLraDwSj"
+    }
+  ],
+  "activeVersion": null,
+  "tags": []
+}
