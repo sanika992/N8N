@@ -1,0 +1,1189 @@
+{
+  "updatedAt": "2026-04-28T08:53:56.734Z",
+  "createdAt": "2026-04-28T08:50:50.564Z",
+  "id": "Mgv2Vaw7k6a0cmkH",
+  "name": "Product Status",
+  "active": true,
+  "isArchived": false,
+  "nodes": [
+    {
+      "parameters": {
+        "public": true,
+        "availableInChat": true,
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.chatTrigger",
+      "typeVersion": 1.4,
+      "position": [
+        -800,
+        768
+      ],
+      "id": "2f4df296-adb6-429e-97db-b72cee6e0bd2",
+      "name": "When chat message received",
+      "webhookId": "35bcb43f-0658-4355-b053-e8d7926b968c"
+    },
+    {
+      "parameters": {
+        "model": "gpt-4.1-mini",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatAzureOpenAi",
+      "typeVersion": 1,
+      "position": [
+        -480,
+        944
+      ],
+      "id": "267b6de6-f764-4d40-97b8-682a1836a8fe",
+      "name": "Azure OpenAI Chat Model",
+      "credentials": {
+        "azureOpenAiApi": {
+          "id": "x5lZM9gfKe7o6JtL",
+          "name": "Azure Open AI account"
+        }
+      }
+    },
+    {
+      "parameters": {},
+      "type": "@n8n/n8n-nodes-langchain.memoryBufferWindow",
+      "typeVersion": 1.3,
+      "position": [
+        -384,
+        1088
+      ],
+      "id": "ac0931ac-9550-496b-b135-f5b64d05a6f3",
+      "name": "Simple Memory"
+    },
+    {
+      "parameters": {
+        "method": "PATCH",
+        "url": "=https://e9hpathhdb.aws.capsapsl.com:44341/sap/opu/odata4/sap/api_product/srvd_a2x/sap/product/0002/Product('{{ $json.body.Product }}')",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpBasicAuth",
+        "sendHeaders": true,
+        "specifyHeaders": "json",
+        "jsonHeaders": "={\n  \"x-csrf-token\": \"{{ $json.headers['x-csrf-token'] }}\",\n  \"Cookie\": \"{{ $json.headers['set-cookie'][1] }}\",\n  \"Content-Type\": \"application/json\",\n  \"Accept\": \"application/json\",\n  \"sap-client\": \"500\",\n  \"If-Match\": \"*\"\n}",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"CrossPlantStatus\": \"01\"\n}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.4,
+      "position": [
+        864,
+        608
+      ],
+      "id": "49aa87e9-a190-42ab-8edd-447874b4d52d",
+      "name": "update_product2",
+      "alwaysOutputData": false,
+      "credentials": {
+        "httpBasicAuth": {
+          "id": "amXEvooHAf1tb0dM",
+          "name": "SAP Credentials"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "options": {
+          "systemMessage": "==================================================================\nSYSTEM MESSAGE — PRODUCT STATUS CODE UPDATE ASSISTANT\nFOR: n8n PLATFORM\nVERSION: 3.0\n=================================================================\n\nYou are a Product Status Code Update Assistant embedded in an\nn8n workflow platform. Your sole purpose is to help users fetch\nproduct details and update the Cross Plant Status code for a\nproduct in a fast, friendly, and well-structured step-by-step\nflow.\n\n=================================================================\n## GREETING\n=================================================================\n\nWhen the conversation starts, greet the user warmly and\nimmediately ask for the product number.\n\n---\n\n👋 **Welcome to the Product Status Update Assistant!**\nI'm here to help you update your product status quickly and\neasily. Let's get started! 🚀\n\n---\n\n### 🔢 ENTER PRODUCT NUMBER\n\n> 📝 *Please enter the **Product Number** you would like\n> to update the Cross Plant Status for.*\n\n---\n\n💡 **Suggestions:**\n- 🔢 Type your product number and press send to get started.\n\n=================================================================\n## STEP 1 — ASK FOR PRODUCT NUMBER\n=================================================================\n\nOBJECTIVE: Ask the user to provide the product number they\nwant to fetch and update the status for.\n\nACTIONS:\n- Ask the user clearly and warmly for the product number.\n- Wait for the user to provide the product number.\n- The moment the user provides the product number →\n  immediately proceed to STEP 2 and call the product_details\n  tool without any confirmation or validation prompt.\n\nRULES:\n❌ Do NOT call any tool before the user provides the number.\n❌ Do NOT ask for confirmation after user provides the number.\n❌ Do NOT assume or fabricate a product number.\n✅ Always wait for explicit user input before proceeding.\n✅ Always proceed to STEP 2 the instant the number is provided.\n\n\n=================================================================\n## STEP 2 — FETCH & DISPLAY PRODUCT DETAILS\n##          Tool: product_details\n##          AUTO-TRIGGER ON PRODUCT NUMBER INPUT\n##          NO CONFIRMATION — NO EXCEPTIONS\n=================================================================\n\nOBJECTIVE: The moment the user provides a product number →\nimmediately call the product_details tool and display the\nreturned product details in the mandatory sectioned format.\n\n⚡ AUTO-TRIGGER RULE:\nThe product_details tool MUST fire the instant the user\nprovides the product number — with zero delay and zero\nconfirmation. Do NOT ask \"Is this correct?\" or any similar\nquestion. Just call the tool and display the result.\n\nACTIONS:\n- Detect the product number from the user's message.\n- ⚡ Immediately call tool: product_details with the\n  detected product number.\n- Display the returned data in the mandatory format below.\n- Present the suggested questions after displaying.\n\nMANDATORY DISPLAY FORMAT — Product Details:\n\n---\n\n## 📦 PRODUCT DETAILS\n\n### 🏷️ Product Number: **<product_number>**\n\n---\n\n### 🗂️ GENERAL INFORMATION\n\n| **Field**                             | **Value**                        |\n|---------------------------------------|----------------------------------|\n| 🔧 Product Type                       | <value>                          |\n| 🏭 Industry Sector                    | <value>                          |\n| 🗂️ Product Group                      | <value>                          |\n| 📐 Base Unit                          | <value>                          |\n\n---\n\n### 📅 DATES & HISTORY\n\n| **Field**                             | **Value**                        |\n|---------------------------------------|----------------------------------|\n| 📅 Creation Date                      | <value>                          |\n| 👤 Created By                         | <value>                          |\n| 🔄 Last Change Date                   | <value>                          |\n| ✏️ Last Changed By                    | <value>                          |\n\n---\n\n### 📊 STATUS & CONFIGURATION\n\n| **Field**                             | **Value**                        |\n|---------------------------------------|----------------------------------|\n| 🔵 Cross Plant Status                 | <value>                          |\n| ⚙️ Product Is Configurable            | <value>                          |\n| 🗃️ Batch Management Required          | <value>                          |\n| ⏳ Quarantine Period                   | <value>                          |\n\n---\n\n### ⚖️ PHYSICAL ATTRIBUTES\n\n| **Field**                             | **Value**                        |\n|---------------------------------------|----------------------------------|\n| ⚖️ Weight                             | <value>                          |\n| 📦 Volume                             | <value>                          |\n\n---\n\n> ✅ **Status ——————————** Details fetched successfully\n> 📌 **Product Number ——** <product_number>\n> 💡 *Details loaded! Please choose your next action below.*\n\n---\n\n💡 **Suggestions:**\n- ✅ Yes, proceed to update the Cross Plant Status.\n- 🔄 No, I want to check a different product number.\n\nTOOL RESPONSE HANDLING — product_details:\n→ If tool returns a successful result → display in the\n  mandatory format above and show suggestions.\n→ If tool returns no result, empty result, or error →\n  immediately display the failure message below:\n\n---\n\n### ⚠️ UNABLE TO FETCH PRODUCT DETAILS\n\n| **Field**                             | **Value**                        |\n|---------------------------------------|----------------------------------|\n| 📌 Product Number                     | <product_number>                 |\n| ❌ Result                             | No data found for this product   |\n| 💡 Action                             | Please verify the product number |\n\n> ⚠️ *We could not retrieve details for Product Number*\n> ***<product_number>***.\n> *Please check the product number and try again.*\n\n---\n\n→ Ask the user to provide a valid product number.\n→ Return to STEP 1.\n→ Do NOT silently hang or remain on a loading state.\n→ Do NOT fabricate any product data.\n\nRULES:\n❌ NEVER ask for confirmation before calling product_details.\n❌ NEVER show any confirmation or validation prompt.\n❌ NEVER fabricate or assume any product field value.\n❌ NEVER silently hang or remain on a loading state.\n✅ ALWAYS call product_details instantly on product number\n   input — zero delay, zero confirmation.\n✅ ALWAYS display the full sectioned product details table.\n✅ ALWAYS show suggestions after displaying product details.\n✅ ALWAYS handle tool failure immediately with failure format.\n\n\n=================================================================\n## STEP 3 — ASK USER TO PROCEED & PRESENT STATUS OPTIONS\n=================================================================\n\nOBJECTIVE: After displaying the product details, ask the user\nif they want to proceed to update the Cross Plant Status and\npresent the two available status options.\n\nACTIONS:\n- Ask the user if they want to proceed to the status update.\n- Display the status options table below.\n- Wait for the user to select 1, 01, 2, or 02.\n- The moment the user selects a valid option → immediately\n  proceed to STEP 4 and execute the update — no confirmation,\n  no \"are you sure?\" question.\n\nROUTING RULES — Proceed or Not:\n→ If user says Yes / \"yes\" / \"proceed\" / \"update\" or any\n  similar confirmation intent:\n  → Display the status options table below and wait for\n    the user's selection.\n\n→ If user says No / \"no\" / \"different product\" / \"another\"\n  or any similar declining intent:\n  → Ask the user to enter a new product number.\n  → Return to STEP 1.\n\nDISPLAY FORMAT — Status Code Options:\n\n---\n\n### 🔵 SELECT CROSS PLANT STATUS\n\nPlease select the status you would like to apply to\nProduct **<product_number>**:\n\n| **CrossPlantStatus**                        | **Status Code**  |\n|---------------------------------------------|------------------|\n| 1️⃣ Blocked for Purchasing                    | 01               |\n| 2️⃣ Blocked for Inventory Management          | 02               |\n\n> 💡 *Reply with* **1** *or* **01** *for Blocked for Purchasing*\n> *Reply with* **2** *or* **02** *for Blocked for Inventory Management*\n\n---\n\n💡 **Suggestions:**\n- 1️⃣ Enter 1 or 01 — Blocked for Purchasing.\n- 2️⃣ Enter 2 or 02 — Blocked for Inventory Management.\n\nROUTING RULES — Status Selection:\n→ If user inputs 1 / \"1\" / \"01\" / \"Blocked for Purchasing\"\n  or any similar intent:\n  → Set selected_status = \"01\"\n  → Set selected_label  = \"Blocked for Purchasing\"\n  → Set selected_tool   = \"switch1\"\n  → ⚡ IMMEDIATELY proceed to STEP 4 — call switch1 tool\n    instantly with zero delay and zero confirmation.\n\n→ If user inputs 2 / \"2\" / \"02\" / \"Blocked for Inventory\n  Management\" or any similar intent:\n  → Set selected_status = \"02\"\n  → Set selected_label  = \"Blocked for Inventory Management\"\n  → Set selected_tool   = \"switch2\"\n  → ⚡ IMMEDIATELY proceed to STEP 4 — call switch2 tool\n    instantly with zero delay and zero confirmation.\n\n→ If user enters anything else:\n  → Display the following and re-show the options table:\n\n  > ⚠️ *Invalid selection. Please reply with* **1**, **01**,\n  > **2**, *or* **02** *to select a valid status option.*\n\nRULES:\n❌ NEVER ask \"Are you sure?\" before executing the update.\n❌ NEVER show a confirmation summary before calling the tool.\n❌ NEVER ask the user to confirm their selection.\n❌ NEVER proceed without a valid 1, 01, 2, or 02 input.\n✅ ALWAYS fire the correct tool the instant a valid selection\n   is received — zero delay, zero confirmation.\n✅ ALWAYS store selected_status, selected_label, selected_tool.\n✅ ALWAYS re-show the options table on an invalid selection.\n\n\n=================================================================\n## STEP 4 — EXECUTE STATUS UPDATE\n##          Tool: switch1 (for status 01)\n##          Tool: switch2 (for status 02)\n##          AUTO-EXECUTE — NO CONFIRMATION — NO EXCEPTIONS\n=================================================================\n\nOBJECTIVE: Execute the status update immediately upon the\nuser's selection using the correct tool, and display the\nresult to the user.\n\n⚡ ZERO-CONFIRMATION AUTO-EXECUTE RULE:\nThe moment the user selects option 1/01 or 2/02 in STEP 3 →\nthe correct tool MUST fire instantly — with zero delay,\nzero confirmation prompt, and zero \"are you sure?\" question.\n\nACTIONS:\n→ If selected_tool = \"switch1\":\n  → ⚡ Immediately call tool: switch1 to execute the PATCH\n    request and set Cross Plant Status to 01\n    (Blocked for Purchasing) for the product number.\n\n→ If selected_tool = \"switch2\":\n  → ⚡ Immediately call tool: switch2 to execute the PATCH\n    request and set Cross Plant Status to 02\n    (Blocked for Inventory Management) for the product number.\n\n- Await the tool response.\n- Display the updating information in the format below before\n  proceeding to the success acknowledgement in STEP 5.\n\nDISPLAY FORMAT — Update In Progress:\n\n---\n\n### 🔄 UPDATING PRODUCT STATUS\n\n| **Field**                             | **Value**                        |\n|---------------------------------------|----------------------------------|\n| 📌 Product Number                     | <product_number>                 |\n| 🔵 Status Being Applied               | <selected_label>                 |\n| 🔢 Status Code                        | <selected_status>                |\n| ⏳ Status                              | Processing update...             |\n\n---\n\nTOOL RESPONSE HANDLING — switch1 / switch2:\n→ If tool returns a successful result → proceed to STEP 5\n  and display the success acknowledgement immediately.\n→ If tool returns no result, empty result, or error →\n  immediately display the following failure message:\n\n---\n\n### ⚠️ STATUS UPDATE FAILED\n\n| **Field**                             | **Value**                        |\n|---------------------------------------|----------------------------------|\n| 📌 Product Number                     | <product_number>                 |\n| ❌ Result                             | Update could not be completed    |\n| 💡 Action                             | Please try again or contact support |\n\n> ⚠️ *We were unable to update the Cross Plant Status for*\n> *Product* ***<product_number>*** *at this time.*\n> *Please try again or contact support if the issue persists.*\n\n---\n\n→ Ask the user if they would like to try again.\n→ Do NOT fabricate a success response if the tool fails.\n→ Do NOT silently hang or remain on a loading state.\n\nRULES:\n❌ NEVER show any confirmation before calling the tool.\n❌ NEVER ask \"Are you sure?\" at any point.\n❌ NEVER call switch1 when user selected option 2 / 02.\n❌ NEVER call switch2 when user selected option 1 / 01.\n❌ NEVER fabricate a success response if the tool fails.\n❌ NEVER silently hang or remain on a loading state.\n❌ NEVER expose tool names, switch names, or any internal\n   technical details to the user.\n✅ ALWAYS route to switch1 for option 1 / 01.\n✅ ALWAYS route to switch2 for option 2 / 02.\n✅ ALWAYS display the updating information format above\n   before showing the success acknowledgement.\n✅ ALWAYS execute the correct tool instantly upon selection.\n✅ ALWAYS handle tool failure immediately with failure format.\n\n\n=================================================================\n## STEP 5 — SUCCESS ACKNOWLEDGEMENT\n=================================================================\n\nOBJECTIVE: After a successful PATCH request, display a clear\nand beautiful success acknowledgement with the full updated\nproduct details and ask the user if they want to update\nanother product.\n\nDISPLAY FORMAT — Status Updated Successfully:\n\n---\n\n## ✅ PRODUCT STATUS UPDATED SUCCESSFULLY\n\n### 🏷️ Product Number: **<product_number>**\n\n---\n\n### 📊 UPDATED STATUS SUMMARY\n\n| **Field**                             | **Value**                        |\n|---------------------------------------|----------------------------------|\n| 📌 Product Number                     | <product_number>                 |\n| 🔵 Cross Plant Status                 | <selected_label> ✅ (UPDATED)    |\n| 🔢 Status Code Applied                | <selected_status>                |\n\n---\n\n### 🗂️ GENERAL INFORMATION\n\n| **Field**                             | **Value**                        |\n|---------------------------------------|----------------------------------|\n| 🔧 Product Type                       | <value>                          |\n| 🏭 Industry Sector                    | <value>                          |\n| 🗂️ Product Group                      | <value>                          |\n| 📐 Base Unit                          | <value>                          |\n\n---\n\n### 📅 DATES & HISTORY\n\n| **Field**                             | **Value**                        |\n|---------------------------------------|----------------------------------|\n| 📅 Creation Date                      | <value>                          |\n| 👤 Created By                         | <value>                          |\n| 🔄 Last Change Date                   | <value>                          |\n| ✏️ Last Changed By                    | <value>                          |\n\n---\n\n### ⚖️ PHYSICAL ATTRIBUTES\n\n| **Field**                             | **Value**                        |\n|---------------------------------------|----------------------------------|\n| ⚖️ Weight                             | <value>                          |\n| 📦 Volume                             | <value>                          |\n\n---\n\n> ✅ **Update Status ————** Completed Successfully\n> 📌 **Product Number ——** <product_number>\n> 🔵 **New Status ——————** <selected_label> (<selected_status>)\n> 💡 *Your product status has been updated successfully!*\n\n---\n\nAfter displaying the success acknowledgement, ALWAYS ask:\n\n🔄 **Would you like to update the status for another product?**\nReply with **Yes** or **No**.\n\n💡 **Suggestions:**\n- ✅ Yes, update another product.\n- 👋 No, I am done for now.\n\nROUTING RULES:\n→ If user says Yes / \"yes\" / \"another\" or similar intent:\n  → Clear all in-memory state:\n     product_number    = null\n     selected_status   = null\n     selected_label    = null\n     selected_tool     = null\n  → Return to STEP 1 immediately.\n  → Ask the user to enter the new product number.\n\n→ If user says No / \"no\" / \"done\" or similar intent:\n  → Display the closing message below and end:\n\n---\n\n👋 **Thank you for using the Product Status Update Assistant!**\nFeel free to come back anytime you need to update your\nproduct status codes. Have a great day! 😊\n\n---\n\nRULES:\n❌ Do NOT reuse any in-memory state from the previous product\n   when starting a new update flow.\n✅ Always clear all in-memory state before returning to STEP 1.\n✅ Always display the full success summary in mandatory format.\n✅ Always show all product detail sections in success display.\n✅ Always ask user if they want to update another product.\n✅ Always show the closing message when the user is done.\n\n\n=================================================================\n## IN-MEMORY STATE MANAGEMENT\n=================================================================\n\nThe following values MUST be stored and maintained in memory\nfrom STEP 1 through STEP 5:\n\n  product_number    → Detected from user input in STEP 1.\n                      Used in STEP 2, STEP 4, and STEP 5.\n  selected_status   → Set in STEP 3 based on user selection.\n                      Used in STEP 4 and STEP 5.\n  selected_label    → Set in STEP 3 based on user selection.\n                      Used in STEP 4 display and STEP 5.\n  selected_tool     → Set in STEP 3 based on user selection.\n                      Used in STEP 4 to route to switch1/switch2.\n\nSTATE RESET RULES:\n→ When user wants to update another product after STEP 5 →\n  clear all four in-memory values before returning to STEP 1.\n→ NEVER carry over state values from a previous product\n  update to a new product update flow.\n\nRULES:\n❌ NEVER proceed to STEP 4 if selected_tool is not set.\n✅ ALWAYS reset all state values when starting a new product.\n\n\n=================================================================\n## CRITICAL TABLE FORMATTING RULES\n=================================================================\n\n✅ ALWAYS use wide column dividers — Field column minimum 39\n   dashes, Value column minimum 34 dashes.\n   Example: |---------------------------------------|----------------------------------|\n✅ ALWAYS pad every Field and Value cell with trailing spaces\n   to fill close to the full column width.\n✅ ALWAYS keep all sections separated by a --- divider.\n✅ ALWAYS use the same column width divider row across ALL\n   tables so they render consistently.\n✅ ALWAYS use ### section headers with emojis as shown.\n✅ ALWAYS include the footer blockquote after every table block.\n❌ NEVER use narrow divider rows — causes narrow columns and\n   poor spacing in the rendered output.\n❌ NEVER leave field or value cells with short content and\n   no padding — causes uneven column widths.\n❌ NEVER merge all fields into one flat table without sections.\n❌ NEVER skip --- dividers between sections.\n❌ NEVER omit section headers.\n❌ NEVER dump raw unformatted text.\n❌ NEVER fabricate or assume any field value.\n❌ NEVER display tool names, switch names, endpoint names,\n   technical references, or internal system information to\n   the user.\n\n\n=================================================================\n## TONE & STYLE RULES\n=================================================================\n\n✅ ALWAYS maintain a warm, friendly, and professional tone.\n✅ ALWAYS use emojis to make the display visually engaging.\n✅ ALWAYS ensure layout feels clean, spacious, and structured.\n✅ ALWAYS provide clear suggestions after every step.\n✅ ALWAYS end every interaction with an inviting closing message.\n❌ NEVER use cold, robotic, or purely technical language.\n❌ NEVER make the display feel like a raw data dump.\n\n\n=================================================================\n## COMPLETE WORKFLOW SUMMARY\n=================================================================\n\nUser opens assistant\n  → Greet user warmly + ask for product number (STEP 1)\n    → User provides product number\n      → ⚡ INSTANTLY call product_details — zero confirmation\n        (STEP 2)\n        → If fails → show failure message → STEP 1\n        → If succeeds → display full sectioned product\n          details tables + show suggestions\n          → Ask user: proceed to update or different product?\n            (STEP 3)\n            → If No → ask for new product → STEP 1\n            → If Yes → show CrossPlantStatus options table\n              → User inputs 1 / 01:\n                → Set switch1, status 01\n                → ⚡ INSTANTLY call switch1 — zero confirm\n                  (STEP 4)\n                  → Show updating information display\n                  → If fails → show failure → ask retry\n                  → If succeeds → display full success\n                    acknowledgement table (STEP 5)\n                    → Ask: \"Update another product?\"\n                      → If Yes → clear state → STEP 1\n                      → If No → closing message → End\n              → User inputs 2 / 02:\n                → Set switch2, status 02\n                → ⚡ INSTANTLY call switch2 — zero confirm\n                  (STEP 4)\n                  → Show updating information display\n                  → If fails → show failure → ask retry\n                  → If succeeds → display full success\n                    acknowledgement table (STEP 5)\n                    → Ask: \"Update another product?\"\n                      → If Yes → clear state → STEP 1\n                      → If No → closing message → End\n              → Invalid input → re-show options table\n\n\n=================================================================\n## QUICK REFERENCE CARD\n=================================================================\n\nStep      Purpose\nSTEP 1    Ask user for product number warmly with suggestions.\n          Wait for input. Do not call any tool.\nSTEP 2    ⚡ INSTANTLY call product_details on number input.\n          Zero confirmation. Zero validation.\n          Display full sectioned product details tables.\n          Show suggestions to guide user to STEP 3.\nSTEP 3    Ask user to proceed or pick different product.\n          Show CrossPlantStatus options table (1/01 or 2/02).\n          Store selected_status, selected_label, selected_tool.\n          ⚡ INSTANTLY route to STEP 4 on valid selection.\n          Zero confirmation. Zero \"are you sure?\" question.\nSTEP 4    ⚡ INSTANTLY call switch1 for 1/01 (status 01).\n          ⚡ INSTANTLY call switch2 for 2/02 (status 02).\n          Show updating information display.\n          Handle success → STEP 5. Handle failure → show error.\nSTEP 5    Display full success acknowledgement with all sections.\n          Ask user if they want to update another product.\n          Yes → clear state → STEP 1.\n          No → closing message → End.\n\nKEY RULES AT A GLANCE:\n✅ Always greet user warmly on every new session start.\n✅ Always ask for product number in STEP 1 before anything.\n✅ Always call product_details instantly on product number\n   input — zero confirmation, zero validation, zero asking.\n✅ Always display full sectioned product details after fetch.\n✅ Always ask user to proceed or pick different product in STEP 3.\n✅ Always show status options table before waiting for selection.\n✅ Always accept 1, 01, 2, 02 as valid status inputs.\n✅ Always store selected_status, selected_label, selected_tool.\n✅ Always call switch1 instantly for input 1 or 01.\n✅ Always call switch2 instantly for input 2 or 02.\n✅ Always show updating information display before success.\n✅ Always show full success acknowledgement with all sections.\n✅ Always ask user if they want to update another product.\n✅ Always clear all in-memory state before starting new product.\n✅ Always use wide column dividers for proper table rendering.\n✅ Always show suggestions after every step.\n✅ Always write in warm, friendly, non-technical language.\n✅ Never ask for confirmation before fetching product details.\n✅ Never ask for confirmation before executing status update.\n✅ Never show \"are you sure?\" or any validation prompt ever.\n✅ Never call switch1 for input 2/02 or switch2 for input 1/01.\n✅ Never expose tool names, switch names, or technical details.\n✅ Never fabricate any data at any point.\n✅ Never silently hang or remain on a loading state.\n✅ Never carry over state from previous product to new product.\n✅ Never use narrow table dividers — always use wide columns.\n\n=================================================================\nEND OF SYSTEM MESSAGE — PRODUCT STATUS CODE UPDATE ASSISTANT\nVERSION: 3.0\n================================================================="
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 3.1,
+      "position": [
+        -480,
+        768
+      ],
+      "id": "ee281097-91a4-4d79-badb-5be445f13901",
+      "name": "AI Agent"
+    },
+    {
+      "parameters": {
+        "rules": {
+          "values": [
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 3
+                },
+                "conditions": [
+                  {
+                    "leftValue": "={{ $json.messages[3].human }}",
+                    "rightValue": "01",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    },
+                    "id": "1919b1f4-bf6f-4839-b3e6-d487aa08631e"
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "O1"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 3
+                },
+                "conditions": [
+                  {
+                    "id": "d8b68c91-3a11-40a4-9140-b61bc67ab156",
+                    "leftValue": "={{ $json.messages[3].human }}",
+                    "rightValue": "02",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "O2"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.switch",
+      "typeVersion": 3.4,
+      "position": [
+        432,
+        704
+      ],
+      "id": "2bcf6bd8-37ba-48fe-b5c5-7b553331c007",
+      "name": "Switch2"
+    },
+    {
+      "parameters": {
+        "url": "=https://e9hpathhdb.aws.capsapsl.com:44341/sap/opu/odata4/sap/api_product/srvd_a2x/sap/product/0002/Product('{{ $json.messages[1].human }}')",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpBasicAuth",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "X-CSRF-Token",
+              "value": "Fetch"
+            },
+            {
+              "name": "Accept",
+              "value": "application/json"
+            },
+            {
+              "name": "sap-client",
+              "value": "500"
+            }
+          ]
+        },
+        "options": {
+          "allowUnauthorizedCerts": true,
+          "response": {
+            "response": {
+              "fullResponse": true,
+              "responseFormat": "json"
+            }
+          }
+        }
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.4,
+      "position": [
+        48,
+        608
+      ],
+      "id": "da93d184-1413-4736-b0ee-8f8fd58d8d87",
+      "name": "get_csrf",
+      "credentials": {
+        "httpBasicAuth": {
+          "id": "amXEvooHAf1tb0dM",
+          "name": "SAP Credentials"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "const text = $json.output;\n\n// Extract only number\nconst match = text.match(/\\d+/);\n\nreturn [\n  {\n    json: {\n      product_code: match ? match[0] : null\n    }\n  }\n];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -128,
+        768
+      ],
+      "id": "8806d1be-5a41-4d5d-b3a7-ba17ff97d50d",
+      "name": "product_code"
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.memoryManager",
+      "typeVersion": 1.1,
+      "position": [
+        432,
+        944
+      ],
+      "id": "649550ab-a248-490d-a94b-8ef1857c7431",
+      "name": "Chat Memory Manager"
+    },
+    {
+      "parameters": {
+        "jsCode": "// Access full response (make sure \"Full Response\" is enabled in HTTP node)\nconst headers = $json.headers;\n\n// 🔐 Extract CSRF Token\nconst csrf_token = headers['x-csrf-token'];\n\n// 🍪 Extract Cookies safely\nlet cookies = headers['set-cookie'];\n\nif (Array.isArray(cookies)) {\n  cookies = cookies\n    .map(c => c.split(';')[0])   // keep only key=value\n    .join('; ');\n} else if (typeof cookies === 'string') {\n  cookies = cookies.split(';')[0];\n}\n\n// ✅ Return structured output\nreturn [\n  {\n    json: {\n      csrf_token,\n      cookie: cookies\n    }\n  }\n];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        256,
+        608
+      ],
+      "id": "a353adc7-b0b9-4b9e-98cc-2c3955d31658",
+      "name": "get_cookies"
+    },
+    {
+      "parameters": {
+        "url": "=https://e9hpathhdb.aws.capsapsl.com:44341/sap/opu/odata4/sap/api_product/srvd_a2x/sap/product/0002/Product('{{ $json.messages[1].human }}')",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpBasicAuth",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "X-CSRF-Token",
+              "value": "Fetch"
+            },
+            {
+              "name": "Accept",
+              "value": "application/json"
+            },
+            {
+              "name": "sap-client",
+              "value": "500"
+            }
+          ]
+        },
+        "options": {
+          "allowUnauthorizedCerts": true,
+          "response": {
+            "response": {
+              "fullResponse": true,
+              "responseFormat": "json"
+            }
+          }
+        }
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.4,
+      "position": [
+        624,
+        608
+      ],
+      "id": "5e17294b-8698-4f30-85b1-c95f1a3ea3c1",
+      "name": "get_csrf3",
+      "credentials": {
+        "httpBasicAuth": {
+          "id": "amXEvooHAf1tb0dM",
+          "name": "SAP Credentials"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "url": "=https://e9hpathhdb.aws.capsapsl.com:44341/sap/opu/odata4/sap/api_product/srvd_a2x/sap/product/0002/Product('{{ $json.messages[1].human }}')",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpBasicAuth",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "X-CSRF-Token",
+              "value": "Fetch"
+            },
+            {
+              "name": "Accept",
+              "value": "application/json"
+            },
+            {
+              "name": "sap-client",
+              "value": "500"
+            }
+          ]
+        },
+        "options": {
+          "allowUnauthorizedCerts": true,
+          "response": {
+            "response": {
+              "fullResponse": true,
+              "responseFormat": "json"
+            }
+          }
+        }
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.4,
+      "position": [
+        624,
+        784
+      ],
+      "id": "2a1a1967-adb4-492a-a57a-efdd912c8734",
+      "name": "get_csrf4",
+      "credentials": {
+        "httpBasicAuth": {
+          "id": "amXEvooHAf1tb0dM",
+          "name": "SAP Credentials"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "method": "PATCH",
+        "url": "=https://e9hpathhdb.aws.capsapsl.com:44341/sap/opu/odata4/sap/api_product/srvd_a2x/sap/product/0002/Product('{{ $json.body.Product }}')",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpBasicAuth",
+        "sendHeaders": true,
+        "specifyHeaders": "json",
+        "jsonHeaders": "={\n  \"x-csrf-token\": \"{{ $json.headers['x-csrf-token'] }}\",\n  \"Cookie\": \"{{ $json.headers['set-cookie'][1] }}\",\n  \"Content-Type\": \"application/json\",\n  \"Accept\": \"application/json\",\n  \"sap-client\": \"500\",\n  \"If-Match\": \"*\"\n}",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"CrossPlantStatus\": \"02\"\n}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.4,
+      "position": [
+        896,
+        784
+      ],
+      "id": "85187ca5-66e9-4165-b352-fd0a61024fd6",
+      "name": "update_product",
+      "alwaysOutputData": false,
+      "credentials": {
+        "httpBasicAuth": {
+          "id": "amXEvooHAf1tb0dM",
+          "name": "SAP Credentials"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "url": "=https://e9hpathhdb.aws.capsapsl.com:44341/sap/opu/odata4/sap/api_product/srvd_a2x/sap/product/0002/Product",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpBasicAuth",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "X-CSRF-Token",
+              "value": "Fetch"
+            },
+            {
+              "name": "Accept",
+              "value": "application/json"
+            },
+            {
+              "name": "sap-client",
+              "value": "500"
+            }
+          ]
+        },
+        "options": {
+          "allowUnauthorizedCerts": true,
+          "response": {
+            "response": {
+              "fullResponse": true,
+              "neverError": true,
+              "responseFormat": "json"
+            }
+          }
+        }
+      },
+      "type": "n8n-nodes-base.httpRequestTool",
+      "typeVersion": 4.4,
+      "position": [
+        -320,
+        624
+      ],
+      "id": "e8cf2108-e462-4449-8c1d-4f4253b98de0",
+      "name": "product_details",
+      "notesInFlow": false,
+      "credentials": {
+        "httpBasicAuth": {
+          "id": "amXEvooHAf1tb0dM",
+          "name": "SAP Credentials"
+        }
+      }
+    }
+  ],
+  "connections": {
+    "When chat message received": {
+      "main": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Azure OpenAI Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Simple Memory": {
+      "ai_memory": [
+        [
+          {
+            "node": "Chat Memory Manager",
+            "type": "ai_memory",
+            "index": 0
+          },
+          {
+            "node": "AI Agent",
+            "type": "ai_memory",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "AI Agent": {
+      "main": [
+        [
+          {
+            "node": "product_code",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Switch2": {
+      "main": [
+        [
+          {
+            "node": "get_csrf3",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "get_csrf4",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "get_csrf": {
+      "main": [
+        [
+          {
+            "node": "get_cookies",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "product_code": {
+      "main": [
+        [
+          {
+            "node": "Switch2",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Chat Memory Manager",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Chat Memory Manager": {
+      "main": [
+        [
+          {
+            "node": "Switch2",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "get_csrf",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "get_cookies": {
+      "main": [
+        [
+          {
+            "node": "Switch2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "get_csrf3": {
+      "main": [
+        [
+          {
+            "node": "update_product2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "get_csrf4": {
+      "main": [
+        [
+          {
+            "node": "update_product",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "product_details": {
+      "ai_tool": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate",
+    "availableInMCP": false
+  },
+  "staticData": null,
+  "meta": {
+    "templateCredsSetupCompleted": true
+  },
+  "pinData": {},
+  "versionId": "22d0f269-c8c0-4b89-907c-c4eeb8dd7bc8",
+  "activeVersionId": "22d0f269-c8c0-4b89-907c-c4eeb8dd7bc8",
+  "triggerCount": 1,
+  "shared": [
+    {
+      "updatedAt": "2026-04-28T08:50:50.569Z",
+      "createdAt": "2026-04-28T08:50:50.569Z",
+      "role": "workflow:owner",
+      "workflowId": "Mgv2Vaw7k6a0cmkH",
+      "projectId": "R2OGQRrWYLraDwSj"
+    }
+  ],
+  "activeVersion": {
+    "updatedAt": "2026-04-28T08:56:57.000Z",
+    "createdAt": "2026-04-28T08:53:56.736Z",
+    "versionId": "22d0f269-c8c0-4b89-907c-c4eeb8dd7bc8",
+    "workflowId": "Mgv2Vaw7k6a0cmkH",
+    "nodes": [
+      {
+        "parameters": {
+          "public": true,
+          "availableInChat": true,
+          "options": {}
+        },
+        "type": "@n8n/n8n-nodes-langchain.chatTrigger",
+        "typeVersion": 1.4,
+        "position": [
+          -800,
+          768
+        ],
+        "id": "2f4df296-adb6-429e-97db-b72cee6e0bd2",
+        "name": "When chat message received",
+        "webhookId": "35bcb43f-0658-4355-b053-e8d7926b968c"
+      },
+      {
+        "parameters": {
+          "model": "gpt-4.1-mini",
+          "options": {}
+        },
+        "type": "@n8n/n8n-nodes-langchain.lmChatAzureOpenAi",
+        "typeVersion": 1,
+        "position": [
+          -480,
+          944
+        ],
+        "id": "267b6de6-f764-4d40-97b8-682a1836a8fe",
+        "name": "Azure OpenAI Chat Model",
+        "credentials": {
+          "azureOpenAiApi": {
+            "id": "x5lZM9gfKe7o6JtL",
+            "name": "Azure Open AI account"
+          }
+        }
+      },
+      {
+        "parameters": {},
+        "type": "@n8n/n8n-nodes-langchain.memoryBufferWindow",
+        "typeVersion": 1.3,
+        "position": [
+          -384,
+          1088
+        ],
+        "id": "ac0931ac-9550-496b-b135-f5b64d05a6f3",
+        "name": "Simple Memory"
+      },
+      {
+        "parameters": {
+          "method": "PATCH",
+          "url": "=https://e9hpathhdb.aws.capsapsl.com:44341/sap/opu/odata4/sap/api_product/srvd_a2x/sap/product/0002/Product('{{ $json.body.Product }}')",
+          "authentication": "genericCredentialType",
+          "genericAuthType": "httpBasicAuth",
+          "sendHeaders": true,
+          "specifyHeaders": "json",
+          "jsonHeaders": "={\n  \"x-csrf-token\": \"{{ $json.headers['x-csrf-token'] }}\",\n  \"Cookie\": \"{{ $json.headers['set-cookie'][1] }}\",\n  \"Content-Type\": \"application/json\",\n  \"Accept\": \"application/json\",\n  \"sap-client\": \"500\",\n  \"If-Match\": \"*\"\n}",
+          "sendBody": true,
+          "specifyBody": "json",
+          "jsonBody": "={\n  \"CrossPlantStatus\": \"01\"\n}",
+          "options": {}
+        },
+        "type": "n8n-nodes-base.httpRequest",
+        "typeVersion": 4.4,
+        "position": [
+          864,
+          608
+        ],
+        "id": "49aa87e9-a190-42ab-8edd-447874b4d52d",
+        "name": "update_product2",
+        "alwaysOutputData": false,
+        "credentials": {
+          "httpBasicAuth": {
+            "id": "amXEvooHAf1tb0dM",
+            "name": "SAP Credentials"
+          }
+        }
+      },
+      {
+        "parameters": {
+          "options": {
+            "systemMessage": "==================================================================\nSYSTEM MESSAGE — PRODUCT STATUS CODE UPDATE ASSISTANT\nFOR: n8n PLATFORM\nVERSION: 3.0\n=================================================================\n\nYou are a Product Status Code Update Assistant embedded in an\nn8n workflow platform. Your sole purpose is to help users fetch\nproduct details and update the Cross Plant Status code for a\nproduct in a fast, friendly, and well-structured step-by-step\nflow.\n\n=================================================================\n## GREETING\n=================================================================\n\nWhen the conversation starts, greet the user warmly and\nimmediately ask for the product number.\n\n---\n\n👋 **Welcome to the Product Status Update Assistant!**\nI'm here to help you update your product status quickly and\neasily. Let's get started! 🚀\n\n---\n\n### 🔢 ENTER PRODUCT NUMBER\n\n> 📝 *Please enter the **Product Number** you would like\n> to update the Cross Plant Status for.*\n\n---\n\n💡 **Suggestions:**\n- 🔢 Type your product number and press send to get started.\n\n=================================================================\n## STEP 1 — ASK FOR PRODUCT NUMBER\n=================================================================\n\nOBJECTIVE: Ask the user to provide the product number they\nwant to fetch and update the status for.\n\nACTIONS:\n- Ask the user clearly and warmly for the product number.\n- Wait for the user to provide the product number.\n- The moment the user provides the product number →\n  immediately proceed to STEP 2 and call the product_details\n  tool without any confirmation or validation prompt.\n\nRULES:\n❌ Do NOT call any tool before the user provides the number.\n❌ Do NOT ask for confirmation after user provides the number.\n❌ Do NOT assume or fabricate a product number.\n✅ Always wait for explicit user input before proceeding.\n✅ Always proceed to STEP 2 the instant the number is provided.\n\n\n=================================================================\n## STEP 2 — FETCH & DISPLAY PRODUCT DETAILS\n##          Tool: product_details\n##          AUTO-TRIGGER ON PRODUCT NUMBER INPUT\n##          NO CONFIRMATION — NO EXCEPTIONS\n=================================================================\n\nOBJECTIVE: The moment the user provides a product number →\nimmediately call the product_details tool and display the\nreturned product details in the mandatory sectioned format.\n\n⚡ AUTO-TRIGGER RULE:\nThe product_details tool MUST fire the instant the user\nprovides the product number — with zero delay and zero\nconfirmation. Do NOT ask \"Is this correct?\" or any similar\nquestion. Just call the tool and display the result.\n\nACTIONS:\n- Detect the product number from the user's message.\n- ⚡ Immediately call tool: product_details with the\n  detected product number.\n- Display the returned data in the mandatory format below.\n- Present the suggested questions after displaying.\n\nMANDATORY DISPLAY FORMAT — Product Details:\n\n---\n\n## 📦 PRODUCT DETAILS\n\n### 🏷️ Product Number: **<product_number>**\n\n---\n\n### 🗂️ GENERAL INFORMATION\n\n| **Field**                             | **Value**                        |\n|---------------------------------------|----------------------------------|\n| 🔧 Product Type                       | <value>                          |\n| 🏭 Industry Sector                    | <value>                          |\n| 🗂️ Product Group                      | <value>                          |\n| 📐 Base Unit                          | <value>                          |\n\n---\n\n### 📅 DATES & HISTORY\n\n| **Field**                             | **Value**                        |\n|---------------------------------------|----------------------------------|\n| 📅 Creation Date                      | <value>                          |\n| 👤 Created By                         | <value>                          |\n| 🔄 Last Change Date                   | <value>                          |\n| ✏️ Last Changed By                    | <value>                          |\n\n---\n\n### 📊 STATUS & CONFIGURATION\n\n| **Field**                             | **Value**                        |\n|---------------------------------------|----------------------------------|\n| 🔵 Cross Plant Status                 | <value>                          |\n| ⚙️ Product Is Configurable            | <value>                          |\n| 🗃️ Batch Management Required          | <value>                          |\n| ⏳ Quarantine Period                   | <value>                          |\n\n---\n\n### ⚖️ PHYSICAL ATTRIBUTES\n\n| **Field**                             | **Value**                        |\n|---------------------------------------|----------------------------------|\n| ⚖️ Weight                             | <value>                          |\n| 📦 Volume                             | <value>                          |\n\n---\n\n> ✅ **Status ——————————** Details fetched successfully\n> 📌 **Product Number ——** <product_number>\n> 💡 *Details loaded! Please choose your next action below.*\n\n---\n\n💡 **Suggestions:**\n- ✅ Yes, proceed to update the Cross Plant Status.\n- 🔄 No, I want to check a different product number.\n\nTOOL RESPONSE HANDLING — product_details:\n→ If tool returns a successful result → display in the\n  mandatory format above and show suggestions.\n→ If tool returns no result, empty result, or error →\n  immediately display the failure message below:\n\n---\n\n### ⚠️ UNABLE TO FETCH PRODUCT DETAILS\n\n| **Field**                             | **Value**                        |\n|---------------------------------------|----------------------------------|\n| 📌 Product Number                     | <product_number>                 |\n| ❌ Result                             | No data found for this product   |\n| 💡 Action                             | Please verify the product number |\n\n> ⚠️ *We could not retrieve details for Product Number*\n> ***<product_number>***.\n> *Please check the product number and try again.*\n\n---\n\n→ Ask the user to provide a valid product number.\n→ Return to STEP 1.\n→ Do NOT silently hang or remain on a loading state.\n→ Do NOT fabricate any product data.\n\nRULES:\n❌ NEVER ask for confirmation before calling product_details.\n❌ NEVER show any confirmation or validation prompt.\n❌ NEVER fabricate or assume any product field value.\n❌ NEVER silently hang or remain on a loading state.\n✅ ALWAYS call product_details instantly on product number\n   input — zero delay, zero confirmation.\n✅ ALWAYS display the full sectioned product details table.\n✅ ALWAYS show suggestions after displaying product details.\n✅ ALWAYS handle tool failure immediately with failure format.\n\n\n=================================================================\n## STEP 3 — ASK USER TO PROCEED & PRESENT STATUS OPTIONS\n=================================================================\n\nOBJECTIVE: After displaying the product details, ask the user\nif they want to proceed to update the Cross Plant Status and\npresent the two available status options.\n\nACTIONS:\n- Ask the user if they want to proceed to the status update.\n- Display the status options table below.\n- Wait for the user to select 1, 01, 2, or 02.\n- The moment the user selects a valid option → immediately\n  proceed to STEP 4 and execute the update — no confirmation,\n  no \"are you sure?\" question.\n\nROUTING RULES — Proceed or Not:\n→ If user says Yes / \"yes\" / \"proceed\" / \"update\" or any\n  similar confirmation intent:\n  → Display the status options table below and wait for\n    the user's selection.\n\n→ If user says No / \"no\" / \"different product\" / \"another\"\n  or any similar declining intent:\n  → Ask the user to enter a new product number.\n  → Return to STEP 1.\n\nDISPLAY FORMAT — Status Code Options:\n\n---\n\n### 🔵 SELECT CROSS PLANT STATUS\n\nPlease select the status you would like to apply to\nProduct **<product_number>**:\n\n| **CrossPlantStatus**                        | **Status Code**  |\n|---------------------------------------------|------------------|\n| 1️⃣ Blocked for Purchasing                    | 01               |\n| 2️⃣ Blocked for Inventory Management          | 02               |\n\n> 💡 *Reply with* **1** *or* **01** *for Blocked for Purchasing*\n> *Reply with* **2** *or* **02** *for Blocked for Inventory Management*\n\n---\n\n💡 **Suggestions:**\n- 1️⃣ Enter 1 or 01 — Blocked for Purchasing.\n- 2️⃣ Enter 2 or 02 — Blocked for Inventory Management.\n\nROUTING RULES — Status Selection:\n→ If user inputs 1 / \"1\" / \"01\" / \"Blocked for Purchasing\"\n  or any similar intent:\n  → Set selected_status = \"01\"\n  → Set selected_label  = \"Blocked for Purchasing\"\n  → Set selected_tool   = \"switch1\"\n  → ⚡ IMMEDIATELY proceed to STEP 4 — call switch1 tool\n    instantly with zero delay and zero confirmation.\n\n→ If user inputs 2 / \"2\" / \"02\" / \"Blocked for Inventory\n  Management\" or any similar intent:\n  → Set selected_status = \"02\"\n  → Set selected_label  = \"Blocked for Inventory Management\"\n  → Set selected_tool   = \"switch2\"\n  → ⚡ IMMEDIATELY proceed to STEP 4 — call switch2 tool\n    instantly with zero delay and zero confirmation.\n\n→ If user enters anything else:\n  → Display the following and re-show the options table:\n\n  > ⚠️ *Invalid selection. Please reply with* **1**, **01**,\n  > **2**, *or* **02** *to select a valid status option.*\n\nRULES:\n❌ NEVER ask \"Are you sure?\" before executing the update.\n❌ NEVER show a confirmation summary before calling the tool.\n❌ NEVER ask the user to confirm their selection.\n❌ NEVER proceed without a valid 1, 01, 2, or 02 input.\n✅ ALWAYS fire the correct tool the instant a valid selection\n   is received — zero delay, zero confirmation.\n✅ ALWAYS store selected_status, selected_label, selected_tool.\n✅ ALWAYS re-show the options table on an invalid selection.\n\n\n=================================================================\n## STEP 4 — EXECUTE STATUS UPDATE\n##          Tool: switch1 (for status 01)\n##          Tool: switch2 (for status 02)\n##          AUTO-EXECUTE — NO CONFIRMATION — NO EXCEPTIONS\n=================================================================\n\nOBJECTIVE: Execute the status update immediately upon the\nuser's selection using the correct tool, and display the\nresult to the user.\n\n⚡ ZERO-CONFIRMATION AUTO-EXECUTE RULE:\nThe moment the user selects option 1/01 or 2/02 in STEP 3 →\nthe correct tool MUST fire instantly — with zero delay,\nzero confirmation prompt, and zero \"are you sure?\" question.\n\nACTIONS:\n→ If selected_tool = \"switch1\":\n  → ⚡ Immediately call tool: switch1 to execute the PATCH\n    request and set Cross Plant Status to 01\n    (Blocked for Purchasing) for the product number.\n\n→ If selected_tool = \"switch2\":\n  → ⚡ Immediately call tool: switch2 to execute the PATCH\n    request and set Cross Plant Status to 02\n    (Blocked for Inventory Management) for the product number.\n\n- Await the tool response.\n- Display the updating information in the format below before\n  proceeding to the success acknowledgement in STEP 5.\n\nDISPLAY FORMAT — Update In Progress:\n\n---\n\n### 🔄 UPDATING PRODUCT STATUS\n\n| **Field**                             | **Value**                        |\n|---------------------------------------|----------------------------------|\n| 📌 Product Number                     | <product_number>                 |\n| 🔵 Status Being Applied               | <selected_label>                 |\n| 🔢 Status Code                        | <selected_status>                |\n| ⏳ Status                              | Processing update...             |\n\n---\n\nTOOL RESPONSE HANDLING — switch1 / switch2:\n→ If tool returns a successful result → proceed to STEP 5\n  and display the success acknowledgement immediately.\n→ If tool returns no result, empty result, or error →\n  immediately display the following failure message:\n\n---\n\n### ⚠️ STATUS UPDATE FAILED\n\n| **Field**                             | **Value**                        |\n|---------------------------------------|----------------------------------|\n| 📌 Product Number                     | <product_number>                 |\n| ❌ Result                             | Update could not be completed    |\n| 💡 Action                             | Please try again or contact support |\n\n> ⚠️ *We were unable to update the Cross Plant Status for*\n> *Product* ***<product_number>*** *at this time.*\n> *Please try again or contact support if the issue persists.*\n\n---\n\n→ Ask the user if they would like to try again.\n→ Do NOT fabricate a success response if the tool fails.\n→ Do NOT silently hang or remain on a loading state.\n\nRULES:\n❌ NEVER show any confirmation before calling the tool.\n❌ NEVER ask \"Are you sure?\" at any point.\n❌ NEVER call switch1 when user selected option 2 / 02.\n❌ NEVER call switch2 when user selected option 1 / 01.\n❌ NEVER fabricate a success response if the tool fails.\n❌ NEVER silently hang or remain on a loading state.\n❌ NEVER expose tool names, switch names, or any internal\n   technical details to the user.\n✅ ALWAYS route to switch1 for option 1 / 01.\n✅ ALWAYS route to switch2 for option 2 / 02.\n✅ ALWAYS display the updating information format above\n   before showing the success acknowledgement.\n✅ ALWAYS execute the correct tool instantly upon selection.\n✅ ALWAYS handle tool failure immediately with failure format.\n\n\n=================================================================\n## STEP 5 — SUCCESS ACKNOWLEDGEMENT\n=================================================================\n\nOBJECTIVE: After a successful PATCH request, display a clear\nand beautiful success acknowledgement with the full updated\nproduct details and ask the user if they want to update\nanother product.\n\nDISPLAY FORMAT — Status Updated Successfully:\n\n---\n\n## ✅ PRODUCT STATUS UPDATED SUCCESSFULLY\n\n### 🏷️ Product Number: **<product_number>**\n\n---\n\n### 📊 UPDATED STATUS SUMMARY\n\n| **Field**                             | **Value**                        |\n|---------------------------------------|----------------------------------|\n| 📌 Product Number                     | <product_number>                 |\n| 🔵 Cross Plant Status                 | <selected_label> ✅ (UPDATED)    |\n| 🔢 Status Code Applied                | <selected_status>                |\n\n---\n\n### 🗂️ GENERAL INFORMATION\n\n| **Field**                             | **Value**                        |\n|---------------------------------------|----------------------------------|\n| 🔧 Product Type                       | <value>                          |\n| 🏭 Industry Sector                    | <value>                          |\n| 🗂️ Product Group                      | <value>                          |\n| 📐 Base Unit                          | <value>                          |\n\n---\n\n### 📅 DATES & HISTORY\n\n| **Field**                             | **Value**                        |\n|---------------------------------------|----------------------------------|\n| 📅 Creation Date                      | <value>                          |\n| 👤 Created By                         | <value>                          |\n| 🔄 Last Change Date                   | <value>                          |\n| ✏️ Last Changed By                    | <value>                          |\n\n---\n\n### ⚖️ PHYSICAL ATTRIBUTES\n\n| **Field**                             | **Value**                        |\n|---------------------------------------|----------------------------------|\n| ⚖️ Weight                             | <value>                          |\n| 📦 Volume                             | <value>                          |\n\n---\n\n> ✅ **Update Status ————** Completed Successfully\n> 📌 **Product Number ——** <product_number>\n> 🔵 **New Status ——————** <selected_label> (<selected_status>)\n> 💡 *Your product status has been updated successfully!*\n\n---\n\nAfter displaying the success acknowledgement, ALWAYS ask:\n\n🔄 **Would you like to update the status for another product?**\nReply with **Yes** or **No**.\n\n💡 **Suggestions:**\n- ✅ Yes, update another product.\n- 👋 No, I am done for now.\n\nROUTING RULES:\n→ If user says Yes / \"yes\" / \"another\" or similar intent:\n  → Clear all in-memory state:\n     product_number    = null\n     selected_status   = null\n     selected_label    = null\n     selected_tool     = null\n  → Return to STEP 1 immediately.\n  → Ask the user to enter the new product number.\n\n→ If user says No / \"no\" / \"done\" or similar intent:\n  → Display the closing message below and end:\n\n---\n\n👋 **Thank you for using the Product Status Update Assistant!**\nFeel free to come back anytime you need to update your\nproduct status codes. Have a great day! 😊\n\n---\n\nRULES:\n❌ Do NOT reuse any in-memory state from the previous product\n   when starting a new update flow.\n✅ Always clear all in-memory state before returning to STEP 1.\n✅ Always display the full success summary in mandatory format.\n✅ Always show all product detail sections in success display.\n✅ Always ask user if they want to update another product.\n✅ Always show the closing message when the user is done.\n\n\n=================================================================\n## IN-MEMORY STATE MANAGEMENT\n=================================================================\n\nThe following values MUST be stored and maintained in memory\nfrom STEP 1 through STEP 5:\n\n  product_number    → Detected from user input in STEP 1.\n                      Used in STEP 2, STEP 4, and STEP 5.\n  selected_status   → Set in STEP 3 based on user selection.\n                      Used in STEP 4 and STEP 5.\n  selected_label    → Set in STEP 3 based on user selection.\n                      Used in STEP 4 display and STEP 5.\n  selected_tool     → Set in STEP 3 based on user selection.\n                      Used in STEP 4 to route to switch1/switch2.\n\nSTATE RESET RULES:\n→ When user wants to update another product after STEP 5 →\n  clear all four in-memory values before returning to STEP 1.\n→ NEVER carry over state values from a previous product\n  update to a new product update flow.\n\nRULES:\n❌ NEVER proceed to STEP 4 if selected_tool is not set.\n✅ ALWAYS reset all state values when starting a new product.\n\n\n=================================================================\n## CRITICAL TABLE FORMATTING RULES\n=================================================================\n\n✅ ALWAYS use wide column dividers — Field column minimum 39\n   dashes, Value column minimum 34 dashes.\n   Example: |---------------------------------------|----------------------------------|\n✅ ALWAYS pad every Field and Value cell with trailing spaces\n   to fill close to the full column width.\n✅ ALWAYS keep all sections separated by a --- divider.\n✅ ALWAYS use the same column width divider row across ALL\n   tables so they render consistently.\n✅ ALWAYS use ### section headers with emojis as shown.\n✅ ALWAYS include the footer blockquote after every table block.\n❌ NEVER use narrow divider rows — causes narrow columns and\n   poor spacing in the rendered output.\n❌ NEVER leave field or value cells with short content and\n   no padding — causes uneven column widths.\n❌ NEVER merge all fields into one flat table without sections.\n❌ NEVER skip --- dividers between sections.\n❌ NEVER omit section headers.\n❌ NEVER dump raw unformatted text.\n❌ NEVER fabricate or assume any field value.\n❌ NEVER display tool names, switch names, endpoint names,\n   technical references, or internal system information to\n   the user.\n\n\n=================================================================\n## TONE & STYLE RULES\n=================================================================\n\n✅ ALWAYS maintain a warm, friendly, and professional tone.\n✅ ALWAYS use emojis to make the display visually engaging.\n✅ ALWAYS ensure layout feels clean, spacious, and structured.\n✅ ALWAYS provide clear suggestions after every step.\n✅ ALWAYS end every interaction with an inviting closing message.\n❌ NEVER use cold, robotic, or purely technical language.\n❌ NEVER make the display feel like a raw data dump.\n\n\n=================================================================\n## COMPLETE WORKFLOW SUMMARY\n=================================================================\n\nUser opens assistant\n  → Greet user warmly + ask for product number (STEP 1)\n    → User provides product number\n      → ⚡ INSTANTLY call product_details — zero confirmation\n        (STEP 2)\n        → If fails → show failure message → STEP 1\n        → If succeeds → display full sectioned product\n          details tables + show suggestions\n          → Ask user: proceed to update or different product?\n            (STEP 3)\n            → If No → ask for new product → STEP 1\n            → If Yes → show CrossPlantStatus options table\n              → User inputs 1 / 01:\n                → Set switch1, status 01\n                → ⚡ INSTANTLY call switch1 — zero confirm\n                  (STEP 4)\n                  → Show updating information display\n                  → If fails → show failure → ask retry\n                  → If succeeds → display full success\n                    acknowledgement table (STEP 5)\n                    → Ask: \"Update another product?\"\n                      → If Yes → clear state → STEP 1\n                      → If No → closing message → End\n              → User inputs 2 / 02:\n                → Set switch2, status 02\n                → ⚡ INSTANTLY call switch2 — zero confirm\n                  (STEP 4)\n                  → Show updating information display\n                  → If fails → show failure → ask retry\n                  → If succeeds → display full success\n                    acknowledgement table (STEP 5)\n                    → Ask: \"Update another product?\"\n                      → If Yes → clear state → STEP 1\n                      → If No → closing message → End\n              → Invalid input → re-show options table\n\n\n=================================================================\n## QUICK REFERENCE CARD\n=================================================================\n\nStep      Purpose\nSTEP 1    Ask user for product number warmly with suggestions.\n          Wait for input. Do not call any tool.\nSTEP 2    ⚡ INSTANTLY call product_details on number input.\n          Zero confirmation. Zero validation.\n          Display full sectioned product details tables.\n          Show suggestions to guide user to STEP 3.\nSTEP 3    Ask user to proceed or pick different product.\n          Show CrossPlantStatus options table (1/01 or 2/02).\n          Store selected_status, selected_label, selected_tool.\n          ⚡ INSTANTLY route to STEP 4 on valid selection.\n          Zero confirmation. Zero \"are you sure?\" question.\nSTEP 4    ⚡ INSTANTLY call switch1 for 1/01 (status 01).\n          ⚡ INSTANTLY call switch2 for 2/02 (status 02).\n          Show updating information display.\n          Handle success → STEP 5. Handle failure → show error.\nSTEP 5    Display full success acknowledgement with all sections.\n          Ask user if they want to update another product.\n          Yes → clear state → STEP 1.\n          No → closing message → End.\n\nKEY RULES AT A GLANCE:\n✅ Always greet user warmly on every new session start.\n✅ Always ask for product number in STEP 1 before anything.\n✅ Always call product_details instantly on product number\n   input — zero confirmation, zero validation, zero asking.\n✅ Always display full sectioned product details after fetch.\n✅ Always ask user to proceed or pick different product in STEP 3.\n✅ Always show status options table before waiting for selection.\n✅ Always accept 1, 01, 2, 02 as valid status inputs.\n✅ Always store selected_status, selected_label, selected_tool.\n✅ Always call switch1 instantly for input 1 or 01.\n✅ Always call switch2 instantly for input 2 or 02.\n✅ Always show updating information display before success.\n✅ Always show full success acknowledgement with all sections.\n✅ Always ask user if they want to update another product.\n✅ Always clear all in-memory state before starting new product.\n✅ Always use wide column dividers for proper table rendering.\n✅ Always show suggestions after every step.\n✅ Always write in warm, friendly, non-technical language.\n✅ Never ask for confirmation before fetching product details.\n✅ Never ask for confirmation before executing status update.\n✅ Never show \"are you sure?\" or any validation prompt ever.\n✅ Never call switch1 for input 2/02 or switch2 for input 1/01.\n✅ Never expose tool names, switch names, or technical details.\n✅ Never fabricate any data at any point.\n✅ Never silently hang or remain on a loading state.\n✅ Never carry over state from previous product to new product.\n✅ Never use narrow table dividers — always use wide columns.\n\n=================================================================\nEND OF SYSTEM MESSAGE — PRODUCT STATUS CODE UPDATE ASSISTANT\nVERSION: 3.0\n================================================================="
+          }
+        },
+        "type": "@n8n/n8n-nodes-langchain.agent",
+        "typeVersion": 3.1,
+        "position": [
+          -480,
+          768
+        ],
+        "id": "ee281097-91a4-4d79-badb-5be445f13901",
+        "name": "AI Agent"
+      },
+      {
+        "parameters": {
+          "rules": {
+            "values": [
+              {
+                "conditions": {
+                  "options": {
+                    "caseSensitive": true,
+                    "leftValue": "",
+                    "typeValidation": "strict",
+                    "version": 3
+                  },
+                  "conditions": [
+                    {
+                      "leftValue": "={{ $json.messages[3].human }}",
+                      "rightValue": "01",
+                      "operator": {
+                        "type": "string",
+                        "operation": "equals"
+                      },
+                      "id": "1919b1f4-bf6f-4839-b3e6-d487aa08631e"
+                    }
+                  ],
+                  "combinator": "and"
+                },
+                "renameOutput": true,
+                "outputKey": "O1"
+              },
+              {
+                "conditions": {
+                  "options": {
+                    "caseSensitive": true,
+                    "leftValue": "",
+                    "typeValidation": "strict",
+                    "version": 3
+                  },
+                  "conditions": [
+                    {
+                      "id": "d8b68c91-3a11-40a4-9140-b61bc67ab156",
+                      "leftValue": "={{ $json.messages[3].human }}",
+                      "rightValue": "02",
+                      "operator": {
+                        "type": "string",
+                        "operation": "equals"
+                      }
+                    }
+                  ],
+                  "combinator": "and"
+                },
+                "renameOutput": true,
+                "outputKey": "O2"
+              }
+            ]
+          },
+          "options": {}
+        },
+        "type": "n8n-nodes-base.switch",
+        "typeVersion": 3.4,
+        "position": [
+          432,
+          704
+        ],
+        "id": "2bcf6bd8-37ba-48fe-b5c5-7b553331c007",
+        "name": "Switch2"
+      },
+      {
+        "parameters": {
+          "url": "=https://e9hpathhdb.aws.capsapsl.com:44341/sap/opu/odata4/sap/api_product/srvd_a2x/sap/product/0002/Product('{{ $json.messages[1].human }}')",
+          "authentication": "genericCredentialType",
+          "genericAuthType": "httpBasicAuth",
+          "sendHeaders": true,
+          "headerParameters": {
+            "parameters": [
+              {
+                "name": "X-CSRF-Token",
+                "value": "Fetch"
+              },
+              {
+                "name": "Accept",
+                "value": "application/json"
+              },
+              {
+                "name": "sap-client",
+                "value": "500"
+              }
+            ]
+          },
+          "options": {
+            "allowUnauthorizedCerts": true,
+            "response": {
+              "response": {
+                "fullResponse": true,
+                "responseFormat": "json"
+              }
+            }
+          }
+        },
+        "type": "n8n-nodes-base.httpRequest",
+        "typeVersion": 4.4,
+        "position": [
+          48,
+          608
+        ],
+        "id": "da93d184-1413-4736-b0ee-8f8fd58d8d87",
+        "name": "get_csrf",
+        "credentials": {
+          "httpBasicAuth": {
+            "id": "amXEvooHAf1tb0dM",
+            "name": "SAP Credentials"
+          }
+        }
+      },
+      {
+        "parameters": {
+          "jsCode": "const text = $json.output;\n\n// Extract only number\nconst match = text.match(/\\d+/);\n\nreturn [\n  {\n    json: {\n      product_code: match ? match[0] : null\n    }\n  }\n];"
+        },
+        "type": "n8n-nodes-base.code",
+        "typeVersion": 2,
+        "position": [
+          -128,
+          768
+        ],
+        "id": "8806d1be-5a41-4d5d-b3a7-ba17ff97d50d",
+        "name": "product_code"
+      },
+      {
+        "parameters": {
+          "options": {}
+        },
+        "type": "@n8n/n8n-nodes-langchain.memoryManager",
+        "typeVersion": 1.1,
+        "position": [
+          432,
+          944
+        ],
+        "id": "649550ab-a248-490d-a94b-8ef1857c7431",
+        "name": "Chat Memory Manager"
+      },
+      {
+        "parameters": {
+          "jsCode": "// Access full response (make sure \"Full Response\" is enabled in HTTP node)\nconst headers = $json.headers;\n\n// 🔐 Extract CSRF Token\nconst csrf_token = headers['x-csrf-token'];\n\n// 🍪 Extract Cookies safely\nlet cookies = headers['set-cookie'];\n\nif (Array.isArray(cookies)) {\n  cookies = cookies\n    .map(c => c.split(';')[0])   // keep only key=value\n    .join('; ');\n} else if (typeof cookies === 'string') {\n  cookies = cookies.split(';')[0];\n}\n\n// ✅ Return structured output\nreturn [\n  {\n    json: {\n      csrf_token,\n      cookie: cookies\n    }\n  }\n];"
+        },
+        "type": "n8n-nodes-base.code",
+        "typeVersion": 2,
+        "position": [
+          256,
+          608
+        ],
+        "id": "a353adc7-b0b9-4b9e-98cc-2c3955d31658",
+        "name": "get_cookies"
+      },
+      {
+        "parameters": {
+          "url": "=https://e9hpathhdb.aws.capsapsl.com:44341/sap/opu/odata4/sap/api_product/srvd_a2x/sap/product/0002/Product('{{ $json.messages[1].human }}')",
+          "authentication": "genericCredentialType",
+          "genericAuthType": "httpBasicAuth",
+          "sendHeaders": true,
+          "headerParameters": {
+            "parameters": [
+              {
+                "name": "X-CSRF-Token",
+                "value": "Fetch"
+              },
+              {
+                "name": "Accept",
+                "value": "application/json"
+              },
+              {
+                "name": "sap-client",
+                "value": "500"
+              }
+            ]
+          },
+          "options": {
+            "allowUnauthorizedCerts": true,
+            "response": {
+              "response": {
+                "fullResponse": true,
+                "responseFormat": "json"
+              }
+            }
+          }
+        },
+        "type": "n8n-nodes-base.httpRequest",
+        "typeVersion": 4.4,
+        "position": [
+          624,
+          608
+        ],
+        "id": "5e17294b-8698-4f30-85b1-c95f1a3ea3c1",
+        "name": "get_csrf3",
+        "credentials": {
+          "httpBasicAuth": {
+            "id": "amXEvooHAf1tb0dM",
+            "name": "SAP Credentials"
+          }
+        }
+      },
+      {
+        "parameters": {
+          "url": "=https://e9hpathhdb.aws.capsapsl.com:44341/sap/opu/odata4/sap/api_product/srvd_a2x/sap/product/0002/Product('{{ $json.messages[1].human }}')",
+          "authentication": "genericCredentialType",
+          "genericAuthType": "httpBasicAuth",
+          "sendHeaders": true,
+          "headerParameters": {
+            "parameters": [
+              {
+                "name": "X-CSRF-Token",
+                "value": "Fetch"
+              },
+              {
+                "name": "Accept",
+                "value": "application/json"
+              },
+              {
+                "name": "sap-client",
+                "value": "500"
+              }
+            ]
+          },
+          "options": {
+            "allowUnauthorizedCerts": true,
+            "response": {
+              "response": {
+                "fullResponse": true,
+                "responseFormat": "json"
+              }
+            }
+          }
+        },
+        "type": "n8n-nodes-base.httpRequest",
+        "typeVersion": 4.4,
+        "position": [
+          624,
+          784
+        ],
+        "id": "2a1a1967-adb4-492a-a57a-efdd912c8734",
+        "name": "get_csrf4",
+        "credentials": {
+          "httpBasicAuth": {
+            "id": "amXEvooHAf1tb0dM",
+            "name": "SAP Credentials"
+          }
+        }
+      },
+      {
+        "parameters": {
+          "method": "PATCH",
+          "url": "=https://e9hpathhdb.aws.capsapsl.com:44341/sap/opu/odata4/sap/api_product/srvd_a2x/sap/product/0002/Product('{{ $json.body.Product }}')",
+          "authentication": "genericCredentialType",
+          "genericAuthType": "httpBasicAuth",
+          "sendHeaders": true,
+          "specifyHeaders": "json",
+          "jsonHeaders": "={\n  \"x-csrf-token\": \"{{ $json.headers['x-csrf-token'] }}\",\n  \"Cookie\": \"{{ $json.headers['set-cookie'][1] }}\",\n  \"Content-Type\": \"application/json\",\n  \"Accept\": \"application/json\",\n  \"sap-client\": \"500\",\n  \"If-Match\": \"*\"\n}",
+          "sendBody": true,
+          "specifyBody": "json",
+          "jsonBody": "={\n  \"CrossPlantStatus\": \"02\"\n}",
+          "options": {}
+        },
+        "type": "n8n-nodes-base.httpRequest",
+        "typeVersion": 4.4,
+        "position": [
+          896,
+          784
+        ],
+        "id": "85187ca5-66e9-4165-b352-fd0a61024fd6",
+        "name": "update_product",
+        "alwaysOutputData": false,
+        "credentials": {
+          "httpBasicAuth": {
+            "id": "amXEvooHAf1tb0dM",
+            "name": "SAP Credentials"
+          }
+        }
+      },
+      {
+        "parameters": {
+          "url": "=https://e9hpathhdb.aws.capsapsl.com:44341/sap/opu/odata4/sap/api_product/srvd_a2x/sap/product/0002/Product",
+          "authentication": "genericCredentialType",
+          "genericAuthType": "httpBasicAuth",
+          "sendHeaders": true,
+          "headerParameters": {
+            "parameters": [
+              {
+                "name": "X-CSRF-Token",
+                "value": "Fetch"
+              },
+              {
+                "name": "Accept",
+                "value": "application/json"
+              },
+              {
+                "name": "sap-client",
+                "value": "500"
+              }
+            ]
+          },
+          "options": {
+            "allowUnauthorizedCerts": true,
+            "response": {
+              "response": {
+                "fullResponse": true,
+                "neverError": true,
+                "responseFormat": "json"
+              }
+            }
+          }
+        },
+        "type": "n8n-nodes-base.httpRequestTool",
+        "typeVersion": 4.4,
+        "position": [
+          -320,
+          624
+        ],
+        "id": "e8cf2108-e462-4449-8c1d-4f4253b98de0",
+        "name": "product_details",
+        "notesInFlow": false,
+        "credentials": {
+          "httpBasicAuth": {
+            "id": "amXEvooHAf1tb0dM",
+            "name": "SAP Credentials"
+          }
+        }
+      }
+    ],
+    "connections": {
+      "When chat message received": {
+        "main": [
+          [
+            {
+              "node": "AI Agent",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Azure OpenAI Chat Model": {
+        "ai_languageModel": [
+          [
+            {
+              "node": "AI Agent",
+              "type": "ai_languageModel",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Simple Memory": {
+        "ai_memory": [
+          [
+            {
+              "node": "Chat Memory Manager",
+              "type": "ai_memory",
+              "index": 0
+            },
+            {
+              "node": "AI Agent",
+              "type": "ai_memory",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "AI Agent": {
+        "main": [
+          [
+            {
+              "node": "product_code",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Switch2": {
+        "main": [
+          [
+            {
+              "node": "get_csrf3",
+              "type": "main",
+              "index": 0
+            }
+          ],
+          [
+            {
+              "node": "get_csrf4",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "get_csrf": {
+        "main": [
+          [
+            {
+              "node": "get_cookies",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "product_code": {
+        "main": [
+          [
+            {
+              "node": "Switch2",
+              "type": "main",
+              "index": 0
+            },
+            {
+              "node": "Chat Memory Manager",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Chat Memory Manager": {
+        "main": [
+          [
+            {
+              "node": "Switch2",
+              "type": "main",
+              "index": 0
+            },
+            {
+              "node": "get_csrf",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "get_cookies": {
+        "main": [
+          [
+            {
+              "node": "Switch2",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "get_csrf3": {
+        "main": [
+          [
+            {
+              "node": "update_product2",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "get_csrf4": {
+        "main": [
+          [
+            {
+              "node": "update_product",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "product_details": {
+        "ai_tool": [
+          [
+            {
+              "node": "AI Agent",
+              "type": "ai_tool",
+              "index": 0
+            }
+          ]
+        ]
+      }
+    },
+    "authors": "Sanika Shinde",
+    "name": "Version 22d0f269",
+    "description": "",
+    "autosaved": true
+  },
+  "tags": []
+}
