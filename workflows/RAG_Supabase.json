@@ -1,0 +1,296 @@
+{
+  "updatedAt": "2026-05-26T05:32:46.184Z",
+  "createdAt": "2026-05-22T09:34:45.992Z",
+  "id": "kWxsFMCduyi4nmJf",
+  "name": "RAG Supabase",
+  "active": false,
+  "isArchived": false,
+  "nodes": [
+    {
+      "parameters": {
+        "path": "1178c405-6a24-40ed-b16f-031508fe66a9",
+        "formTitle": "Upload SAP Knowledge PDF",
+        "formFields": {
+          "values": [
+            {
+              "fieldLabel": "PDF_Upload",
+              "fieldType": "file",
+              "requiredField": true
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "33686e9e-0226-4964-83c6-6e23553e1170",
+      "name": "On form submission1",
+      "type": "n8n-nodes-base.formTrigger",
+      "typeVersion": 2,
+      "position": [
+        -304,
+        -128
+      ],
+      "webhookId": "1178c405-6a24-40ed-b16f-031508fe66a9"
+    },
+    {
+      "parameters": {
+        "dataType": "binary",
+        "options": {}
+      },
+      "id": "133bc729-f1aa-4e27-b85c-375e53d435dc",
+      "name": "Default Data Loader1",
+      "type": "@n8n/n8n-nodes-langchain.documentDefaultDataLoader",
+      "typeVersion": 1,
+      "position": [
+        -128,
+        112
+      ]
+    },
+    {
+      "parameters": {
+        "chunkOverlap": 200,
+        "options": {}
+      },
+      "id": "1968fb8a-6176-44b4-bd0b-6439e305f79a",
+      "name": "Recursive Character Text Splitter1",
+      "type": "@n8n/n8n-nodes-langchain.textSplitterRecursiveCharacterTextSplitter",
+      "typeVersion": 1,
+      "position": [
+        -128,
+        304
+      ]
+    },
+    {
+      "parameters": {
+        "model": "text-embedding-ada-002",
+        "options": {}
+      },
+      "id": "38344b85-fdb8-410d-9dd5-adbc57febe93",
+      "name": "Azure OpenAI Embeddings1",
+      "type": "@n8n/n8n-nodes-langchain.embeddingsAzureOpenAi",
+      "typeVersion": 1,
+      "position": [
+        288,
+        208
+      ],
+      "credentials": {
+        "azureOpenAiApi": {
+          "id": "x5lZM9gfKe7o6JtL",
+          "name": "Azure Open AI account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "hasOutputParser": true,
+        "options": {
+          "systemMessage": "Study uploaded document and give answer"
+        }
+      },
+      "id": "73d45178-bf7d-4315-ab47-0a104d21b0fa",
+      "name": "AI Agent1",
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 2,
+      "position": [
+        736,
+        -128
+      ]
+    },
+    {
+      "parameters": {
+        "model": "gpt-4o-mini",
+        "options": {}
+      },
+      "id": "2b58d7d2-2b3b-43e1-be25-3da6eecd102e",
+      "name": "Azure OpenAI Chat Model1",
+      "type": "@n8n/n8n-nodes-langchain.lmChatAzureOpenAi",
+      "typeVersion": 1,
+      "position": [
+        656,
+        64
+      ],
+      "credentials": {
+        "azureOpenAiApi": {
+          "id": "x5lZM9gfKe7o6JtL",
+          "name": "Azure Open AI account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "public": true,
+        "availableInChat": true,
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.chatTrigger",
+      "typeVersion": 1.4,
+      "position": [
+        528,
+        -128
+      ],
+      "id": "623f16b3-67f9-4aa6-b576-d90f432981da",
+      "name": "When chat message received",
+      "webhookId": "2a87329a-13c6-4411-ac2f-260f95fb4061"
+    },
+    {
+      "parameters": {
+        "mode": "insert",
+        "tableName": {
+          "__rl": true,
+          "value": "documents",
+          "mode": "list",
+          "cachedResultName": "documents"
+        },
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.vectorStoreSupabase",
+      "typeVersion": 1.3,
+      "position": [
+        -96,
+        -128
+      ],
+      "id": "0b65e6f9-4970-4f05-9ac0-19adbc48b57d",
+      "name": "Supabase Vector Store",
+      "credentials": {
+        "supabaseApi": {
+          "id": "J3uPKjabIhVSHyqg",
+          "name": "Supabase account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "mode": "retrieve-as-tool",
+        "toolDescription": "work with data",
+        "tableName": {
+          "__rl": true,
+          "value": "documents",
+          "mode": "list",
+          "cachedResultName": "documents"
+        },
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.vectorStoreSupabase",
+      "typeVersion": 1.3,
+      "position": [
+        832,
+        208
+      ],
+      "id": "c911f03c-97e1-458e-9f5e-99bfcfc4374e",
+      "name": "Supabase Vector Store1",
+      "credentials": {
+        "supabaseApi": {
+          "id": "J3uPKjabIhVSHyqg",
+          "name": "Supabase account"
+        }
+      }
+    }
+  ],
+  "connections": {
+    "On form submission1": {
+      "main": [
+        [
+          {
+            "node": "Supabase Vector Store",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Default Data Loader1": {
+      "ai_document": [
+        [
+          {
+            "node": "Supabase Vector Store",
+            "type": "ai_document",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Recursive Character Text Splitter1": {
+      "ai_textSplitter": [
+        [
+          {
+            "node": "Default Data Loader1",
+            "type": "ai_textSplitter",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Azure OpenAI Embeddings1": {
+      "ai_embedding": [
+        [
+          {
+            "node": "Supabase Vector Store",
+            "type": "ai_embedding",
+            "index": 0
+          },
+          {
+            "node": "Supabase Vector Store1",
+            "type": "ai_embedding",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Azure OpenAI Chat Model1": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI Agent1",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "When chat message received": {
+      "main": [
+        [
+          {
+            "node": "AI Agent1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Supabase Vector Store1": {
+      "ai_tool": [
+        [
+          {
+            "node": "AI Agent1",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate",
+    "availableInMCP": false
+  },
+  "staticData": null,
+  "meta": {
+    "templateCredsSetupCompleted": true
+  },
+  "pinData": {},
+  "versionId": "2fb1e6ec-2765-4c10-a699-29b0a05b0369",
+  "activeVersionId": null,
+  "triggerCount": 0,
+  "shared": [
+    {
+      "updatedAt": "2026-05-22T09:34:46.014Z",
+      "createdAt": "2026-05-22T09:34:46.014Z",
+      "role": "workflow:owner",
+      "workflowId": "kWxsFMCduyi4nmJf",
+      "projectId": "R2OGQRrWYLraDwSj"
+    }
+  ],
+  "activeVersion": null,
+  "tags": []
+}
