@@ -1,0 +1,963 @@
+{
+  "updatedAt": "2026-04-21T12:57:15.736Z",
+  "createdAt": "2026-04-20T06:59:53.237Z",
+  "id": "gsunkzTb8sYmoRWk",
+  "name": "Ranking BP Agent",
+  "active": true,
+  "isArchived": false,
+  "nodes": [
+    {
+      "parameters": {
+        "public": true,
+        "availableInChat": true,
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.chatTrigger",
+      "typeVersion": 1.4,
+      "position": [
+        -496,
+        16
+      ],
+      "id": "6332f376-611b-4b92-acb9-210fe7efcea1",
+      "name": "When chat message received",
+      "webhookId": "4aa75d3b-c9dc-4f1a-a4c9-62d4ae716459"
+    },
+    {
+      "parameters": {
+        "options": {
+          "systemMessage": "You are a helpful AI assistant for ranking Business Partners (BPs) in SAP S/4HANA.\n\n═══════════════════════════════════════════════\nTOOLS AVAILABLE TO YOU\n═══════════════════════════════════════════════\n\nYou have 5 tools:\n\nLOOKUP TOOLS (use ONE based on user selection):\n  - State  → call this when rank_by is \"State\"\n  - City   → call this when rank_by is \"City\"\n  - Region → call this when rank_by is \"Region\"\n\nRANKING TOOLS (always call BOTH in order):\n  - getSalesOrdersCountByCardSalesAndDate\n  - getBusinessPartnersBySalesOrdersCountFilter\n\n═══════════════════════════════════════════════\nCONVERSATION FLOW — FOLLOW THIS EXACT ORDER\n═══════════════════════════════════════════════\n\n───────────────────────────────────────────────\nSTEP 1 — Ask Ranking Criteria\n───────────────────────────────────────────────\nAsk the user how they want to rank Business Partners.\nGive them exactly 3 options:\n  - State\n  - City\n  - Region\n\nWait for user to reply before doing anything else.\nDO NOT call any tool at this step.\n\nExample message:\n\"Hello! 👋 I can help you rank Business Partners \nfrom SAP S/4HANA.\n\nHow would you like to rank them?\nPlease select one:\n- **State**\n- **City**\n- **Region**\"\n\n───────────────────────────────────────────────\nSTEP 2 — Confirm Selection, Ask Search Keyword\n───────────────────────────────────────────────\nWhen user replies with State, City, or Region:\n- Confirm their selection\n- Ask them to TYPE a search keyword\n\nExample message (if user chose City):\n\"You selected **City**. 🏙️\n\nPlease type a search keyword to find your city.\nFor example: type **Mum** to find Mumbai,\nor **San** to find San Diego.\"\n\nDO NOT call any tool yet.\nWait for user to type a keyword.\n\n───────────────────────────────────────────────\nSTEP 3 — Call Lookup Tool with Search Keyword\n───────────────────────────────────────────────\nWhen user types a search keyword (e.g. \"Mum\", \"US\", \"CA\"):\n\n- If rank_by is \"State\"  → call the State tool\n  with search_term = exactly what user typed\n\n- If rank_by is \"City\"   → call the City tool\n  with search_term = exactly what user typed\n\n- If rank_by is \"Region\" → call the Region tool\n  with search_term = exactly what user typed\n\nAfter tool returns results:\n- Show the found values to the user as a numbered list\n- Ask user to confirm which one they want\n\nExample message:\n\"I found the following cities matching **Mum**:\n\n1. Mumbai\n2. Mumbra\n\nPlease type the name exactly as shown above \nto confirm your selection.\"\n\nCRITICAL RULES FOR THIS STEP:\n- NEVER pass \"State\", \"City\", or \"Region\" as search_term\n- ONLY pass what the user actually typed as the keyword\n- ALWAYS wait for user's actual keyword before calling tool\n\n───────────────────────────────────────────────\nSTEP 4 — Ask for Date Range\n───────────────────────────────────────────────\nAfter user confirms the filter value:\n\nAsk the user for a date range:\n- From Date (start date)\n- To Date (end date)\n\nExample message:\n\"Great! You selected **Mumbai**. 📅\n\nNow please provide the date range for \nsales order analysis:\n\n- **From Date** (e.g. 2024-01-01)\n- **To Date**   (e.g. 2024-12-31)\"\n\nWait for user to provide both dates.\nDO NOT call any tool yet.\n\n───────────────────────────────────────────────\nSTEP 5 — Fetch Ranked Business Partners\n───────────────────────────────────────────────\nWhen user provides from_date and to_date:\n\nCall tools in this EXACT ORDER:\n\n  FIRST → getSalesOrdersCountByCardSalesAndDate\n    Parameters:\n      - from_date : convert to ISO format\n                    e.g. 2024-01-01T00:00:00\n      - to_date   : convert to ISO format\n                    e.g. 2024-12-31T23:59:59\n\n  SECOND → getBusinessPartnersBySalesOrdersCountFilter\n    Parameters:\n      - rank_by        : selected criteria\n                         (State / City / Region)\n      - filterby_city   : filter value if City,\n                          else empty string \"\"\n      - filterby_region : filter value if Region,\n                          else empty string \"\"\n      - filterby_state  : filter value if State,\n                          else empty string \"\"\n      - from_date      : same ISO date from above\n      - to_date        : same ISO date from above\n\n───────────────────────────────────────────────\nSTEP 6 — Display Results\n───────────────────────────────────────────────\nAfter tools return data, display results \nfollowing ALL rules below.\n\nFILTERING RULES (VERY IMPORTANT):\n  - Tool returns ALL Business Partners\n  - YOU must filter before displaying\n  - ONLY show rows where field matches \n    filter_value (case insensitive):\n      rank_by = State  → only rows where State  == filter_value\n      rank_by = City   → only rows where City   == filter_value\n      rank_by = Region → only rows where Region == filter_value\n  - REMOVE all rows that do not match\n  - If zero rows remain → say:\n    \"No Business Partners found for [filter_value]\"\n\nSORTING RULES:\n  - Sort by OrderCount descending (highest first)\n  - Add Rank numbers: 1, 2, 3...\n\nTABLE FORMAT (always use this exact format):\n\n| Rank | BP ID | BP Name | City | Region | State | Orders |\n|------|-------|---------|------|--------|-------|--------|\n|  1   |  ...  |   ...   | ...  |  ...   |  ...  |   ...  |\n|  2   |  ...  |   ...   | ...  |  ...   |  ...  |   ...  |\n\nAfter table, show a summary line:\n\"📊 Total **[count]** Business Partners ranked \nfor [rank_by]: **[filter_value]**\nPeriod: [from_date] to [to_date]\"\n\n───────────────────────────────────────────────\nSTEP 7 — Ask to Rank Again\n───────────────────────────────────────────────\nAfter displaying results, ask:\n\n\"Would you like to rank Business Partners again?\n- Type **Yes** to start a new ranking\n- Type **No** to finish\"\n\nIf user says Yes  → go back to STEP 1\nIf user says No   → say goodbye message\n\n═══════════════════════════════════════════════\nCHART / VISUALIZATION RULES\n═══════════════════════════════════════════════\n\nIf user asks for a chart or visualization:\n- Use Mermaid xychart-beta syntax\n- Replace spaces with underscores in all labels\n- No special characters in labels\n\nExample format:\n\\```mermaid\nxychart-beta\n  title \"Top Business Partners\"\n  x-axis [BP_001, BP_002, BP_003]\n  y-axis \"Order Count\" 0 --> 100\n  bar [45, 32, 28]\n\\```\n\n═══════════════════════════════════════════════\nRESPONSE FORMAT — ALWAYS USE THIS JSON\n═══════════════════════════════════════════════\n\nAlways respond ONLY in this valid JSON structure.\nNo text outside the JSON. No exceptions.\n\n{\n  \"action\": \"AskRankBy | AskFilterValue | AskDateRange | FetchData | Done | FinishConversation\",\n  \"reasoning\": \"Explain your step-by-step thinking here\",\n  \"content\": \"Your message to user in Markdown format\",\n  \"rank_by\": \"State | City | Region | null\",\n  \"filter_value\": \"confirmed filter value or null\",\n  \"from_date\": \"2024-01-01T00:00:00 or null\",\n  \"to_date\": \"2024-12-31T23:59:59 or null\",\n  \"suggested_questions\": [\n    \"Would you like to see a chart of top Business Partners?\",\n    \"Would you like to rank by a different criteria?\"\n  ]\n}\n\nACTION values explained:\n  AskRankBy          → Step 1 (asking State/City/Region)\n  AskFilterValue     → Step 2 and Step 3\n  AskDateRange       → Step 4\n  FetchData          → Step 5 (calling tools)\n  Done               → Step 6 (showing results)\n  FinishConversation → Step 7 when user says No\n\n═══════════════════════════════════════════════\nCRITICAL RULES — NEVER BREAK THESE\n═══════════════════════════════════════════════\n\n1. ALWAYS respond in valid JSON only\n2. NEVER call State/City/Region tool with the \n   word \"State\", \"City\", or \"Region\" as search_term\n3. ALWAYS wait for user to type actual keyword \n   before calling any lookup tool\n4. ALWAYS call getSalesOrdersCountByCardSalesAndDate \n   FIRST before getBusinessPartnersBySalesOrdersCountFilter\n5. ALWAYS filter tool results before displaying\n6. NEVER show BPs that do not match the filter value\n7. NEVER fabricate or guess BP data\n8. NEVER skip steps in the conversation flow\n9. No text outside the JSON response"
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 3.1,
+      "position": [
+        -160,
+        16
+      ],
+      "id": "d9dd60cc-dba5-4fff-89c8-d18798ca5968",
+      "name": "AI Agent"
+    },
+    {
+      "parameters": {
+        "model": "gpt-4.1-mini",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatAzureOpenAi",
+      "typeVersion": 1,
+      "position": [
+        -656,
+        256
+      ],
+      "id": "d5ad8438-88f3-4c60-ba0f-231673035e57",
+      "name": "Azure OpenAI Chat Model",
+      "credentials": {
+        "azureOpenAiApi": {
+          "id": "x5lZM9gfKe7o6JtL",
+          "name": "Azure Open AI account"
+        }
+      }
+    },
+    {
+      "parameters": {},
+      "type": "@n8n/n8n-nodes-langchain.memoryBufferWindow",
+      "typeVersion": 1.3,
+      "position": [
+        -464,
+        288
+      ],
+      "id": "7a09f17e-845a-4416-910d-35fa0bdc06ca",
+      "name": "Simple Memory"
+    },
+    {
+      "parameters": {
+        "toolDescription": "Region",
+        "url": "https://e9hpathhdb.aws.capsapsl.com:44341/sap/opu/odata/sap/API_BUSINESS_PARTNER/A_BusinessPartnerAddress?$filter=substringof('A',Region) eq true&$select=FullName,BusinessPartner,Region",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpBasicAuth",
+        "sendQuery": true,
+        "queryParameters": {
+          "parameters": [
+            {
+              "name": "$filter",
+              "value": "substringof('A',Region) eq true"
+            },
+            {
+              "name": "$select",
+              "value": "FullName,BusinessPartner,Region"
+            }
+          ]
+        },
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Accept",
+              "value": "application/json"
+            },
+            {
+              "name": "sap-client",
+              "value": "500"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequestTool",
+      "typeVersion": 4.4,
+      "position": [
+        368,
+        560
+      ],
+      "id": "3dbc43fe-f5f1-4c19-a103-2a4c2e0e6891",
+      "name": "Region",
+      "credentials": {
+        "httpBasicAuth": {
+          "id": "amXEvooHAf1tb0dM",
+          "name": "SAP Credentials"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "toolDescription": "City",
+        "url": "https://e9hpathhdb.aws.capsapsl.com:44341/sap/opu/odata/sap/API_BUSINESS_PARTNER/A_BusinessPartnerAddress?$filter=substringof('A',CityName) eq true&$select=FullName,BusinessPartner,CityName",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpBasicAuth",
+        "sendQuery": true,
+        "queryParameters": {
+          "parameters": [
+            {
+              "name": "$select",
+              "value": "FullName,BusinessPartner,CityName"
+            },
+            {
+              "name": "$filter",
+              "value": "substringof('A',CityName) eq true"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequestTool",
+      "typeVersion": 4.4,
+      "position": [
+        224,
+        560
+      ],
+      "id": "7714946e-15e8-4435-9ea5-40d9cb5cde7b",
+      "name": "City",
+      "credentials": {
+        "httpBasicAuth": {
+          "id": "amXEvooHAf1tb0dM",
+          "name": "SAP Credentials"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "url": "/sap/opu/odata/sap/API_SALES_ORDER_SRV/A_SalesOrder?$filter=CreationDate%20ge%20datetime%27${parameters.from_date[0..15]}:00%27%20and%20CreationDate%20le%20datetime%27${parameters.to_date[0..15]}:00%27&$format=json&$orderby=SalesOrder%20desc&$select=SalesOrder,CreationDate,SoldToParty",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpBasicAuth",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Accept",
+              "value": "application/json"
+            },
+            {
+              "name": "sap-client",
+              "value": "500"
+            }
+          ]
+        },
+        "options": {
+          "response": {
+            "response": {
+              "fullResponse": true,
+              "responseFormat": "text",
+              "outputPropertyName": "<#assign resp = response.getBusinessPartnersBySalesOrdersCountFilter /> <#assign body = (resp.body)!{} /> <#assign bps = (body.d.results)![] />  <#-- 1. Build counts from sales orders --> <#assign soResults = (response.getSalesOrdersCountByCardSalesAndDate.body.d.results)![] /> <#assign counts = {} /> <#list soResults as so>   <#assign code = (so.SoldToParty)!\"\" />   <#if code != \"\">     <#assign counts = counts + { code?string : ((counts[code?string]!0) + 1) } />   </#if> </#list>  <#-- 2. Use parameters (NOT replies). We remove literal quotes added by the platform --> <#assign rankBy    = (parameters.rank_by!\"\")?replace('\"', '') /> <#assign cityVal   = (parameters.filterby_city!\"\")?replace('\"', '') /> <#assign regionVal = (parameters.filterby_region!\"\")?replace('\"', '') /> <#assign stateVal  = (parameters.filterby_state!\"\")?replace('\"', '') />  <#-- 3. Determine the Header label --> <#assign headerVal = \"Results\" /> <#if rankBy == \"City\"><#assign headerVal = cityVal /> <#elseif rankBy == \"Region\"><#assign headerVal = regionVal /> <#elseif rankBy == \"State\"><#assign headerVal = stateVal /> </#if>  {   \"success\": ${ (resp.statusCode == 200)?c },   \"BusinessPartners\": [     <#list bps as bp>       <#assign addrList = (bp.to_BusinessPartnerAddress.results)![] />       <#assign addr = (addrList?size > 0)?then(addrList[0], {}) />       {         \"BusinessPartner\": \"${bp.BusinessPartner!''}\",         \"BusinessPartnerName\": \"${(bp.BusinessPartnerFullName!'')?json_string}\",         \"City\": \"${(addr.CityName)!'-'}\",         \"State\": \"${(addr.Country)!'-'}\",         \"Region\": \"${(addr.Region)!'-'}\",         \"OrderCount\": ${counts[bp.BusinessPartner?string]!0}       }<#if bp_has_next>,</#if>     </#list>   ],   \"Header\": \"${headerVal?json_string}\" }"
+            }
+          }
+        }
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.4,
+      "position": [
+        224,
+        64
+      ],
+      "id": "284fa189-1adc-4085-87c4-375079a26858",
+      "name": "getSalesOrdersCountByCardSalesAndDate",
+      "credentials": {
+        "httpBasicAuth": {
+          "id": "amXEvooHAf1tb0dM",
+          "name": "SAP Credentials"
+        }
+      },
+      "disabled": true
+    },
+    {
+      "parameters": {
+        "url": "<#assign quote = \"%27\" /><#assign space = \"%20\" /><#assign filterExpr = \"\" /><#assign results = (response.getSalesOrdersCountByCardSalesAndDate.body.d.results)![] /><#list results as row><#assign bpId = (row.SoldToParty)!\"\" /><#if bpId != \"\"><#if filterExpr == \"\"><#assign filterExpr = \"BusinessPartner\" + space + \"eq\" + space + quote + bpId + quote /><#else><#if !filterExpr?contains(bpId)><#assign filterExpr = filterExpr + space + \"or\" + space + \"BusinessPartner\" + space + \"eq\" + space + quote + bpId + quote /></#if></#if></#if></#list>/sap/opu/odata/sap/API_BUSINESS_PARTNER/A_BusinessPartner?$select=BusinessPartner,BusinessPartnerFullName,to_BusinessPartnerAddress/Country,to_BusinessPartnerAddress/CityName,to_BusinessPartnerAddress/Region&$expand=to_BusinessPartnerAddress&$orderby=BusinessPartner%20desc&$format=json<#if filterExpr != \"\">&$filter=${filterExpr}</#if>",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpBasicAuth",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Accept",
+              "value": "application/json"
+            },
+            {
+              "name": "sap-client",
+              "value": "500"
+            }
+          ]
+        },
+        "options": {
+          "response": {
+            "response": {
+              "responseFormat": "text",
+              "outputPropertyName": "<#assign resp = response.getBusinessPartnersBySalesOrdersCountFilter /> <#assign body = (resp.body)!{} /> <#assign bps = (body.d.results)![] />  <#-- 1. Build counts from sales orders --> <#assign soResults = (response.getSalesOrdersCountByCardSalesAndDate.body.d.results)![] /> <#assign counts = {} /> <#list soResults as so>   <#assign code = (so.SoldToParty)!\"\" />   <#if code != \"\">     <#assign counts = counts + { code?string : ((counts[code?string]!0) + 1) } />   </#if> </#list>  <#-- 2. Use parameters (NOT replies). We remove literal quotes added by the platform --> <#assign rankBy    = (parameters.rank_by!\"\")?replace('\"', '') /> <#assign cityVal   = (parameters.filterby_city!\"\")?replace('\"', '') /> <#assign regionVal = (parameters.filterby_region!\"\")?replace('\"', '') /> <#assign stateVal  = (parameters.filterby_state!\"\")?replace('\"', '') />  <#-- 3. Determine the Header label --> <#assign headerVal = \"Results\" /> <#if rankBy == \"City\"><#assign headerVal = cityVal /> <#elseif rankBy == \"Region\"><#assign headerVal = regionVal /> <#elseif rankBy == \"State\"><#assign headerVal = stateVal /> </#if>  {   \"success\": ${ (resp.statusCode == 200)?c },   \"BusinessPartners\": [     <#list bps as bp>       <#assign addrList = (bp.to_BusinessPartnerAddress.results)![] />       <#assign addr = (addrList?size > 0)?then(addrList[0], {}) />       {         \"BusinessPartner\": \"${bp.BusinessPartner!''}\",         \"BusinessPartnerName\": \"${(bp.BusinessPartnerFullName!'')?json_string}\",         \"City\": \"${(addr.CityName)!'-'}\",         \"State\": \"${(addr.Country)!'-'}\",         \"Region\": \"${(addr.Region)!'-'}\",         \"OrderCount\": ${counts[bp.BusinessPartner?string]!0}       }<#if bp_has_next>,</#if>     </#list>   ],   \"Header\": \"${headerVal?json_string}\" }"
+            }
+          }
+        }
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.4,
+      "position": [
+        608,
+        16
+      ],
+      "id": "5d5f9f10-7dc5-4a3b-a9bb-4c313ef13e3f",
+      "name": "getBusinessPartnersBySalesOrdersCountFilter",
+      "credentials": {
+        "httpBasicAuth": {
+          "id": "amXEvooHAf1tb0dM",
+          "name": "SAP Credentials"
+        }
+      },
+      "disabled": true
+    },
+    {
+      "parameters": {
+        "toolDescription": "State",
+        "url": "={{ $fromAI('URL', ``, 'string') }}",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpBasicAuth",
+        "sendQuery": true,
+        "queryParameters": {
+          "parameters": [
+            {
+              "name": "$filter",
+              "value": "substringof('A',Country) eq true"
+            },
+            {
+              "name": "$select",
+              "value": "FullName,BusinessPartner,Country"
+            }
+          ]
+        },
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Accept",
+              "value": "application/json"
+            },
+            {
+              "name": "sap-client",
+              "value": "500"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequestTool",
+      "typeVersion": 4.4,
+      "position": [
+        80,
+        592
+      ],
+      "id": "0de24366-b3c5-4f8a-8720-f9e13beba048",
+      "name": "State",
+      "credentials": {
+        "httpBasicAuth": {
+          "id": "amXEvooHAf1tb0dM",
+          "name": "SAP Credentials"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "path": "484a4ac6-4886-4388-a79f-702a3db4a57b",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2.1,
+      "position": [
+        -368,
+        448
+      ],
+      "id": "0f94d739-d44b-41de-8447-cfa60a930f8a",
+      "name": "Webhook",
+      "webhookId": "484a4ac6-4886-4388-a79f-702a3db4a57b"
+    },
+    {
+      "parameters": {
+        "rules": {
+          "values": [
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 3
+                },
+                "conditions": [
+                  {
+                    "leftValue": "State",
+                    "rightValue": "{{ $json.body.filter_type }}",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    },
+                    "id": "6da253e7-ad93-452c-848b-07c200a0eebf"
+                  }
+                ],
+                "combinator": "and"
+              }
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 3
+                },
+                "conditions": [
+                  {
+                    "id": "5f2993f8-429a-46f4-b93d-c891a30f4bae",
+                    "leftValue": "City",
+                    "rightValue": "{{ $json.body.filter_type }}",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals",
+                      "name": "filter.operator.equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              }
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 3
+                },
+                "conditions": [
+                  {
+                    "id": "3cbb8963-cdef-4b6d-a519-65c0926cb5bc",
+                    "leftValue": "Region",
+                    "rightValue": "={{ $json.body.filter_type }}",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals",
+                      "name": "filter.operator.equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              }
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.switch",
+      "typeVersion": 3.4,
+      "position": [
+        -160,
+        448
+      ],
+      "id": "cf22c472-fcf8-406b-9b27-dc94b4d0ff05",
+      "name": "Switch"
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.4,
+      "position": [
+        64,
+        400
+      ],
+      "id": "d1236b7f-6737-4464-8332-8f118cbd1083",
+      "name": "HTTP Request",
+      "disabled": true
+    },
+    {
+      "parameters": {
+        "toolDescription": "State",
+        "url": "={{ $fromAI('URL', ``, 'string') }}",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpBasicAuth",
+        "sendQuery": true,
+        "queryParameters": {
+          "parameters": [
+            {
+              "name": "$filter",
+              "value": "substringof('A',Country) eq true"
+            },
+            {
+              "name": "$select",
+              "value": "FullName,BusinessPartner,Country"
+            }
+          ]
+        },
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Accept",
+              "value": "application/json"
+            },
+            {
+              "name": "sap-client",
+              "value": "500"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequestTool",
+      "typeVersion": 4.4,
+      "position": [
+        464,
+        416
+      ],
+      "id": "a853fe35-9be7-4a08-9bd4-b846870ff7eb",
+      "name": "State1",
+      "credentials": {
+        "httpBasicAuth": {
+          "id": "amXEvooHAf1tb0dM",
+          "name": "SAP Credentials"
+        }
+      }
+    }
+  ],
+  "connections": {
+    "When chat message received": {
+      "main": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Azure OpenAI Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Simple Memory": {
+      "ai_memory": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_memory",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Region": {
+      "ai_tool": [
+        []
+      ]
+    },
+    "City": {
+      "ai_tool": [
+        []
+      ]
+    },
+    "AI Agent": {
+      "main": [
+        [
+          {
+            "node": "getSalesOrdersCountByCardSalesAndDate",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "getSalesOrdersCountByCardSalesAndDate": {
+      "main": [
+        []
+      ]
+    },
+    "State": {
+      "ai_tool": [
+        []
+      ]
+    },
+    "Webhook": {
+      "main": [
+        [
+          {
+            "node": "Switch",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Switch": {
+      "main": [
+        [
+          {
+            "node": "HTTP Request",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "State1": {
+      "ai_tool": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate",
+    "availableInMCP": false
+  },
+  "staticData": null,
+  "meta": {
+    "templateCredsSetupCompleted": true
+  },
+  "pinData": {},
+  "versionId": "c6b497d5-8719-4f70-b8c5-f91dea4ff463",
+  "activeVersionId": "adb015b7-bca6-46c7-9b20-e3440a61c9d2",
+  "triggerCount": 1,
+  "shared": [
+    {
+      "updatedAt": "2026-04-20T06:59:53.250Z",
+      "createdAt": "2026-04-20T06:59:53.250Z",
+      "role": "workflow:owner",
+      "workflowId": "gsunkzTb8sYmoRWk",
+      "projectId": "R2OGQRrWYLraDwSj"
+    }
+  ],
+  "activeVersion": {
+    "updatedAt": "2026-04-21T12:20:57.000Z",
+    "createdAt": "2026-04-21T12:20:04.871Z",
+    "versionId": "adb015b7-bca6-46c7-9b20-e3440a61c9d2",
+    "workflowId": "gsunkzTb8sYmoRWk",
+    "nodes": [
+      {
+        "parameters": {
+          "public": true,
+          "availableInChat": true,
+          "options": {}
+        },
+        "type": "@n8n/n8n-nodes-langchain.chatTrigger",
+        "typeVersion": 1.4,
+        "position": [
+          -496,
+          16
+        ],
+        "id": "6332f376-611b-4b92-acb9-210fe7efcea1",
+        "name": "When chat message received",
+        "webhookId": "4aa75d3b-c9dc-4f1a-a4c9-62d4ae716459"
+      },
+      {
+        "parameters": {
+          "options": {
+            "systemMessage": "You are a helpful AI assistant for ranking Business Partners (BPs) in SAP S/4HANA.\n\n═══════════════════════════════════════════════\nTOOLS AVAILABLE TO YOU\n═══════════════════════════════════════════════\n\nYou have 5 tools:\n\nLOOKUP TOOLS (use ONE based on user selection):\n  - State  → call this when rank_by is \"State\"\n  - City   → call this when rank_by is \"City\"\n  - Region → call this when rank_by is \"Region\"\n\nRANKING TOOLS (always call BOTH in order):\n  - getSalesOrdersCountByCardSalesAndDate\n  - getBusinessPartnersBySalesOrdersCountFilter\n\n═══════════════════════════════════════════════\nCONVERSATION FLOW — FOLLOW THIS EXACT ORDER\n═══════════════════════════════════════════════\n\n───────────────────────────────────────────────\nSTEP 1 — Ask Ranking Criteria\n───────────────────────────────────────────────\nAsk the user how they want to rank Business Partners.\nGive them exactly 3 options:\n  - State\n  - City\n  - Region\n\nWait for user to reply before doing anything else.\nDO NOT call any tool at this step.\n\nExample message:\n\"Hello! 👋 I can help you rank Business Partners \nfrom SAP S/4HANA.\n\nHow would you like to rank them?\nPlease select one:\n- **State**\n- **City**\n- **Region**\"\n\n───────────────────────────────────────────────\nSTEP 2 — Confirm Selection, Ask Search Keyword\n───────────────────────────────────────────────\nWhen user replies with State, City, or Region:\n- Confirm their selection\n- Ask them to TYPE a search keyword\n\nExample message (if user chose City):\n\"You selected **City**. 🏙️\n\nPlease type a search keyword to find your city.\nFor example: type **Mum** to find Mumbai,\nor **San** to find San Diego.\"\n\nDO NOT call any tool yet.\nWait for user to type a keyword.\n\n───────────────────────────────────────────────\nSTEP 3 — Call Lookup Tool with Search Keyword\n───────────────────────────────────────────────\nWhen user types a search keyword (e.g. \"Mum\", \"US\", \"CA\"):\n\n- If rank_by is \"State\"  → call the State tool\n  with search_term = exactly what user typed\n\n- If rank_by is \"City\"   → call the City tool\n  with search_term = exactly what user typed\n\n- If rank_by is \"Region\" → call the Region tool\n  with search_term = exactly what user typed\n\nAfter tool returns results:\n- Show the found values to the user as a numbered list\n- Ask user to confirm which one they want\n\nExample message:\n\"I found the following cities matching **Mum**:\n\n1. Mumbai\n2. Mumbra\n\nPlease type the name exactly as shown above \nto confirm your selection.\"\n\nCRITICAL RULES FOR THIS STEP:\n- NEVER pass \"State\", \"City\", or \"Region\" as search_term\n- ONLY pass what the user actually typed as the keyword\n- ALWAYS wait for user's actual keyword before calling tool\n\n───────────────────────────────────────────────\nSTEP 4 — Ask for Date Range\n───────────────────────────────────────────────\nAfter user confirms the filter value:\n\nAsk the user for a date range:\n- From Date (start date)\n- To Date (end date)\n\nExample message:\n\"Great! You selected **Mumbai**. 📅\n\nNow please provide the date range for \nsales order analysis:\n\n- **From Date** (e.g. 2024-01-01)\n- **To Date**   (e.g. 2024-12-31)\"\n\nWait for user to provide both dates.\nDO NOT call any tool yet.\n\n───────────────────────────────────────────────\nSTEP 5 — Fetch Ranked Business Partners\n───────────────────────────────────────────────\nWhen user provides from_date and to_date:\n\nCall tools in this EXACT ORDER:\n\n  FIRST → getSalesOrdersCountByCardSalesAndDate\n    Parameters:\n      - from_date : convert to ISO format\n                    e.g. 2024-01-01T00:00:00\n      - to_date   : convert to ISO format\n                    e.g. 2024-12-31T23:59:59\n\n  SECOND → getBusinessPartnersBySalesOrdersCountFilter\n    Parameters:\n      - rank_by        : selected criteria\n                         (State / City / Region)\n      - filterby_city   : filter value if City,\n                          else empty string \"\"\n      - filterby_region : filter value if Region,\n                          else empty string \"\"\n      - filterby_state  : filter value if State,\n                          else empty string \"\"\n      - from_date      : same ISO date from above\n      - to_date        : same ISO date from above\n\n───────────────────────────────────────────────\nSTEP 6 — Display Results\n───────────────────────────────────────────────\nAfter tools return data, display results \nfollowing ALL rules below.\n\nFILTERING RULES (VERY IMPORTANT):\n  - Tool returns ALL Business Partners\n  - YOU must filter before displaying\n  - ONLY show rows where field matches \n    filter_value (case insensitive):\n      rank_by = State  → only rows where State  == filter_value\n      rank_by = City   → only rows where City   == filter_value\n      rank_by = Region → only rows where Region == filter_value\n  - REMOVE all rows that do not match\n  - If zero rows remain → say:\n    \"No Business Partners found for [filter_value]\"\n\nSORTING RULES:\n  - Sort by OrderCount descending (highest first)\n  - Add Rank numbers: 1, 2, 3...\n\nTABLE FORMAT (always use this exact format):\n\n| Rank | BP ID | BP Name | City | Region | State | Orders |\n|------|-------|---------|------|--------|-------|--------|\n|  1   |  ...  |   ...   | ...  |  ...   |  ...  |   ...  |\n|  2   |  ...  |   ...   | ...  |  ...   |  ...  |   ...  |\n\nAfter table, show a summary line:\n\"📊 Total **[count]** Business Partners ranked \nfor [rank_by]: **[filter_value]**\nPeriod: [from_date] to [to_date]\"\n\n───────────────────────────────────────────────\nSTEP 7 — Ask to Rank Again\n───────────────────────────────────────────────\nAfter displaying results, ask:\n\n\"Would you like to rank Business Partners again?\n- Type **Yes** to start a new ranking\n- Type **No** to finish\"\n\nIf user says Yes  → go back to STEP 1\nIf user says No   → say goodbye message\n\n═══════════════════════════════════════════════\nCHART / VISUALIZATION RULES\n═══════════════════════════════════════════════\n\nIf user asks for a chart or visualization:\n- Use Mermaid xychart-beta syntax\n- Replace spaces with underscores in all labels\n- No special characters in labels\n\nExample format:\n\\```mermaid\nxychart-beta\n  title \"Top Business Partners\"\n  x-axis [BP_001, BP_002, BP_003]\n  y-axis \"Order Count\" 0 --> 100\n  bar [45, 32, 28]\n\\```\n\n═══════════════════════════════════════════════\nRESPONSE FORMAT — ALWAYS USE THIS JSON\n═══════════════════════════════════════════════\n\nAlways respond ONLY in this valid JSON structure.\nNo text outside the JSON. No exceptions.\n\n{\n  \"action\": \"AskRankBy | AskFilterValue | AskDateRange | FetchData | Done | FinishConversation\",\n  \"reasoning\": \"Explain your step-by-step thinking here\",\n  \"content\": \"Your message to user in Markdown format\",\n  \"rank_by\": \"State | City | Region | null\",\n  \"filter_value\": \"confirmed filter value or null\",\n  \"from_date\": \"2024-01-01T00:00:00 or null\",\n  \"to_date\": \"2024-12-31T23:59:59 or null\",\n  \"suggested_questions\": [\n    \"Would you like to see a chart of top Business Partners?\",\n    \"Would you like to rank by a different criteria?\"\n  ]\n}\n\nACTION values explained:\n  AskRankBy          → Step 1 (asking State/City/Region)\n  AskFilterValue     → Step 2 and Step 3\n  AskDateRange       → Step 4\n  FetchData          → Step 5 (calling tools)\n  Done               → Step 6 (showing results)\n  FinishConversation → Step 7 when user says No\n\n═══════════════════════════════════════════════\nCRITICAL RULES — NEVER BREAK THESE\n═══════════════════════════════════════════════\n\n1. ALWAYS respond in valid JSON only\n2. NEVER call State/City/Region tool with the \n   word \"State\", \"City\", or \"Region\" as search_term\n3. ALWAYS wait for user to type actual keyword \n   before calling any lookup tool\n4. ALWAYS call getSalesOrdersCountByCardSalesAndDate \n   FIRST before getBusinessPartnersBySalesOrdersCountFilter\n5. ALWAYS filter tool results before displaying\n6. NEVER show BPs that do not match the filter value\n7. NEVER fabricate or guess BP data\n8. NEVER skip steps in the conversation flow\n9. No text outside the JSON response"
+          }
+        },
+        "type": "@n8n/n8n-nodes-langchain.agent",
+        "typeVersion": 3.1,
+        "position": [
+          -160,
+          16
+        ],
+        "id": "d9dd60cc-dba5-4fff-89c8-d18798ca5968",
+        "name": "AI Agent"
+      },
+      {
+        "parameters": {
+          "model": "gpt-4.1-mini",
+          "options": {}
+        },
+        "type": "@n8n/n8n-nodes-langchain.lmChatAzureOpenAi",
+        "typeVersion": 1,
+        "position": [
+          -656,
+          256
+        ],
+        "id": "d5ad8438-88f3-4c60-ba0f-231673035e57",
+        "name": "Azure OpenAI Chat Model",
+        "credentials": {
+          "azureOpenAiApi": {
+            "id": "x5lZM9gfKe7o6JtL",
+            "name": "Azure Open AI account"
+          }
+        }
+      },
+      {
+        "parameters": {},
+        "type": "@n8n/n8n-nodes-langchain.memoryBufferWindow",
+        "typeVersion": 1.3,
+        "position": [
+          -464,
+          288
+        ],
+        "id": "7a09f17e-845a-4416-910d-35fa0bdc06ca",
+        "name": "Simple Memory"
+      },
+      {
+        "parameters": {
+          "toolDescription": "Region",
+          "url": "https://e9hpathhdb.aws.capsapsl.com:44341/sap/opu/odata/sap/API_BUSINESS_PARTNER/A_BusinessPartnerAddress?$filter=substringof('A',Region) eq true&$select=FullName,BusinessPartner,Region",
+          "authentication": "genericCredentialType",
+          "genericAuthType": "httpBasicAuth",
+          "sendQuery": true,
+          "queryParameters": {
+            "parameters": [
+              {
+                "name": "$filter",
+                "value": "substringof('A',Region) eq true"
+              },
+              {
+                "name": "$select",
+                "value": "FullName,BusinessPartner,Region"
+              }
+            ]
+          },
+          "sendHeaders": true,
+          "headerParameters": {
+            "parameters": [
+              {
+                "name": "Accept",
+                "value": "application/json"
+              },
+              {
+                "name": "sap-client",
+                "value": "500"
+              }
+            ]
+          },
+          "options": {}
+        },
+        "type": "n8n-nodes-base.httpRequestTool",
+        "typeVersion": 4.4,
+        "position": [
+          160,
+          288
+        ],
+        "id": "3dbc43fe-f5f1-4c19-a103-2a4c2e0e6891",
+        "name": "Region",
+        "credentials": {
+          "httpBasicAuth": {
+            "id": "amXEvooHAf1tb0dM",
+            "name": "SAP Credentials"
+          }
+        }
+      },
+      {
+        "parameters": {
+          "toolDescription": "State",
+          "url": "={{ $fromAI('URL', ``, 'string') }}",
+          "authentication": "genericCredentialType",
+          "genericAuthType": "httpBasicAuth",
+          "sendQuery": true,
+          "queryParameters": {
+            "parameters": [
+              {
+                "name": "$filter",
+                "value": "substringof('A',Country) eq true"
+              },
+              {
+                "name": "$select",
+                "value": "FullName,BusinessPartner,Country"
+              }
+            ]
+          },
+          "sendHeaders": true,
+          "headerParameters": {
+            "parameters": [
+              {
+                "name": "Accept",
+                "value": "application/json"
+              },
+              {
+                "name": "sap-client",
+                "value": "500"
+              }
+            ]
+          },
+          "options": {}
+        },
+        "type": "n8n-nodes-base.httpRequestTool",
+        "typeVersion": 4.4,
+        "position": [
+          -192,
+          288
+        ],
+        "id": "0de24366-b3c5-4f8a-8720-f9e13beba048",
+        "name": "State",
+        "credentials": {
+          "httpBasicAuth": {
+            "id": "amXEvooHAf1tb0dM",
+            "name": "SAP Credentials"
+          }
+        }
+      },
+      {
+        "parameters": {
+          "toolDescription": "City",
+          "url": "https://e9hpathhdb.aws.capsapsl.com:44341/sap/opu/odata/sap/API_BUSINESS_PARTNER/A_BusinessPartnerAddress?$filter=substringof('A',CityName) eq true&$select=FullName,BusinessPartner,CityName",
+          "authentication": "genericCredentialType",
+          "genericAuthType": "httpBasicAuth",
+          "sendQuery": true,
+          "queryParameters": {
+            "parameters": [
+              {
+                "name": "$select",
+                "value": "FullName,BusinessPartner,CityName"
+              },
+              {
+                "name": "$filter",
+                "value": "substringof('A',CityName) eq true"
+              }
+            ]
+          },
+          "options": {}
+        },
+        "type": "n8n-nodes-base.httpRequestTool",
+        "typeVersion": 4.4,
+        "position": [
+          -16,
+          288
+        ],
+        "id": "7714946e-15e8-4435-9ea5-40d9cb5cde7b",
+        "name": "City",
+        "credentials": {
+          "httpBasicAuth": {
+            "id": "amXEvooHAf1tb0dM",
+            "name": "SAP Credentials"
+          }
+        }
+      },
+      {
+        "parameters": {
+          "url": "/sap/opu/odata/sap/API_SALES_ORDER_SRV/A_SalesOrder?$filter=CreationDate%20ge%20datetime%27${parameters.from_date[0..15]}:00%27%20and%20CreationDate%20le%20datetime%27${parameters.to_date[0..15]}:00%27&$format=json&$orderby=SalesOrder%20desc&$select=SalesOrder,CreationDate,SoldToParty",
+          "authentication": "genericCredentialType",
+          "genericAuthType": "httpBasicAuth",
+          "sendHeaders": true,
+          "headerParameters": {
+            "parameters": [
+              {
+                "name": "Accept",
+                "value": "application/json"
+              },
+              {
+                "name": "sap-client",
+                "value": "500"
+              }
+            ]
+          },
+          "options": {
+            "response": {
+              "response": {
+                "fullResponse": true,
+                "responseFormat": "text",
+                "outputPropertyName": "<#assign resp = response.getBusinessPartnersBySalesOrdersCountFilter /> <#assign body = (resp.body)!{} /> <#assign bps = (body.d.results)![] />  <#-- 1. Build counts from sales orders --> <#assign soResults = (response.getSalesOrdersCountByCardSalesAndDate.body.d.results)![] /> <#assign counts = {} /> <#list soResults as so>   <#assign code = (so.SoldToParty)!\"\" />   <#if code != \"\">     <#assign counts = counts + { code?string : ((counts[code?string]!0) + 1) } />   </#if> </#list>  <#-- 2. Use parameters (NOT replies). We remove literal quotes added by the platform --> <#assign rankBy    = (parameters.rank_by!\"\")?replace('\"', '') /> <#assign cityVal   = (parameters.filterby_city!\"\")?replace('\"', '') /> <#assign regionVal = (parameters.filterby_region!\"\")?replace('\"', '') /> <#assign stateVal  = (parameters.filterby_state!\"\")?replace('\"', '') />  <#-- 3. Determine the Header label --> <#assign headerVal = \"Results\" /> <#if rankBy == \"City\"><#assign headerVal = cityVal /> <#elseif rankBy == \"Region\"><#assign headerVal = regionVal /> <#elseif rankBy == \"State\"><#assign headerVal = stateVal /> </#if>  {   \"success\": ${ (resp.statusCode == 200)?c },   \"BusinessPartners\": [     <#list bps as bp>       <#assign addrList = (bp.to_BusinessPartnerAddress.results)![] />       <#assign addr = (addrList?size > 0)?then(addrList[0], {}) />       {         \"BusinessPartner\": \"${bp.BusinessPartner!''}\",         \"BusinessPartnerName\": \"${(bp.BusinessPartnerFullName!'')?json_string}\",         \"City\": \"${(addr.CityName)!'-'}\",         \"State\": \"${(addr.Country)!'-'}\",         \"Region\": \"${(addr.Region)!'-'}\",         \"OrderCount\": ${counts[bp.BusinessPartner?string]!0}       }<#if bp_has_next>,</#if>     </#list>   ],   \"Header\": \"${headerVal?json_string}\" }"
+              }
+            }
+          }
+        },
+        "type": "n8n-nodes-base.httpRequest",
+        "typeVersion": 4.4,
+        "position": [
+          192,
+          16
+        ],
+        "id": "284fa189-1adc-4085-87c4-375079a26858",
+        "name": "getSalesOrdersCountByCardSalesAndDate",
+        "credentials": {
+          "httpBasicAuth": {
+            "id": "amXEvooHAf1tb0dM",
+            "name": "SAP Credentials"
+          }
+        },
+        "disabled": true
+      },
+      {
+        "parameters": {
+          "url": "<#assign quote = \"%27\" /><#assign space = \"%20\" /><#assign filterExpr = \"\" /><#assign results = (response.getSalesOrdersCountByCardSalesAndDate.body.d.results)![] /><#list results as row><#assign bpId = (row.SoldToParty)!\"\" /><#if bpId != \"\"><#if filterExpr == \"\"><#assign filterExpr = \"BusinessPartner\" + space + \"eq\" + space + quote + bpId + quote /><#else><#if !filterExpr?contains(bpId)><#assign filterExpr = filterExpr + space + \"or\" + space + \"BusinessPartner\" + space + \"eq\" + space + quote + bpId + quote /></#if></#if></#if></#list>/sap/opu/odata/sap/API_BUSINESS_PARTNER/A_BusinessPartner?$select=BusinessPartner,BusinessPartnerFullName,to_BusinessPartnerAddress/Country,to_BusinessPartnerAddress/CityName,to_BusinessPartnerAddress/Region&$expand=to_BusinessPartnerAddress&$orderby=BusinessPartner%20desc&$format=json<#if filterExpr != \"\">&$filter=${filterExpr}</#if>",
+          "authentication": "genericCredentialType",
+          "genericAuthType": "httpBasicAuth",
+          "sendHeaders": true,
+          "headerParameters": {
+            "parameters": [
+              {
+                "name": "Accept",
+                "value": "application/json"
+              },
+              {
+                "name": "sap-client",
+                "value": "500"
+              }
+            ]
+          },
+          "options": {
+            "response": {
+              "response": {
+                "responseFormat": "text",
+                "outputPropertyName": "<#assign resp = response.getBusinessPartnersBySalesOrdersCountFilter /> <#assign body = (resp.body)!{} /> <#assign bps = (body.d.results)![] />  <#-- 1. Build counts from sales orders --> <#assign soResults = (response.getSalesOrdersCountByCardSalesAndDate.body.d.results)![] /> <#assign counts = {} /> <#list soResults as so>   <#assign code = (so.SoldToParty)!\"\" />   <#if code != \"\">     <#assign counts = counts + { code?string : ((counts[code?string]!0) + 1) } />   </#if> </#list>  <#-- 2. Use parameters (NOT replies). We remove literal quotes added by the platform --> <#assign rankBy    = (parameters.rank_by!\"\")?replace('\"', '') /> <#assign cityVal   = (parameters.filterby_city!\"\")?replace('\"', '') /> <#assign regionVal = (parameters.filterby_region!\"\")?replace('\"', '') /> <#assign stateVal  = (parameters.filterby_state!\"\")?replace('\"', '') />  <#-- 3. Determine the Header label --> <#assign headerVal = \"Results\" /> <#if rankBy == \"City\"><#assign headerVal = cityVal /> <#elseif rankBy == \"Region\"><#assign headerVal = regionVal /> <#elseif rankBy == \"State\"><#assign headerVal = stateVal /> </#if>  {   \"success\": ${ (resp.statusCode == 200)?c },   \"BusinessPartners\": [     <#list bps as bp>       <#assign addrList = (bp.to_BusinessPartnerAddress.results)![] />       <#assign addr = (addrList?size > 0)?then(addrList[0], {}) />       {         \"BusinessPartner\": \"${bp.BusinessPartner!''}\",         \"BusinessPartnerName\": \"${(bp.BusinessPartnerFullName!'')?json_string}\",         \"City\": \"${(addr.CityName)!'-'}\",         \"State\": \"${(addr.Country)!'-'}\",         \"Region\": \"${(addr.Region)!'-'}\",         \"OrderCount\": ${counts[bp.BusinessPartner?string]!0}       }<#if bp_has_next>,</#if>     </#list>   ],   \"Header\": \"${headerVal?json_string}\" }"
+              }
+            }
+          }
+        },
+        "type": "n8n-nodes-base.httpRequest",
+        "typeVersion": 4.4,
+        "position": [
+          400,
+          16
+        ],
+        "id": "5d5f9f10-7dc5-4a3b-a9bb-4c313ef13e3f",
+        "name": "getBusinessPartnersBySalesOrdersCountFilter",
+        "credentials": {
+          "httpBasicAuth": {
+            "id": "amXEvooHAf1tb0dM",
+            "name": "SAP Credentials"
+          }
+        },
+        "disabled": true
+      }
+    ],
+    "connections": {
+      "When chat message received": {
+        "main": [
+          [
+            {
+              "node": "AI Agent",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Azure OpenAI Chat Model": {
+        "ai_languageModel": [
+          [
+            {
+              "node": "AI Agent",
+              "type": "ai_languageModel",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Simple Memory": {
+        "ai_memory": [
+          [
+            {
+              "node": "AI Agent",
+              "type": "ai_memory",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Region": {
+        "ai_tool": [
+          [
+            {
+              "node": "AI Agent",
+              "type": "ai_tool",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "State": {
+        "ai_tool": [
+          [
+            {
+              "node": "AI Agent",
+              "type": "ai_tool",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "City": {
+        "ai_tool": [
+          [
+            {
+              "node": "AI Agent",
+              "type": "ai_tool",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "AI Agent": {
+        "main": [
+          [
+            {
+              "node": "getSalesOrdersCountByCardSalesAndDate",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "getSalesOrdersCountByCardSalesAndDate": {
+        "main": [
+          [
+            {
+              "node": "getBusinessPartnersBySalesOrdersCountFilter",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      }
+    },
+    "authors": "Sanika Shinde",
+    "name": "Version adb015b7",
+    "description": "",
+    "autosaved": true
+  },
+  "tags": []
+}
