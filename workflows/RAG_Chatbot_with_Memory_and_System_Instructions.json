@@ -1,0 +1,321 @@
+{
+  "updatedAt": "2026-04-30T12:56:51.293Z",
+  "createdAt": "2026-04-30T12:56:51.293Z",
+  "id": "ufoQE4CHxXsKcGRv",
+  "name": "RAG Chatbot with Memory and System Instructions",
+  "active": false,
+  "isArchived": false,
+  "nodes": [
+    {
+      "parameters": {
+        "formTitle": "submit file ",
+        "formFields": {
+          "values": [
+            {
+              "fieldLabel": "file name ",
+              "fieldType": "file"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.formTrigger",
+      "typeVersion": 2.5,
+      "position": [
+        80,
+        48
+      ],
+      "id": "6130677f-ad19-4253-bd2e-a8d8bba626a5",
+      "name": "On form submission",
+      "webhookId": "9aeb3d96-15d4-486a-a66f-881fbd745da6"
+    },
+    {
+      "parameters": {
+        "mode": "insert",
+        "memoryKey": {
+          "__rl": true,
+          "mode": "list",
+          "value": "vector_store_key"
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.vectorStoreInMemory",
+      "typeVersion": 1.3,
+      "position": [
+        288,
+        48
+      ],
+      "id": "8306aa56-d494-494f-84d4-1a20bd199f00",
+      "name": "Simple Vector Store"
+    },
+    {
+      "parameters": {
+        "dataType": "binary",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.documentDefaultDataLoader",
+      "typeVersion": 1.1,
+      "position": [
+        416,
+        256
+      ],
+      "id": "51de6962-4bbb-422e-98a7-088bf367917b",
+      "name": "Default Data Loader"
+    },
+    {
+      "parameters": {
+        "content": "## Load Data Flow",
+        "height": 384,
+        "width": 640
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        0,
+        0
+      ],
+      "typeVersion": 1,
+      "id": "71835647-327d-4d7f-aecf-acc326bb5186",
+      "name": "Sticky Note"
+    },
+    {
+      "parameters": {
+        "model": "text-embedding-ada-002",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.embeddingsAzureOpenAi",
+      "typeVersion": 1,
+      "position": [
+        672,
+        464
+      ],
+      "id": "26e75ef4-2576-4906-9482-2499740d7b40",
+      "name": "Embeddings Azure OpenAI"
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.chatTrigger",
+      "typeVersion": 1.4,
+      "position": [
+        960,
+        48
+      ],
+      "id": "f903bf02-b085-4469-b115-575670a2d59c",
+      "name": "When chat message received",
+      "webhookId": "4359747d-f86d-41bc-ae85-ac25d55ae70e"
+    },
+    {
+      "parameters": {
+        "options": {
+          "systemMessage": "You are an SAP invoice assistant.\n\nAlways use retrieved document context before answering.\n\nExtract values accurately from invoices,\npurchase orders and supplier documents.\n\nIf asked about invoice fields like PO number,\namount, vendor, quantity or tax,\nreturn exact values from the document.\n\nIf not found, say:\nI don't know based on the uploaded document."
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 3.1,
+      "position": [
+        1168,
+        48
+      ],
+      "id": "6d0655d4-7ea8-4080-8fa7-3502e16c863e",
+      "name": "AI Agent"
+    },
+    {
+      "parameters": {
+        "model": "gpt-4o-mini",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatAzureOpenAi",
+      "typeVersion": 1,
+      "position": [
+        1040,
+        256
+      ],
+      "id": "ecca973a-40d5-494c-be41-6390229c4313",
+      "name": "Azure OpenAI Chat Model"
+    },
+    {
+      "parameters": {
+        "mode": "retrieve-as-tool",
+        "toolDescription": "Use this knowledge base to answer questions from the user",
+        "memoryKey": {
+          "__rl": true,
+          "mode": "list",
+          "value": "vector_store_key"
+        },
+        "topK": 3
+      },
+      "type": "@n8n/n8n-nodes-langchain.vectorStoreInMemory",
+      "typeVersion": 1.3,
+      "position": [
+        1376,
+        288
+      ],
+      "id": "b1144692-bfb8-41dc-b4a8-15e399ade209",
+      "name": "Simple Vector Store1"
+    },
+    {
+      "parameters": {
+        "content": "## Retriever Flow",
+        "height": 464,
+        "width": 800
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        848,
+        0
+      ],
+      "typeVersion": 1,
+      "id": "0644bd9c-742b-4e84-a678-c0cc3698d3c8",
+      "name": "Sticky Note1"
+    },
+    {
+      "parameters": {
+        "content": "## Readme\nLoad your data into a vector database with the \n **Load Data** flow, and then use your data as chat context with the  **Retriever** flow.",
+        "height": 192,
+        "width": 288,
+        "color": 4
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        -336,
+        80
+      ],
+      "typeVersion": 1,
+      "id": "097fd25d-b5cb-4d75-a662-db6caf4259cd",
+      "name": "Sticky Note2"
+    },
+    {
+      "parameters": {
+        "content": "## Embeddings\n\nThe Insert and Retrieve operation use the same embedding node.\n\nThis is to ensure that they are using the **exact same embeddings and settings**.\n\nDifferent embeddings might not work at all, or have unintended consequences.\n",
+        "height": 224,
+        "width": 464,
+        "color": 3
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        912,
+        512
+      ],
+      "typeVersion": 1,
+      "id": "75ffab4d-32cb-4fb6-9655-d6137c8af928",
+      "name": "Sticky Note3"
+    },
+    {
+      "parameters": {},
+      "type": "@n8n/n8n-nodes-langchain.memoryBufferWindow",
+      "typeVersion": 1.3,
+      "position": [
+        1216,
+        240
+      ],
+      "id": "50d9c020-cb85-49c9-90ba-8e9ebc818c66",
+      "name": "Simple Memory"
+    }
+  ],
+  "connections": {
+    "On form submission": {
+      "main": [
+        [
+          {
+            "node": "Simple Vector Store",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Default Data Loader": {
+      "ai_document": [
+        [
+          {
+            "node": "Simple Vector Store",
+            "type": "ai_document",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Embeddings Azure OpenAI": {
+      "ai_embedding": [
+        [
+          {
+            "node": "Simple Vector Store",
+            "type": "ai_embedding",
+            "index": 0
+          },
+          {
+            "node": "Simple Vector Store1",
+            "type": "ai_embedding",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "When chat message received": {
+      "main": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Azure OpenAI Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Simple Vector Store1": {
+      "ai_tool": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Simple Memory": {
+      "ai_memory": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_memory",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate",
+    "availableInMCP": false
+  },
+  "staticData": null,
+  "meta": null,
+  "pinData": {},
+  "versionId": "2cc75de4-ff7c-4299-86ee-2f72fa47b10b",
+  "activeVersionId": null,
+  "triggerCount": 0,
+  "shared": [
+    {
+      "updatedAt": "2026-04-30T12:56:51.297Z",
+      "createdAt": "2026-04-30T12:56:51.297Z",
+      "role": "workflow:owner",
+      "workflowId": "ufoQE4CHxXsKcGRv",
+      "projectId": "R2OGQRrWYLraDwSj"
+    }
+  ],
+  "activeVersion": null,
+  "tags": []
+}
