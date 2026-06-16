@@ -1,0 +1,164 @@
+{
+  "updatedAt": "2026-04-28T13:40:32.699Z",
+  "createdAt": "2026-04-27T10:30:17.828Z",
+  "id": "FHagRa35q9GwnDw8",
+  "name": "LoopOverItemNode",
+  "active": false,
+  "isArchived": false,
+  "nodes": [
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [
+        -144,
+        -128
+      ],
+      "id": "07882439-f22d-4e23-b903-2948941777c4",
+      "name": "When clicking ‘Execute workflow’"
+    },
+    {
+      "parameters": {
+        "jsCode": "return [\n  { json: { id: 1, name: \"Alice\", email: \"alice@example.com\" } },\n  { json: { id: 2, name: \"Bob\", email: \"bob@example.com\" } },\n  { json: { id: 3, name: \"Charlie\", email: \"charlie@example.com\" } },\n  { json: { id: 4, name: \"Diana\", email: \"diana@example.com\" } }\n];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        64,
+        -128
+      ],
+      "id": "5cf49c5d-8115-4b56-8a2b-5580eda0a239",
+      "name": "Code in JavaScript"
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "n8n-nodes-base.splitInBatches",
+      "typeVersion": 3,
+      "position": [
+        272,
+        -128
+      ],
+      "id": "41b5d718-0f56-4a29-a3ef-62e117950d29",
+      "name": "Loop Over Items"
+    },
+    {
+      "parameters": {
+        "mode": "runOnceForEachItem",
+        "jsCode": "const user = $json;\n\nreturn {\n  json: {\n    processed_id: user.id,\n    message: `Hello ${user.name}, eryour account has been reviewed.`,\n    email: user.email,\n    timestamp: new Date().toISOString()\n  }\n};"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        464,
+        -48
+      ],
+      "id": "f262e200-d39e-4159-9b76-a03792079e4c",
+      "name": "Code in JavaScript1"
+    },
+    {
+      "parameters": {
+        "jsCode": "const items = $input.all();\n\nreturn [\n  {\n    json: {\n      status: \"All items processed successfully\",\n      totalItemsProcessed: items.length,\n      completedAt: new Date().toISOString()\n    }\n  }\n];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        480,
+        -224
+      ],
+      "id": "4b702f5a-f639-49e5-b022-d9c5fc0e3766",
+      "name": "Code in JavaScript2"
+    },
+    {
+      "parameters": {
+        "content": "The Full Flow \n\n👆 You Click \"Execute Workflow\"\n          │\n          ▼\n📋 Generate 4 Users (Alice, Bob, Charlie, Diana)\n          │\n          ▼\n🔄 Loop Over Items picks them up one by one\n          │\n    ┌─────┴──────┐\n    │  LOOP      │  ──→ 👷 Process Each User (Code JS1)\n    │  (x4)      │  ←── Send back result\n    └─────┬──────┘\n          │ (after 4 iterations)\n          ▼\n    ✅ DONE Output\n          │\n          ▼\n📊 Final Report: \"4 items processed successfully\"",
+        "height": 432,
+        "width": 448
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        -896,
+        -224
+      ],
+      "id": "464771b3-df6e-4c57-9225-50b714034d8e",
+      "name": "Sticky Note"
+    }
+  ],
+  "connections": {
+    "When clicking ‘Execute workflow’": {
+      "main": [
+        [
+          {
+            "node": "Code in JavaScript",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code in JavaScript": {
+      "main": [
+        [
+          {
+            "node": "Loop Over Items",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Loop Over Items": {
+      "main": [
+        [
+          {
+            "node": "Code in JavaScript2",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Code in JavaScript1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code in JavaScript1": {
+      "main": [
+        [
+          {
+            "node": "Loop Over Items",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate",
+    "availableInMCP": false
+  },
+  "staticData": null,
+  "meta": null,
+  "pinData": {},
+  "versionId": "0217ec64-47e2-4493-8421-1f72e5209371",
+  "activeVersionId": null,
+  "triggerCount": 0,
+  "shared": [
+    {
+      "updatedAt": "2026-04-27T10:30:17.836Z",
+      "createdAt": "2026-04-27T10:30:17.836Z",
+      "role": "workflow:owner",
+      "workflowId": "FHagRa35q9GwnDw8",
+      "projectId": "R2OGQRrWYLraDwSj"
+    }
+  ],
+  "activeVersion": null,
+  "tags": []
+}
