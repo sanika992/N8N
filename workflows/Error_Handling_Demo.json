@@ -1,0 +1,203 @@
+{
+  "updatedAt": "2026-06-12T06:49:28.841Z",
+  "createdAt": "2026-06-11T08:52:47.890Z",
+  "id": "NNz7Ob6IyFtpSVne",
+  "name": "Error Handling Demo",
+  "active": true,
+  "isArchived": false,
+  "nodes": [
+    {
+      "parameters": {
+        "url": "https://abcxyz123.fake",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.4,
+      "position": [
+        544,
+        -208
+      ],
+      "id": "5581accc-be1d-4773-b9b8-36498227491d",
+      "name": "HTTP Request"
+    },
+    {
+      "parameters": {
+        "url": "https://zippopotam.us",
+        "options": {
+          "allowUnauthorizedCerts": true
+        }
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.4,
+      "position": [
+        528,
+        -32
+      ],
+      "id": "1f5f710a-24e4-428b-b102-1fdccf9b34c2",
+      "name": "HTTP Request1"
+    },
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "field": "minutes",
+              "minutesInterval": 1
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.3,
+      "position": [
+        -48,
+        -128
+      ],
+      "id": "21c55839-b320-4331-8ee9-f582429401af",
+      "name": "Schedule Trigger",
+      "disabled": true
+    },
+    {
+      "parameters": {
+        "jsCode": "throw new Error(\"Demo Error\");"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        192,
+        -128
+      ],
+      "id": "abdfb761-756f-4139-8935-4d7041364990",
+      "name": "Code in JavaScript"
+    }
+  ],
+  "connections": {
+    "Schedule Trigger": {
+      "main": [
+        [
+          {
+            "node": "Code in JavaScript",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate",
+    "availableInMCP": false,
+    "timeSavedMode": "fixed",
+    "errorWorkflow": "DL87EAlPvApX5uFg",
+    "callerPolicy": "workflowsFromSameOwner"
+  },
+  "staticData": {
+    "node:Schedule Trigger": {
+      "recurrenceRules": []
+    }
+  },
+  "meta": null,
+  "pinData": {},
+  "versionId": "30c12971-4a9a-4ae2-bd12-c3408166f1b6",
+  "activeVersionId": "f98e58c4-5e14-4f55-9c5f-1284633a993a",
+  "triggerCount": 1,
+  "shared": [
+    {
+      "updatedAt": "2026-06-11T08:52:47.892Z",
+      "createdAt": "2026-06-11T08:52:47.892Z",
+      "role": "workflow:owner",
+      "workflowId": "NNz7Ob6IyFtpSVne",
+      "projectId": "R2OGQRrWYLraDwSj"
+    }
+  ],
+  "activeVersion": {
+    "updatedAt": "2026-06-11T10:18:22.000Z",
+    "createdAt": "2026-06-11T10:18:14.861Z",
+    "versionId": "f98e58c4-5e14-4f55-9c5f-1284633a993a",
+    "workflowId": "NNz7Ob6IyFtpSVne",
+    "nodes": [
+      {
+        "parameters": {
+          "url": "https://abcxyz123.fake",
+          "options": {}
+        },
+        "type": "n8n-nodes-base.httpRequest",
+        "typeVersion": 4.4,
+        "position": [
+          336,
+          -240
+        ],
+        "id": "5581accc-be1d-4773-b9b8-36498227491d",
+        "name": "HTTP Request"
+      },
+      {
+        "parameters": {
+          "url": "https://zippopotam.us",
+          "options": {
+            "allowUnauthorizedCerts": true
+          }
+        },
+        "type": "n8n-nodes-base.httpRequest",
+        "typeVersion": 4.4,
+        "position": [
+          512,
+          -192
+        ],
+        "id": "1f5f710a-24e4-428b-b102-1fdccf9b34c2",
+        "name": "HTTP Request1"
+      },
+      {
+        "parameters": {
+          "rule": {
+            "interval": [
+              {
+                "field": "minutes",
+                "minutesInterval": 1
+              }
+            ]
+          }
+        },
+        "type": "n8n-nodes-base.scheduleTrigger",
+        "typeVersion": 1.3,
+        "position": [
+          0,
+          0
+        ],
+        "id": "21c55839-b320-4331-8ee9-f582429401af",
+        "name": "Schedule Trigger"
+      },
+      {
+        "parameters": {
+          "jsCode": "throw new Error(\"Demo Error\");"
+        },
+        "type": "n8n-nodes-base.code",
+        "typeVersion": 2,
+        "position": [
+          208,
+          0
+        ],
+        "id": "abdfb761-756f-4139-8935-4d7041364990",
+        "name": "Code in JavaScript"
+      }
+    ],
+    "connections": {
+      "Schedule Trigger": {
+        "main": [
+          [
+            {
+              "node": "Code in JavaScript",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      }
+    },
+    "authors": "Sanika Shinde",
+    "name": "Version f98e58c4",
+    "description": "",
+    "autosaved": true
+  },
+  "tags": []
+}
