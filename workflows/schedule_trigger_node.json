@@ -1,0 +1,275 @@
+{
+  "updatedAt": "2026-06-02T13:09:28.118Z",
+  "createdAt": "2026-06-01T11:22:31.295Z",
+  "id": "ZhwKYwqxktap2a2f",
+  "name": "schedule trigger node",
+  "active": false,
+  "isArchived": false,
+  "nodes": [
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "field": "minutes"
+            }
+          ]
+        }
+      },
+      "id": "80cb54b4-7286-4932-8137-77c763e7fc40",
+      "name": "Schedule Trigger",
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.2,
+      "position": [
+        176,
+        16
+      ],
+      "alwaysOutputData": false
+    },
+    {
+      "parameters": {
+        "operation": "getAll",
+        "limit": 5,
+        "filters": {
+          "labelIds": [
+            "INBOX"
+          ],
+          "readStatus": "unread"
+        }
+      },
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.2,
+      "position": [
+        416,
+        16
+      ],
+      "id": "65e1bb3e-99fb-4881-a243-619e6c3ceb30",
+      "name": "Get many messages",
+      "webhookId": "a08831f9-f850-4ffc-9f91-13019c11c98d",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "ufBHP0gOl5jBybIp",
+          "name": "Gmail account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "=Subject: {{$json.Subject}}\n\nFrom: {{$json.From}}\n\nContent: {{$json.snippet}}",
+        "options": {
+          "systemMessage": "You are an email classification assistant.\n\nAnalyze the email subject and content.\n\nReturn ONLY one of these exact values:\n\nIMPORTANT\nNOT_IMPORTTANT\n\nClassification Rules:\n\nIMPORTANT:\n- Contains words like urgent, important, alert, action required\n- Waiting for response\n- Client communication\n- Manager communication\n- Meeting request\n- Production issue\n- Deadline\n- Follow up request\n\nNOT_IMPORTANT:\n- Newsletter\n- Advertisement\n- Promotions\n- Social updates\n- Spam\n\nReturn ONLY IMPORTANT or NOT_IMPORTANT.\nDo not explain your answer.\nDo not add any other text."
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 3.1,
+      "position": [
+        624,
+        16
+      ],
+      "id": "5ed12196-cc9a-4491-b2ca-f3edef2b7d4a",
+      "name": "AI Agent"
+    },
+    {
+      "parameters": {
+        "model": "gpt-4o-mini",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatAzureOpenAi",
+      "typeVersion": 1,
+      "position": [
+        560,
+        176
+      ],
+      "id": "daf029e7-3d5f-4d1c-8e08-20cbfd5ae2e1",
+      "name": "Azure OpenAI Chat Model",
+      "credentials": {
+        "azureOpenAiApi": {
+          "id": "x5lZM9gfKe7o6JtL",
+          "name": "Azure Open AI account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 3
+          },
+          "conditions": [
+            {
+              "id": "06c8efc0-7ca4-42c1-916c-476e55fba90d",
+              "leftValue": "={{$json.output}}",
+              "rightValue": "IMPORTANT",
+              "operator": {
+                "type": "string",
+                "operation": "equals"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
+      "position": [
+        976,
+        16
+      ],
+      "id": "c7700cd8-4ab3-4e7a-943d-75bc29524c18",
+      "name": "If"
+    },
+    {
+      "parameters": {
+        "sendTo": "sanikashinde992@gmail.com",
+        "subject": "=Important Email Alert: {{$node[\"Get many messages\"].json[\"Subject\"]}}",
+        "message": "=An important email was detected.  From: {{$node[\"Get many messages\"].json[\"From\"]}}  Subject: {{$node[\"Get many messages\"].json[\"Subject\"]}}  Preview: {{$node[\"Get many messages\"].json[\"snippet\"]}}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.2,
+      "position": [
+        1184,
+        -48
+      ],
+      "id": "ce89d4d2-a2bb-4553-a775-0d3b71f1a918",
+      "name": "Send a message",
+      "webhookId": "bf595811-9d62-47aa-b181-7bc1e6eb9300",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "ufBHP0gOl5jBybIp",
+          "name": "Gmail account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "b8f3360f-623e-4e4c-b1ec-5384c8effb82",
+              "name": "status",
+              "value": "Ignored",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        1184,
+        80
+      ],
+      "id": "86a189a3-de90-472f-81fa-219a8c09bf87",
+      "name": "Edit Fields"
+    },
+    {
+      "parameters": {
+        "content": "| Schedule Trigger(fix time)                       | Polling Trigger (monitoring contineously)                                    |\n| -------------------------------------- | --------------------------------------------------- |\n| Focus is **WHEN** to run               | Focus is **WHAT** you're checking                   |\n| Runs at a fixed time                   | Repeatedly checks for changes                       |\n| Used for scheduled tasks               | Used for monitoring                                 |\n| Example: Send report every day at 9 AM | Example: Check Gmail every 5 minutes for new emails |\n",
+        "width": 576
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        -80,
+        304
+      ],
+      "id": "cadc4fbd-c6b8-4fc1-a397-f3e7162f3830",
+      "name": "Sticky Note"
+    }
+  ],
+  "connections": {
+    "Schedule Trigger": {
+      "main": [
+        [
+          {
+            "node": "Get many messages",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get many messages": {
+      "main": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Azure OpenAI Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "AI Agent": {
+      "main": [
+        [
+          {
+            "node": "If",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If": {
+      "main": [
+        [
+          {
+            "node": "Send a message",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Edit Fields",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate",
+    "availableInMCP": false
+  },
+  "staticData": null,
+  "meta": {
+    "templateCredsSetupCompleted": true
+  },
+  "pinData": {},
+  "versionId": "8162e005-80c6-4795-a229-da7bf46b4e88",
+  "activeVersionId": null,
+  "triggerCount": 0,
+  "shared": [
+    {
+      "updatedAt": "2026-06-01T11:22:31.303Z",
+      "createdAt": "2026-06-01T11:22:31.303Z",
+      "role": "workflow:owner",
+      "workflowId": "ZhwKYwqxktap2a2f",
+      "projectId": "R2OGQRrWYLraDwSj"
+    }
+  ],
+  "activeVersion": null,
+  "tags": []
+}
