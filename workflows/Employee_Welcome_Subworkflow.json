@@ -1,0 +1,71 @@
+{
+  "updatedAt": "2026-06-11T08:13:31.641Z",
+  "createdAt": "2026-06-11T08:11:11.024Z",
+  "id": "RnXsuOdekRPSctbO",
+  "name": "Employee Welcome Subworkflow",
+  "active": false,
+  "isArchived": false,
+  "nodes": [
+    {
+      "parameters": {
+        "inputSource": "passthrough"
+      },
+      "type": "n8n-nodes-base.executeWorkflowTrigger",
+      "typeVersion": 1.1,
+      "position": [
+        0,
+        0
+      ],
+      "id": "79703505-5ae3-496a-a0fc-dcb752eed8ea",
+      "name": "When Executed by Another Workflow"
+    },
+    {
+      "parameters": {
+        "jsCode": "const employee = $input.first().json.employee;\n\nreturn [\n{\njson:{\nmessage: `Welcome ${employee} to n8n!`\n}\n}\n];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        208,
+        0
+      ],
+      "id": "81fa6f3a-07a3-48dd-8897-86dfad2c2d60",
+      "name": "Code in JavaScript"
+    }
+  ],
+  "connections": {
+    "When Executed by Another Workflow": {
+      "main": [
+        [
+          {
+            "node": "Code in JavaScript",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate",
+    "availableInMCP": false
+  },
+  "staticData": null,
+  "meta": null,
+  "pinData": {},
+  "versionId": "c8149348-daad-4545-b55e-3da78e0e3bc9",
+  "activeVersionId": null,
+  "triggerCount": 0,
+  "shared": [
+    {
+      "updatedAt": "2026-06-11T08:11:11.042Z",
+      "createdAt": "2026-06-11T08:11:11.042Z",
+      "role": "workflow:owner",
+      "workflowId": "RnXsuOdekRPSctbO",
+      "projectId": "R2OGQRrWYLraDwSj"
+    }
+  ],
+  "activeVersion": null,
+  "tags": []
+}
