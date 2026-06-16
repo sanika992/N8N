@@ -1,0 +1,62 @@
+{
+  "updatedAt": "2026-06-11T08:30:09.468Z",
+  "createdAt": "2026-06-11T08:29:01.635Z",
+  "id": "bgCHNnm5sGzRwM2Y",
+  "name": "My workflow",
+  "active": false,
+  "isArchived": false,
+  "nodes": [
+    {
+      "parameters": {
+        "pollTimes": {
+          "item": [
+            {
+              "mode": "everyMinute"
+            }
+          ]
+        },
+        "filters": {},
+        "options": {}
+      },
+      "type": "n8n-nodes-base.microsoftOutlookTrigger",
+      "typeVersion": 1,
+      "position": [
+        0,
+        0
+      ],
+      "id": "eea4d07b-20f6-4e4b-89d2-03df29cb295a",
+      "name": "Microsoft Outlook Trigger",
+      "credentials": {
+        "microsoftOutlookOAuth2Api": {
+          "id": "yRQauCWuWf3XmC7Y",
+          "name": "Microsoft Outlook account"
+        }
+      }
+    }
+  ],
+  "connections": {},
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate",
+    "availableInMCP": false
+  },
+  "staticData": null,
+  "meta": {
+    "templateCredsSetupCompleted": true
+  },
+  "pinData": {},
+  "versionId": "2f24409c-4d72-480e-9f3d-40e1dfe1d4e4",
+  "activeVersionId": null,
+  "triggerCount": 0,
+  "shared": [
+    {
+      "updatedAt": "2026-06-11T08:29:01.635Z",
+      "createdAt": "2026-06-11T08:29:01.635Z",
+      "role": "workflow:owner",
+      "workflowId": "bgCHNnm5sGzRwM2Y",
+      "projectId": "R2OGQRrWYLraDwSj"
+    }
+  ],
+  "activeVersion": null,
+  "tags": []
+}
