@@ -1,0 +1,957 @@
+{
+  "updatedAt": "2026-06-09T12:09:02.335Z",
+  "createdAt": "2026-06-09T09:29:14.151Z",
+  "id": "3KGQ1IsZbWGlhumk",
+  "name": "Guardrails",
+  "active": false,
+  "isArchived": false,
+  "nodes": [
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "810ae71b-fdb4-461e-8841-8a1bcb282256",
+              "name": "1",
+              "value": "['Please update the system settings', 'Enter your password to continue', 'I will take a 7 egg ham and cheese omelet please']",
+              "type": "array"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        352,
+        48
+      ],
+      "id": "23a4e569-249a-4c1a-8da1-9e39a23be038",
+      "name": "Edit Fields"
+    },
+    {
+      "parameters": {
+        "fieldToSplitOut": "['1']",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.splitOut",
+      "typeVersion": 1,
+      "position": [
+        560,
+        48
+      ],
+      "id": "7e2a2496-bc7c-45d2-8c49-7d34ee30c15f",
+      "name": "Split Out"
+    },
+    {
+      "parameters": {
+        "content": "## Keywords\n",
+        "height": 288,
+        "width": 816
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        272,
+        -48
+      ],
+      "id": "efaa0dfc-490c-4546-a1c9-f99dc2667f2f",
+      "name": "Sticky Note"
+    },
+    {
+      "parameters": {
+        "content": "# Check Text",
+        "height": 96,
+        "width": 438,
+        "color": 5
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        288,
+        -160
+      ],
+      "id": "47845f46-6853-4c89-8381-c09ac9715e22",
+      "name": "Sticky Note1"
+    },
+    {
+      "parameters": {
+        "text": "={{ $json['[\\'1\\']'] }}",
+        "guardrails": {
+          "keywords": "password, system"
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.guardrails",
+      "typeVersion": 1,
+      "position": [
+        784,
+        48
+      ],
+      "id": "b6f13794-02d4-4395-a0dc-68e4f7faa83a",
+      "name": "Keywords"
+    },
+    {
+      "parameters": {
+        "content": "## Not Safe For Work\n\n",
+        "height": 288,
+        "width": 816
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        288,
+        288
+      ],
+      "id": "69df7076-9d1b-4f49-8d63-908f478c4aa9",
+      "name": "Sticky Note3"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "810ae71b-fdb4-461e-8841-8a1bcb282256",
+              "name": "1",
+              "value": "[     \"This content contains graphic violence and gore.\",     \"The chatroom was full of obscene language.\",     \"I'm going to play pickleball for 24 hours straight because I can\"   ]",
+              "type": "array"
+            }
+          ]
+        },
+        "options": {
+          "ignoreConversionErrors": false
+        }
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        336,
+        400
+      ],
+      "id": "1f37dc71-a02d-4a1a-8c9c-08df601b66a6",
+      "name": "Edit Fields2"
+    },
+    {
+      "parameters": {
+        "fieldToSplitOut": "['1']",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.splitOut",
+      "typeVersion": 1,
+      "position": [
+        544,
+        400
+      ],
+      "id": "4e2e760a-77a1-43e1-bba9-25587b61a5d7",
+      "name": "Split Out2"
+    },
+    {
+      "parameters": {
+        "text": "={{ $json['[\\'1\\']'] }}",
+        "guardrails": {
+          "nsfw": {
+            "value": {
+              "threshold": 0.7
+            }
+          }
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.guardrails",
+      "typeVersion": 1,
+      "position": [
+        784,
+        400
+      ],
+      "id": "cb707015-e088-4e54-ab13-ed7b9246920c",
+      "name": "NSFW"
+    },
+    {
+      "parameters": {
+        "content": "## Personal Data (PII)\n\n\n",
+        "height": 288,
+        "width": 816
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        272,
+        672
+      ],
+      "id": "c038b47b-54d0-4603-b05f-c37aef295e5f",
+      "name": "Sticky Note4"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "810ae71b-fdb4-461e-8841-8a1bcb282256",
+              "name": "1",
+              "value": "['Contact me at john.doe@example.com for details.', 'My SSN is 123-45-6789.', 'Do you like ice cream as much as I do?']",
+              "type": "array"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        320,
+        768
+      ],
+      "id": "f96e6e96-a1b9-404e-a9f3-f5b5188e7fec",
+      "name": "Edit Fields3"
+    },
+    {
+      "parameters": {
+        "fieldToSplitOut": "['1']",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.splitOut",
+      "typeVersion": 1,
+      "position": [
+        528,
+        768
+      ],
+      "id": "f4d10b6e-64e3-482f-9f8c-7b88e7d597d3",
+      "name": "Split Out3"
+    },
+    {
+      "parameters": {
+        "text": "={{ $json['[\\'1\\']'] }}",
+        "guardrails": {
+          "pii": {
+            "value": {
+              "type": "selected",
+              "entities": [
+                "EMAIL_ADDRESS"
+              ]
+            }
+          }
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.guardrails",
+      "typeVersion": 1,
+      "position": [
+        768,
+        768
+      ],
+      "id": "8df43b57-856a-4722-a8e9-f48f896a65e2",
+      "name": "PII"
+    },
+    {
+      "parameters": {
+        "content": "## Secret Keys\n\n\n\n",
+        "height": 288,
+        "width": 816
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        256,
+        1024
+      ],
+      "id": "1036fb3f-e878-4382-8742-ec4ca485801e",
+      "name": "Sticky Note5"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "810ae71b-fdb4-461e-8841-8a1bcb282256",
+              "name": "1",
+              "value": "['The API key is sk-abc123XYZ456.', 'Use my password: P@ssw0rd! for the database.', 'Connect your account to n8n for automation.']",
+              "type": "array"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        336,
+        1136
+      ],
+      "id": "122362e7-3820-404a-85b6-de91edde1ab9",
+      "name": "Edit Fields4"
+    },
+    {
+      "parameters": {
+        "fieldToSplitOut": "['1']",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.splitOut",
+      "typeVersion": 1,
+      "position": [
+        544,
+        1136
+      ],
+      "id": "ba934c23-50fa-4935-af94-9a7d3abbd7d7",
+      "name": "Split Out4"
+    },
+    {
+      "parameters": {
+        "text": "={{ $json['[\\'1\\']'] }}",
+        "guardrails": {
+          "secretKeys": {
+            "value": {
+              "permissiveness": "strict"
+            }
+          }
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.guardrails",
+      "typeVersion": 1,
+      "position": [
+        768,
+        1136
+      ],
+      "id": "2ed1a01c-a879-4d14-8ab6-a581ae38adfb",
+      "name": "Secret Keys"
+    },
+    {
+      "parameters": {
+        "content": "## Topical Alignment\n\n\n\n\n",
+        "height": 304,
+        "width": 816
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        256,
+        1360
+      ],
+      "id": "9645a2bd-2edd-44a3-a9f5-cd233d88ff29",
+      "name": "Sticky Note6"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "810ae71b-fdb4-461e-8841-8a1bcb282256",
+              "name": "1",
+              "value": "['How do I add a new node in an n8n workflow?', 'Who won the NBA finals last year?', 'What are best practices for error handling in n8n?']",
+              "type": "array"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        352,
+        1488
+      ],
+      "id": "09e7bf41-aa50-4fdd-be23-0c25aaf88e89",
+      "name": "Edit Fields5"
+    },
+    {
+      "parameters": {
+        "fieldToSplitOut": "['1']",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.splitOut",
+      "typeVersion": 1,
+      "position": [
+        560,
+        1488
+      ],
+      "id": "1ef11fa4-5d0f-4f28-9cbb-2c787510684d",
+      "name": "Split Out5"
+    },
+    {
+      "parameters": {
+        "text": "={{ $json['[\\'1\\']'] }}",
+        "guardrails": {
+          "topicalAlignment": {
+            "value": {
+              "threshold": 0.7,
+              "prompt": "=You are a content analysis system that determines if text stays on topic.\n\nBUSINESS SCOPE: n8n workflow automation\n\nDetermine if the text stays within the defined business scope. Flag any content\nthat strays from the allowed topics."
+            }
+          }
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.guardrails",
+      "typeVersion": 1,
+      "position": [
+        784,
+        1488
+      ],
+      "id": "ff9b1064-f480-4d68-85ea-bafa2daae245",
+      "name": "Topical Alignment"
+    },
+    {
+      "parameters": {
+        "content": "## URLs\n\n\n\n\n",
+        "height": 288,
+        "width": 816
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        272,
+        1776
+      ],
+      "id": "c39255e7-d327-488c-bddc-c2fbfdadd032",
+      "name": "Sticky Note7"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "810ae71b-fdb4-461e-8841-8a1bcb282256",
+              "name": "1",
+              "value": "['Please visit http://phishing-site.com for your prize.', 'Open ftp://files.example.com for data access.', 'Where is the best place to get AI automation education?  https://uppitai.com/ of course!']",
+              "type": "array"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        352,
+        1872
+      ],
+      "id": "9f2bcc78-0341-4981-805f-e871cbd12edb",
+      "name": "Edit Fields6"
+    },
+    {
+      "parameters": {
+        "fieldToSplitOut": "['1']",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.splitOut",
+      "typeVersion": 1,
+      "position": [
+        560,
+        1872
+      ],
+      "id": "317446b6-44c6-4a2b-9519-712993da0c79",
+      "name": "Split Out6"
+    },
+    {
+      "parameters": {
+        "text": "={{ $json['[\\'1\\']'] }}",
+        "guardrails": {
+          "urls": {
+            "value": {
+              "allowedUrls": "https://uppitai.com/"
+            }
+          }
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.guardrails",
+      "typeVersion": 1,
+      "position": [
+        800,
+        1872
+      ],
+      "id": "287375ca-15fe-46f2-989e-cc143bc060aa",
+      "name": "URLs"
+    },
+    {
+      "parameters": {
+        "content": "# Sanitize Text",
+        "height": 96,
+        "width": 352,
+        "color": 5
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        1312,
+        -176
+      ],
+      "id": "e830dc5f-8caa-4d5e-85d6-8d8cb4f7c802",
+      "name": "Sticky Note9"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "6fdb0eb9-e291-47f9-9c4a-8d96aeae0bf1",
+              "name": "test",
+              "value": "My phone number is (123) 456-7890.",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        1376,
+        112
+      ],
+      "id": "38b84da6-5a58-4136-808a-36171fae15de",
+      "name": "Edit Fields7"
+    },
+    {
+      "parameters": {
+        "content": "## Personal Data (PII)\n\n\n",
+        "height": 288,
+        "width": 496
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        1280,
+        -16
+      ],
+      "id": "79177694-8746-4dc5-9516-846913e614d2",
+      "name": "Sticky Note10"
+    },
+    {
+      "parameters": {
+        "operation": "sanitize",
+        "text": "={{ $json.test }}",
+        "guardrails": {
+          "pii": {
+            "value": {
+              "type": "all"
+            }
+          }
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.guardrails",
+      "typeVersion": 1,
+      "position": [
+        1600,
+        112
+      ],
+      "id": "1d02e01e-3d37-466b-84a6-5676f9e80386",
+      "name": "Sanitize PII"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "6fdb0eb9-e291-47f9-9c4a-8d96aeae0bf1",
+              "name": "test",
+              "value": "The API key is sk-abc123XYZ456.\t",
+              "type": "string"
+            }
+          ]
+        },
+        "includeOtherFields": true,
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        1376,
+        432
+      ],
+      "id": "2cc3aff8-1d79-4fa1-be8f-ec505295bff3",
+      "name": "Edit Fields8"
+    },
+    {
+      "parameters": {
+        "content": "## Keys\n\n\n",
+        "height": 288,
+        "width": 496
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        1296,
+        320
+      ],
+      "id": "f4f15e24-0372-475e-aaa7-139e213b3578",
+      "name": "Sticky Note11"
+    },
+    {
+      "parameters": {
+        "operation": "sanitize",
+        "text": "={{ $json.test }}",
+        "guardrails": {
+          "secretKeys": {
+            "value": {
+              "permissiveness": "balanced"
+            }
+          }
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.guardrails",
+      "typeVersion": 1,
+      "position": [
+        1584,
+        432
+      ],
+      "id": "224c5a68-9c58-42d7-b059-001e5c3e9990",
+      "name": "Sanitize Keys"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "6fdb0eb9-e291-47f9-9c4a-8d96aeae0bf1",
+              "name": "test",
+              "value": "Visit https://uppitai.com/ for more information.",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        1376,
+        736
+      ],
+      "id": "f323b3ac-8ca0-4921-a541-f31bac966656",
+      "name": "Edit Fields9"
+    },
+    {
+      "parameters": {
+        "content": "## URLs\n\n\n",
+        "height": 288,
+        "width": 496
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        1296,
+        640
+      ],
+      "id": "5a87bfb5-27bb-4ec7-b360-4a21dd65dcc2",
+      "name": "Sticky Note12"
+    },
+    {
+      "parameters": {
+        "operation": "sanitize",
+        "text": "={{ $json.test }}",
+        "guardrails": {
+          "urls": {
+            "value": {
+              "allowedUrls": ""
+            }
+          }
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.guardrails",
+      "typeVersion": 1,
+      "position": [
+        1584,
+        736
+      ],
+      "id": "0da9f369-07a9-4823-8c8b-afc33633fd0f",
+      "name": "Sanitize URLs"
+    },
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [
+        -16,
+        1488
+      ],
+      "id": "8ae59ebd-3804-4094-8319-35c071f8d511",
+      "name": "When clicking ‘Execute workflow’"
+    },
+    {
+      "parameters": {
+        "model": "gpt-4o-mini",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatAzureOpenAi",
+      "typeVersion": 1,
+      "position": [
+        1600,
+        1280
+      ],
+      "id": "62f02a97-7b24-469e-b9e5-b03423912d9a",
+      "name": "Azure OpenAI Chat Model",
+      "credentials": {
+        "azureOpenAiApi": {
+          "id": "x5lZM9gfKe7o6JtL",
+          "name": "Azure Open AI account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "content": " Explanation\n\nCheck Text is used to validate content against rules or policies and determine whether it should be allowed.\nSanitize Text is used to clean or remove unsafe content before passing it to downstream systems such as AI agents, databases, or APIs.\n\nEasy One-Liner\nCheck Text = Detect bad content\nSanitize Text = Remove bad content\n\nThis is usually the simplest and clearest way to explain it during an n8n discussion.",
+        "height": 256,
+        "width": 896
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        -816,
+        160
+      ],
+      "id": "b5252e0d-8ab0-4b1c-af83-b474f920b2dd",
+      "name": "Sticky Note2"
+    },
+    {
+      "parameters": {
+        "content": "What are Guardrails?\n\nGuardrails protect workflows from:\n\nInvalid input\nSecurity issues\nHarmful content\nUnexpected behavior",
+        "width": 688
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        -688,
+        -64
+      ],
+      "id": "8ea13e4f-269a-4621-9565-f861a328d2ac",
+      "name": "Sticky Note8"
+    }
+  ],
+  "connections": {
+    "Edit Fields": {
+      "main": [
+        [
+          {
+            "node": "Split Out",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Split Out": {
+      "main": [
+        [
+          {
+            "node": "Keywords",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Edit Fields2": {
+      "main": [
+        [
+          {
+            "node": "Split Out2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Split Out2": {
+      "main": [
+        [
+          {
+            "node": "NSFW",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Edit Fields3": {
+      "main": [
+        [
+          {
+            "node": "Split Out3",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Split Out3": {
+      "main": [
+        [
+          {
+            "node": "PII",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Edit Fields4": {
+      "main": [
+        [
+          {
+            "node": "Split Out4",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Split Out4": {
+      "main": [
+        [
+          {
+            "node": "Secret Keys",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Edit Fields5": {
+      "main": [
+        [
+          {
+            "node": "Split Out5",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Split Out5": {
+      "main": [
+        [
+          {
+            "node": "Topical Alignment",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Edit Fields6": {
+      "main": [
+        [
+          {
+            "node": "Split Out6",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Split Out6": {
+      "main": [
+        [
+          {
+            "node": "URLs",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Edit Fields7": {
+      "main": [
+        [
+          {
+            "node": "Sanitize PII",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Edit Fields8": {
+      "main": [
+        [
+          {
+            "node": "Sanitize Keys",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Edit Fields9": {
+      "main": [
+        [
+          {
+            "node": "Sanitize URLs",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Azure OpenAI Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "NSFW",
+            "type": "ai_languageModel",
+            "index": 0
+          },
+          {
+            "node": "PII",
+            "type": "ai_languageModel",
+            "index": 0
+          },
+          {
+            "node": "Secret Keys",
+            "type": "ai_languageModel",
+            "index": 0
+          },
+          {
+            "node": "Topical Alignment",
+            "type": "ai_languageModel",
+            "index": 0
+          },
+          {
+            "node": "URLs",
+            "type": "ai_languageModel",
+            "index": 0
+          },
+          {
+            "node": "Keywords",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "When clicking ‘Execute workflow’": {
+      "main": [
+        [
+          {
+            "node": "Edit Fields5",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "PII": {
+      "main": [
+        []
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate",
+    "availableInMCP": false
+  },
+  "staticData": null,
+  "meta": {
+    "templateCredsSetupCompleted": true
+  },
+  "pinData": {},
+  "versionId": "fc6a52ed-c9b0-46e0-a987-73c7f3ef480b",
+  "activeVersionId": null,
+  "triggerCount": 0,
+  "shared": [
+    {
+      "updatedAt": "2026-06-09T09:29:14.157Z",
+      "createdAt": "2026-06-09T09:29:14.157Z",
+      "role": "workflow:owner",
+      "workflowId": "3KGQ1IsZbWGlhumk",
+      "projectId": "R2OGQRrWYLraDwSj"
+    }
+  ],
+  "activeVersion": null,
+  "tags": []
+}
