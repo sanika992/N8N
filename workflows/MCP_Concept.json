@@ -1,0 +1,206 @@
+{
+  "updatedAt": "2026-05-26T10:28:35.122Z",
+  "createdAt": "2026-05-26T10:28:11.812Z",
+  "id": "RCBme95cDNrUxUC4",
+  "name": "MCP_Concept",
+  "active": false,
+  "isArchived": false,
+  "nodes": [
+    {
+      "parameters": {},
+      "id": "a4cd0368-45a9-47a4-b78d-b576e36e6477",
+      "name": "Manual Trigger",
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [
+        64,
+        224
+      ]
+    },
+    {
+      "parameters": {
+        "content": "# MCP (Model Context Protocol) Demo Workflow\n\nThis workflow is designed to explain MCP concepts in a simple way inside n8n.\n\nFlow:\n1. Manual Trigger starts the workflow.\n2. User Query node simulates user input.\n3. MCP Client Concept node explains how MCP communicates.\n4. Tool Response node simulates a response from an MCP Server.\n5. Final Output node formats the result.\n\nYou can use this workflow to explain:\n- MCP Client\n- MCP Server\n- Tools\n- Context Sharing\n- AI Agent Communication"
+      },
+      "id": "1a20e5a9-14d8-49f0-93b0-11b300d6ec03",
+      "name": "Introduction Note",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        0,
+        0
+      ]
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "id": "7cb16115-252e-44fc-94f2-742e2cd3d163",
+      "name": "User Query",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3,
+      "position": [
+        304,
+        224
+      ]
+    },
+    {
+      "parameters": {
+        "content": "## User Query Node\n\nThis node simulates the request sent by a user or AI Agent.\n\nExample:\n\"Get customer order details\"\n\nIn MCP architecture:\n- AI Agent = Client\n- External System = MCP Server"
+      },
+      "id": "f77d72b4-3cd1-494e-8684-2be375c11c83",
+      "name": "User Query Note",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        240,
+        0
+      ]
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "id": "fdb2b079-37e4-4db1-8347-85dfd6d55c82",
+      "name": "MCP Client Concept",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3,
+      "position": [
+        608,
+        224
+      ]
+    },
+    {
+      "parameters": {
+        "content": "## MCP Client Concept\n\nThis node represents the MCP Client.\n\nResponsibilities:\n- Sends requests\n- Uses tools\n- Shares context\n- Communicates with MCP Servers\n\nExample Tool:\nfetch_order_tool"
+      },
+      "id": "a53f77d2-89c6-4637-88a2-7b73a47c54a1",
+      "name": "MCP Client Note",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        544,
+        0
+      ]
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "id": "4c75aafa-d29b-4e44-88a5-68c773ea52e9",
+      "name": "Tool Response",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3,
+      "position": [
+        912,
+        224
+      ]
+    },
+    {
+      "parameters": {
+        "content": "## MCP Server / Tool Response\n\nThis node simulates the MCP Server response.\n\nThe MCP Server:\n- Executes tools\n- Fetches data\n- Returns structured responses\n\nExample:\nOrder #4582 found successfully"
+      },
+      "id": "28600830-14d1-42aa-91c2-bad5b3667028",
+      "name": "MCP Server Note",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        848,
+        0
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "return [{ json: { summary: `MCP Flow Completed Successfully`, userQuery: $json.user_query || 'N/A', toolUsed: $json.tool_name || 'N/A', response: $json.server_response || 'N/A' } }];"
+      },
+      "id": "6f0f92ad-cc62-4f87-ae3a-1ac6c4ec4bff",
+      "name": "Final Output",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1200,
+        224
+      ]
+    },
+    {
+      "parameters": {
+        "content": "## Final Output\n\nThis node combines the complete MCP communication flow.\n\nLearning Outcome:\n- Understand Client → Server communication\n- Understand tool calling\n- Understand structured responses\n- Understand AI Agent orchestration"
+      },
+      "id": "67ff4936-80be-49b4-99ef-02b359a11e84",
+      "name": "Final Note",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        1152,
+        0
+      ]
+    }
+  ],
+  "connections": {
+    "Manual Trigger": {
+      "main": [
+        [
+          {
+            "node": "User Query",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "User Query": {
+      "main": [
+        [
+          {
+            "node": "MCP Client Concept",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "MCP Client Concept": {
+      "main": [
+        [
+          {
+            "node": "Tool Response",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Tool Response": {
+      "main": [
+        [
+          {
+            "node": "Final Output",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate",
+    "availableInMCP": false
+  },
+  "staticData": null,
+  "meta": null,
+  "pinData": {},
+  "versionId": "660949df-4bef-498c-a7ac-9f15e5bb1582",
+  "activeVersionId": null,
+  "triggerCount": 0,
+  "shared": [
+    {
+      "updatedAt": "2026-05-26T10:28:11.830Z",
+      "createdAt": "2026-05-26T10:28:11.830Z",
+      "role": "workflow:owner",
+      "workflowId": "RCBme95cDNrUxUC4",
+      "projectId": "R2OGQRrWYLraDwSj"
+    }
+  ],
+  "activeVersion": null,
+  "tags": []
+}
