@@ -1,0 +1,616 @@
+{
+  "updatedAt": "2026-05-12T12:18:46.584Z",
+  "createdAt": "2026-05-11T12:32:12.013Z",
+  "id": "mAeSvc1MlWjwn1fo",
+  "name": "MCP WorkFlow",
+  "active": true,
+  "isArchived": false,
+  "nodes": [
+    {
+      "parameters": {
+        "public": true,
+        "availableInChat": true,
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.chatTrigger",
+      "typeVersion": 1.4,
+      "position": [
+        48,
+        96
+      ],
+      "id": "5c251f72-b82c-4088-90bb-bd541aefeaa3",
+      "name": "When chat message received",
+      "webhookId": "466ba85f-28b8-46bb-8596-1dc4c0732e1f"
+    },
+    {
+      "parameters": {
+        "model": "gpt-4.1-mini",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatAzureOpenAi",
+      "typeVersion": 1,
+      "position": [
+        160,
+        288
+      ],
+      "id": "d391eddf-4c61-4c0d-bc78-8e1af8e49b2a",
+      "name": "Azure OpenAI Chat Model",
+      "credentials": {
+        "azureOpenAiApi": {
+          "id": "x5lZM9gfKe7o6JtL",
+          "name": "Azure Open AI account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "={{ $json.chatInput }}",
+        "hasOutputParser": true,
+        "options": {
+          "systemMessage": "=You are a SAP assistant. Always respond in this JSON structure:\n{\n  \"action\": \"<ask_product | ask_status | call_mcp_1 | call_mcp_2 | done>\",\n  \"message\": \"<what to say to the user>\",\n  \"productNumber\": \"<only when collected>\",\n  \"statusCode\": \"<01 or 02, only when collected>\"\n}\n\nConversation flow:\n1. action=ask_product → message=\"Please enter the Product Number:\"\n2. action=ask_status  → message=\"Please enter the new CrossPlantStatus code: 01 or 02\"\n3. If statusCode is 01 → action=call_mcp_1\n4. If statusCode is 02 → action=call_mcp_2\n5. After tool call → action=done, message=\"Thank you\"\n\nRULES:\n- Always include action and message.\n- Include productNumber once collected, carry it forward in every response.\n- Include statusCode once collected.\n- Do NOT add any text outside the JSON object."
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 3.1,
+      "position": [
+        288,
+        96
+      ],
+      "id": "83de1251-60c4-4bb8-a131-656b6689111e",
+      "name": "AI Agent"
+    },
+    {
+      "parameters": {
+        "path": "=path12"
+      },
+      "type": "@n8n/n8n-nodes-langchain.mcpTrigger",
+      "typeVersion": 2,
+      "position": [
+        1376,
+        48
+      ],
+      "id": "034e41ea-30cf-4754-bba7-18154bcd5f93",
+      "name": "MCP Server Trigger",
+      "webhookId": "1bb46108-8b11-465e-96d9-5aff7bf24994",
+      "alwaysOutputData": false
+    },
+    {
+      "parameters": {
+        "content": "## CLIENT SIDE",
+        "height": 464,
+        "width": 832
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        0,
+        0
+      ],
+      "typeVersion": 1,
+      "id": "6783dfa7-fd32-426a-be95-341a46d9b336",
+      "name": "Sticky Note"
+    },
+    {
+      "parameters": {
+        "content": "## SERVER SIDE",
+        "height": 464,
+        "width": 720,
+        "color": 6
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        1168,
+        0
+      ],
+      "typeVersion": 1,
+      "id": "d22b7664-b9a8-46c3-ae56-9782c3a8acb2",
+      "name": "Sticky Note1"
+    },
+    {
+      "parameters": {},
+      "type": "@n8n/n8n-nodes-langchain.memoryBufferWindow",
+      "typeVersion": 1.3,
+      "position": [
+        336,
+        288
+      ],
+      "id": "7003f828-4348-475c-80ba-ebc95b1772a9",
+      "name": "Simple Memory"
+    },
+    {
+      "parameters": {
+        "description": "Calling when the User select 01 status code",
+        "workflowId": {
+          "__rl": true,
+          "value": "VFnBI8GW5LjvlvaI",
+          "mode": "list",
+          "cachedResultUrl": "/workflow/VFnBI8GW5LjvlvaI",
+          "cachedResultName": "server1"
+        },
+        "workflowInputs": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "messages": "={{$fromAI ('productNumber','string') }}  "
+          },
+          "matchingColumns": [
+            "messages"
+          ],
+          "schema": [
+            {
+              "id": "messages",
+              "displayName": "messages",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.toolWorkflow",
+      "typeVersion": 2.2,
+      "position": [
+        1392,
+        256
+      ],
+      "id": "539617eb-f593-4112-be59-5c5bb72990e0",
+      "name": "SUB MCP CALL 1"
+    },
+    {
+      "parameters": {
+        "description": "Calling when the User select 02 status code",
+        "workflowId": {
+          "__rl": true,
+          "value": "H6uz1V4GtpI5UcaP",
+          "mode": "list",
+          "cachedResultUrl": "/workflow/H6uz1V4GtpI5UcaP",
+          "cachedResultName": "server2"
+        },
+        "workflowInputs": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "messages": "={{$fromAI ('productNumber','string') }}\n "
+          },
+          "matchingColumns": [
+            "messages"
+          ],
+          "schema": [
+            {
+              "id": "messages",
+              "displayName": "messages",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.toolWorkflow",
+      "typeVersion": 2.2,
+      "position": [
+        1664,
+        256
+      ],
+      "id": "3229a70e-8485-4ff0-b0ea-9b7f32d2343b",
+      "name": "SUB MCP CALL 2"
+    },
+    {
+      "parameters": {
+        "endpointUrl": "http://localhost:5678/mcp-test/path12",
+        "authentication": "bearerAuth",
+        "include": "selected",
+        "includeTools": [
+          "SUB_MCP_CALL_2",
+          "SUB_MCP_CALL_1"
+        ],
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.mcpClientTool",
+      "typeVersion": 1.2,
+      "position": [
+        496,
+        288
+      ],
+      "id": "14338525-9edc-4324-b0b5-d555f16084b2",
+      "name": "MCP Call Client",
+      "credentials": {
+        "httpBearerAuth": {
+          "id": "j6euxTTzH40YvN1K",
+          "name": "Bearer Auth account"
+        }
+      }
+    }
+  ],
+  "connections": {
+    "When chat message received": {
+      "main": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Azure OpenAI Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Simple Memory": {
+      "ai_memory": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_memory",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "SUB MCP CALL 1": {
+      "ai_tool": [
+        [
+          {
+            "node": "MCP Server Trigger",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "SUB MCP CALL 2": {
+      "ai_tool": [
+        [
+          {
+            "node": "MCP Server Trigger",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "MCP Call Client": {
+      "ai_tool": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate",
+    "availableInMCP": false
+  },
+  "staticData": null,
+  "meta": {
+    "templateCredsSetupCompleted": true
+  },
+  "pinData": {},
+  "versionId": "357501d2-1599-4816-8ffc-730e65cbd2e6",
+  "activeVersionId": "ae9ca5ce-d418-4be7-ad65-1b09bd78ecda",
+  "triggerCount": 2,
+  "shared": [
+    {
+      "updatedAt": "2026-05-11T12:32:12.030Z",
+      "createdAt": "2026-05-11T12:32:12.030Z",
+      "role": "workflow:owner",
+      "workflowId": "mAeSvc1MlWjwn1fo",
+      "projectId": "R2OGQRrWYLraDwSj"
+    }
+  ],
+  "activeVersion": {
+    "updatedAt": "2026-05-12T12:10:15.000Z",
+    "createdAt": "2026-05-12T12:10:06.035Z",
+    "versionId": "ae9ca5ce-d418-4be7-ad65-1b09bd78ecda",
+    "workflowId": "mAeSvc1MlWjwn1fo",
+    "nodes": [
+      {
+        "parameters": {
+          "public": true,
+          "availableInChat": true,
+          "options": {}
+        },
+        "type": "@n8n/n8n-nodes-langchain.chatTrigger",
+        "typeVersion": 1.4,
+        "position": [
+          48,
+          96
+        ],
+        "id": "5c251f72-b82c-4088-90bb-bd541aefeaa3",
+        "name": "When chat message received",
+        "webhookId": "466ba85f-28b8-46bb-8596-1dc4c0732e1f"
+      },
+      {
+        "parameters": {
+          "model": "gpt-4.1-mini",
+          "options": {}
+        },
+        "type": "@n8n/n8n-nodes-langchain.lmChatAzureOpenAi",
+        "typeVersion": 1,
+        "position": [
+          160,
+          288
+        ],
+        "id": "d391eddf-4c61-4c0d-bc78-8e1af8e49b2a",
+        "name": "Azure OpenAI Chat Model",
+        "credentials": {
+          "azureOpenAiApi": {
+            "id": "x5lZM9gfKe7o6JtL",
+            "name": "Azure Open AI account"
+          }
+        }
+      },
+      {
+        "parameters": {
+          "promptType": "define",
+          "text": "={{ $json.chatInput }}",
+          "hasOutputParser": true,
+          "options": {
+            "systemMessage": "=You are a SAP assistant. Always respond in this JSON structure:\n{\n  \"action\": \"<ask_product | ask_status | call_mcp_1 | call_mcp_2 | done>\",\n  \"message\": \"<what to say to the user>\",\n  \"productNumber\": \"<only when collected>\",\n  \"statusCode\": \"<01 or 02, only when collected>\"\n}\n\nConversation flow:\n1. action=ask_product → message=\"Please enter the Product Number:\"\n2. action=ask_status  → message=\"Please enter the new CrossPlantStatus code: 01 or 02\"\n3. If statusCode is 01 → action=call_mcp_1\n4. If statusCode is 02 → action=call_mcp_2\n5. After tool call → action=done, message=\"Thank you\"\n\nRULES:\n- Always include action and message.\n- Include productNumber once collected, carry it forward in every response.\n- Include statusCode once collected.\n- Do NOT add any text outside the JSON object."
+          }
+        },
+        "type": "@n8n/n8n-nodes-langchain.agent",
+        "typeVersion": 3.1,
+        "position": [
+          288,
+          96
+        ],
+        "id": "83de1251-60c4-4bb8-a131-656b6689111e",
+        "name": "AI Agent"
+      },
+      {
+        "parameters": {
+          "path": "=path12"
+        },
+        "type": "@n8n/n8n-nodes-langchain.mcpTrigger",
+        "typeVersion": 2,
+        "position": [
+          1376,
+          48
+        ],
+        "id": "034e41ea-30cf-4754-bba7-18154bcd5f93",
+        "name": "MCP Server Trigger",
+        "webhookId": "1bb46108-8b11-465e-96d9-5aff7bf24994",
+        "alwaysOutputData": false
+      },
+      {
+        "parameters": {
+          "content": "## CLIENT SIDE",
+          "height": 464,
+          "width": 832
+        },
+        "type": "n8n-nodes-base.stickyNote",
+        "position": [
+          0,
+          0
+        ],
+        "typeVersion": 1,
+        "id": "6783dfa7-fd32-426a-be95-341a46d9b336",
+        "name": "Sticky Note"
+      },
+      {
+        "parameters": {
+          "content": "## SERVER SIDE",
+          "height": 464,
+          "width": 720,
+          "color": 6
+        },
+        "type": "n8n-nodes-base.stickyNote",
+        "position": [
+          1168,
+          0
+        ],
+        "typeVersion": 1,
+        "id": "d22b7664-b9a8-46c3-ae56-9782c3a8acb2",
+        "name": "Sticky Note1"
+      },
+      {
+        "parameters": {},
+        "type": "@n8n/n8n-nodes-langchain.memoryBufferWindow",
+        "typeVersion": 1.3,
+        "position": [
+          336,
+          288
+        ],
+        "id": "7003f828-4348-475c-80ba-ebc95b1772a9",
+        "name": "Simple Memory"
+      },
+      {
+        "parameters": {
+          "description": "Calling when the User select 01 status code",
+          "workflowId": {
+            "__rl": true,
+            "value": "VFnBI8GW5LjvlvaI",
+            "mode": "list",
+            "cachedResultUrl": "/workflow/VFnBI8GW5LjvlvaI",
+            "cachedResultName": "server1"
+          },
+          "workflowInputs": {
+            "mappingMode": "defineBelow",
+            "value": {
+              "messages": "={{$fromAI ('productNumber','string') }}  "
+            },
+            "matchingColumns": [
+              "messages"
+            ],
+            "schema": [
+              {
+                "id": "messages",
+                "displayName": "messages",
+                "required": false,
+                "defaultMatch": false,
+                "display": true,
+                "canBeUsedToMatch": true
+              }
+            ],
+            "attemptToConvertTypes": false,
+            "convertFieldsToString": false
+          }
+        },
+        "type": "@n8n/n8n-nodes-langchain.toolWorkflow",
+        "typeVersion": 2.2,
+        "position": [
+          1392,
+          256
+        ],
+        "id": "539617eb-f593-4112-be59-5c5bb72990e0",
+        "name": "SUB MCP CALL 1"
+      },
+      {
+        "parameters": {
+          "description": "Calling when the User select 02 status code",
+          "workflowId": {
+            "__rl": true,
+            "value": "H6uz1V4GtpI5UcaP",
+            "mode": "list",
+            "cachedResultUrl": "/workflow/H6uz1V4GtpI5UcaP",
+            "cachedResultName": "server2"
+          },
+          "workflowInputs": {
+            "mappingMode": "defineBelow",
+            "value": {
+              "messages": "={{$fromAI ('productNumber','string') }}\n "
+            },
+            "matchingColumns": [
+              "messages"
+            ],
+            "schema": [
+              {
+                "id": "messages",
+                "displayName": "messages",
+                "required": false,
+                "defaultMatch": false,
+                "display": true,
+                "canBeUsedToMatch": true
+              }
+            ],
+            "attemptToConvertTypes": false,
+            "convertFieldsToString": false
+          }
+        },
+        "type": "@n8n/n8n-nodes-langchain.toolWorkflow",
+        "typeVersion": 2.2,
+        "position": [
+          1664,
+          256
+        ],
+        "id": "3229a70e-8485-4ff0-b0ea-9b7f32d2343b",
+        "name": "SUB MCP CALL 2"
+      },
+      {
+        "parameters": {
+          "endpointUrl": "http://localhost:5678/mcp-test/path12",
+          "authentication": "bearerAuth",
+          "include": "selected",
+          "includeTools": "={{ [\"SUB_MCP_CALL_2\",\"SUB_MCP_CALL_1\"] }}",
+          "options": {}
+        },
+        "type": "@n8n/n8n-nodes-langchain.mcpClientTool",
+        "typeVersion": 1.2,
+        "position": [
+          496,
+          288
+        ],
+        "id": "14338525-9edc-4324-b0b5-d555f16084b2",
+        "name": "MCP Call Client",
+        "credentials": {
+          "httpBearerAuth": {
+            "id": "j6euxTTzH40YvN1K",
+            "name": "Bearer Auth account"
+          }
+        }
+      }
+    ],
+    "connections": {
+      "When chat message received": {
+        "main": [
+          [
+            {
+              "node": "AI Agent",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Azure OpenAI Chat Model": {
+        "ai_languageModel": [
+          [
+            {
+              "node": "AI Agent",
+              "type": "ai_languageModel",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Simple Memory": {
+        "ai_memory": [
+          [
+            {
+              "node": "AI Agent",
+              "type": "ai_memory",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "SUB MCP CALL 1": {
+        "ai_tool": [
+          [
+            {
+              "node": "MCP Server Trigger",
+              "type": "ai_tool",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "SUB MCP CALL 2": {
+        "ai_tool": [
+          [
+            {
+              "node": "MCP Server Trigger",
+              "type": "ai_tool",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "MCP Call Client": {
+        "ai_tool": [
+          [
+            {
+              "node": "AI Agent",
+              "type": "ai_tool",
+              "index": 0
+            }
+          ]
+        ]
+      }
+    },
+    "authors": "Sanika Shinde",
+    "name": "Version ae9ca5ce",
+    "description": "",
+    "autosaved": true
+  },
+  "tags": []
+}
