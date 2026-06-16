@@ -1,0 +1,114 @@
+{
+  "updatedAt": "2026-06-08T11:56:52.132Z",
+  "createdAt": "2026-06-08T11:25:49.124Z",
+  "id": "nJ1gdlaLVlAfpGWz",
+  "name": "Redis",
+  "active": false,
+  "isArchived": false,
+  "nodes": [
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.redis",
+      "typeVersion": 1,
+      "position": [
+        832,
+        128
+      ],
+      "id": "7c48b038-c6c4-435f-86fe-418fe4406ac6",
+      "name": "Redis",
+      "credentials": {
+        "redis": {
+          "id": "SyhyHTG4eh5sP5Py",
+          "name": "Redis account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "// Loop over input items and add a new field called 'myNewField' to the JSON of each one\nfor (const item of $input.all()) {\n  item.json.myNewField = 1;\n}\n\nreturn $input.all();"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1040,
+        128
+      ],
+      "id": "9397bd8c-b712-4ab8-bc1d-b611ce9a72cc",
+      "name": "Code in JavaScript"
+    },
+    {
+      "parameters": {
+        "content": "## Redis Node \nRedis (Remote Dictionary Server) is an open-source, in-memory data store used as a: Cache (to speed up applications), Database, Message broker.\n\nRedis is a super-fast storage system that helps applications run quicker by keeping frequently used data in memory.",
+        "height": 608,
+        "width": 864
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        512,
+        -96
+      ],
+      "typeVersion": 1,
+      "id": "7b5d05c0-0498-4be9-baae-fab67d1e59c0",
+      "name": "Sticky Note"
+    },
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [
+        608,
+        128
+      ],
+      "id": "b84b95d2-8130-4ab6-bb17-95e6b0e1a472",
+      "name": "When clicking ‘Execute workflow’"
+    }
+  ],
+  "connections": {
+    "Redis": {
+      "main": [
+        [
+          {
+            "node": "Code in JavaScript",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "When clicking ‘Execute workflow’": {
+      "main": [
+        [
+          {
+            "node": "Redis",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate",
+    "availableInMCP": false
+  },
+  "staticData": null,
+  "meta": {
+    "templateCredsSetupCompleted": true
+  },
+  "pinData": {},
+  "versionId": "e78bc54d-eaa0-46d1-b6e9-357c6d348f31",
+  "activeVersionId": null,
+  "triggerCount": 0,
+  "shared": [
+    {
+      "updatedAt": "2026-06-08T11:25:49.129Z",
+      "createdAt": "2026-06-08T11:25:49.129Z",
+      "role": "workflow:owner",
+      "workflowId": "nJ1gdlaLVlAfpGWz",
+      "projectId": "R2OGQRrWYLraDwSj"
+    }
+  ],
+  "activeVersion": null,
+  "tags": []
+}
