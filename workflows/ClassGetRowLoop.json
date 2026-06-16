@@ -1,0 +1,180 @@
+{
+  "updatedAt": "2026-05-08T09:39:38.994Z",
+  "createdAt": "2026-05-04T09:59:22.856Z",
+  "id": "h41E6Tej9l31CWIL",
+  "name": "ClassGetRowLoop",
+  "active": false,
+  "isArchived": false,
+  "nodes": [
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [
+        0,
+        0
+      ],
+      "id": "6c069f53-02bb-4948-a6cb-fb4691e9d737",
+      "name": "When clicking ‘Execute workflow’"
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "n8n-nodes-base.splitInBatches",
+      "typeVersion": 3,
+      "position": [
+        624,
+        0
+      ],
+      "id": "2d67fba9-c723-4d61-a48c-12842b36b23b",
+      "name": "Loop Over Items"
+    },
+    {
+      "parameters": {
+        "jsCode": "const allRows = $input.all();\n\nreturn [\n  {\n    json: {\n      status       : \"All Rows Extracted Successfully\",\n      totalFetched : allRows.length,\n      completedAt  : new Date().toISOString()\n    }\n  }\n];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        832,
+        -96
+      ],
+      "id": "3fbdc03b-845b-4045-b959-2ef4da6815ac",
+      "name": "Code in JavaScript2"
+    },
+    {
+      "parameters": {
+        "operation": "get",
+        "dataTableId": {
+          "__rl": true,
+          "value": "fDMrkHtsFQTa7BLL",
+          "mode": "list",
+          "cachedResultName": "ClassInfo",
+          "cachedResultUrl": "/projects/R2OGQRrWYLraDwSj/datatables/fDMrkHtsFQTa7BLL"
+        },
+        "filters": {
+          "conditions": [
+            {
+              "keyName": "Roll_no",
+              "keyValue": "={{ $json.roll_no }}"
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.dataTable",
+      "typeVersion": 1.1,
+      "position": [
+        832,
+        80
+      ],
+      "id": "da2d95ff-ad79-484e-9bcd-2ea69cd12263",
+      "name": "Get row(s)"
+    },
+    {
+      "parameters": {
+        "jsCode": "// Loop over input items and add a new field called 'myNewField' to the JSON of each one\n// for (const item of $input.all()) {\n//   item.json.myNewField = 1;\n// }\n// Return roll numbers as array which is only one item\n// return { \"role_no\" : [ 1 , 2 , 3 ] };\n\n//Return each roll number as individual item directly\nreturn [\n  { json: { roll_no: 1 } },\n  { json: { roll_no: 2 } },\n  { json: { roll_no: 3 } },\n  { json: { roll_no: 4 } },\n  { json: { roll_no: 5 } },\n  { json: { roll_no: 6 } },\n  { json: { roll_no: 7 } },\n  { json: { roll_no: 8 } }\n];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        288,
+        0
+      ],
+      "id": "19892c51-9eb7-4f46-bc7a-1c401134c443",
+      "name": "Roll Number List"
+    },
+    {
+      "parameters": {
+        "content": "Flow \n\n[Manual Trigger]\n      │\n[ONE Code Node]\n Returns 4 individual items\n {roll_no:1}, {roll_no:2}\n {roll_no:3}, {roll_no:4}\n      │\n[Loop Over Items]  ◄──────────────────┐\n      │                                │\n      ├── [Loop Branch]                │\n      │         │                      │\n      │  [Data Table - Get Row]        │\n      │   Table : ClassInfo            │\n      │   Row ID: {{$json.roll_no}}    │\n      │         │                      │\n      │         └────────────────────► ┘\n      │         (repeats 4 times)\n      │\n      └── [Done Branch]\n                │\n        [Final Code Node]\n        \"All rows extracted\"\n\n\"When Execute is clicked the Code node returns 4 roll numbers as 4 separate items. The Loop Over Items node picks each roll number one by one and passes it to the Data Table Get Row node which fetches that specific student record from the ClassInfo table. This repeats 4 times until all students are fetched. Finally the Done branch triggers a completion summary.\"\n",
+        "height": 544,
+        "width": 400
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        -592,
+        -128
+      ],
+      "id": "d5e20089-a0fd-4ed0-9841-f4268136b897",
+      "name": "Sticky Note"
+    }
+  ],
+  "connections": {
+    "When clicking ‘Execute workflow’": {
+      "main": [
+        [
+          {
+            "node": "Roll Number List",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Loop Over Items": {
+      "main": [
+        [
+          {
+            "node": "Code in JavaScript2",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Get row(s)",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get row(s)": {
+      "main": [
+        [
+          {
+            "node": "Loop Over Items",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Roll Number List": {
+      "main": [
+        [
+          {
+            "node": "Loop Over Items",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate",
+    "availableInMCP": false
+  },
+  "staticData": null,
+  "meta": {
+    "templateCredsSetupCompleted": true
+  },
+  "pinData": {},
+  "versionId": "7ee6f339-d10d-4d6e-a1ac-3401a6c20922",
+  "activeVersionId": null,
+  "triggerCount": 0,
+  "shared": [
+    {
+      "updatedAt": "2026-05-04T09:59:22.861Z",
+      "createdAt": "2026-05-04T09:59:22.861Z",
+      "role": "workflow:owner",
+      "workflowId": "h41E6Tej9l31CWIL",
+      "projectId": "R2OGQRrWYLraDwSj"
+    }
+  ],
+  "activeVersion": null,
+  "tags": []
+}
